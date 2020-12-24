@@ -12,6 +12,20 @@ GNU/Linux：hardware->kernel->shell->App
 
 kill -9 xx结束，也可以用Ctrl+c结束进程。
 
+### 网络通信工具
+
+ping hostname/ip,发送ICMP；
+
+telnet hostname/ip,登录远程计算机；
+
+tcpdump,分析网络中传运的数据包；
+
+netstat,检验各端口的情况；
+
+lsof -i, list open file.
+
+（2019.7.17）
+
 ## 2 常用命令
 
 ### rm -rf xx
@@ -59,6 +73,40 @@ root:root 表示 组：名。
 ### ls -l|wc -l
 
 表示当前目录下的文件数。
+
+### zip -r obeject source
+
+-r表示压缩文件夹，否则data为0；
+
+解压用unzip。
+
+### ln -s xx/tmp xx/dir/linktemp
+
+link,s表示软连接，即创建快捷方式。
+
+### chmod 777 filename
+
+更改文件相应权限，777为所有权限。
+
+### ls -a
+
+查看隐藏文件。
+
+### touch filename
+
+文件不存在时创建一个空文件。
+
+### who am i
+
+查看自己的用户名。
+
+### alias s="ls;ps aux"
+
+当前shell下重命名linux命令。
+
+### echo $$
+
+打印显示相关的值，如当前进程号。
 
 ## 3 linux执行命令结果输出到文件
 
@@ -111,6 +159,8 @@ gdb可直接执行程序文件，并可手动设参，如
 | x/\<n/f/u> \<addr> | 比如x/16db 0xXX， 查看该地址16个单位，以十进制单字节显示的值 |
 | l                  | 查看代码.c文件（注意编译时机差异.c文件与.o文件不一致情况）   |
 
+（2019.6.10）
+
 ## 5 GCC
 
 gcc编译的四个阶段：
@@ -141,6 +191,8 @@ gcc最基本的用法就是：gcc [options] [filenames] => gcc test.c （简洁�
 | -Wall     | 编译后显示所有警告                |
 |           |                                   |
 
+（2019.7.1）
+
 ## 6 ctags
 
 ctags是个程序，3条命令：
@@ -152,6 +204,8 @@ ctags是个程序，3条命令：
 | Ctrl + T | 跳出来                                 |
 
 在Linux下可以用vim + ctags组合来写程序。
+
+（2019.6.26）
 
 ## 7 vi/vim
 
@@ -193,13 +247,141 @@ ctrl+u表示先后滚动半屏；
 
 ## 8  shell
 
+shell 命令行解释器，本身就是一个c语言写的程序。
+
+分交互式shell，linux命令行界面本身就是一个shell，即用户登录系统就启动了一个bash，也可以输入一个bash再启动一个交互shell，bash->Bourne Again shell.
+
+非交互式shell，如常见的shell script脚本，注意句首#!/bin/bash 句末不加分号。
+
+### 变量
+
+系统变量，如$HOME,$PATH...
+
+自定义变量
+
+可以用set命令显示所有变量
+
+基本语法为 变量=值 **（中间不能有空格）**
+
+撤销为 unset 变量
+
+readonly 变量
+
+将命令的返回值赋给变量，例如 
+
+```
+A=`ls`
+A=$(ls)
+```
+
+### 设置环境变量
+
+环境变量在当前shell进程及子进程中可用，子进程可以理解为一份拷贝，从而增删对父进程无影响。程序可直接调用环境变量。
+
+修改/etc/profile文件，可永久性修改环境变量；
+
+直接使用export添加，只对当前shell及子进程有效；
+
+### 位置参数变量
+
+| $n    | test.sh 1 2 3        |
+| ----- | -------------------- |
+| $0    | 代表命令本身         |
+| $1~$9 | 代表输入参数         |
+| $*    | 全部位置参数（整体） |
+| $@    | 全部位置参数（分别） |
+| #     | 参数个数             |
+
+### 预定义变量
+
+|      |                                      |
+| ---- | ------------------------------------ |
+| $$   | 当前进程号                           |
+| $!   | 后台最后一个进程                     |
+| $?   | 上一条命令的返回值，成功为0，失败为1 |
+
+### 运算式
+
+echo $[5+6] 或 echo $((5+6))
+
+### 判断式
+
+```
+if [ $1 -lt 5 ]  /*if与[之间必须要有空格，括号内也要有空格，lt=less than*/
+then
+  echo ...
+elif [ $1 = string ] /*=与!=只能比较字符串*/
+then
+  echo...
+fi
+```
+
+也可以用if [ $1 -lt 5 ];then 的形式。
+
+### 流程控制
+
+```
+for i in "$*"
+do
+  ...
+done
+或者
+for((j=0;j<5;j++))
+do
+  ...
+done
+```
+
+另外，while与case也可以。
+
+### 函数
+
+系统函数，如basename,dirname...
+
+自定义函数，function(){ ... },任意参数用$1~$9，函数名用$0表示。
+
+### 举例
+
+以下为一个将当前目录下的压缩文件解压后批量重命名的shell script.
+
+```
+#!/bin/bash
+
+FILE=`ls`
+
+for i in $FILE
+do
+  if [ $i != test.sh ];then
+  echo $i
+  unzip -l $i /*-l：显示压缩文件内所包含的文件；*/
+  fi
+done
+
+rm *.zip
+
+for i in $FILE
+do
+  NN=$(echo $i | sed 's/_/-/g')
+  echo $NN
+  mv $i $NN
+done
+
+:<<!
+mv $i vvv
+!
+```
+
+（2019.9.3）
+
 ## 9  shell脚本的运行问题
 
-## 10  Makefile
+## 10 Makefile
 
 ## 11 Linux文本处理三剑客
 
-## 12 Linux IPC通信机制
+## 12 Linux 进程间通信机制
+
+主要有共享内存，消息队列，信号灯，管道，套接字（socket）等进程通信间机制。
 
 ### 管道
 
