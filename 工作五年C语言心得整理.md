@@ -300,6 +300,20 @@ gcc -o xx.s -S xx.c -m32
 
 （2019.9.19）
 
+## 9 内存溢出问题
+
+例如如下函数：
+
+```
+strcpy(char *dest,const char *src,int n);
+```
+
+当n>dest串长度时，dest栈空间溢出产生崩溃异常，即出bug，堆栈缓冲区溢出有时可以被系统检测到以产生终止该过程的segmentation fault。
+
+C/C++中容易造成缓冲区溢出的函数：strcpy(),gets(),strcat()...数组下标越界，或打印字符串时无终止符。许多病毒就是利用缓冲区溢出漏洞对操作系统进行攻击的。
+
+（2019.6.17）
+
 ## 补充1 BCD码
 
 BCD：Binary-Coded Decimal，二进码十进数。
@@ -316,6 +330,6 @@ BCD：Binary-Coded Decimal，二进码十进数。
 
 Json：JavaScript Object Notation.一种轻量的数据交换格式。
 
-cJson：以标准的C写的Json解释器，由cJson.h,cJson.c组成。
+cJson：以标准的C写的Json解释器，由cJson.h,cJson.c组成。可以将文本形式的Json解析成链表形式，之后用户可以自定义函数将链表形式转化成结构体形式。
 
 Json为文本格式，易于人阅读及机器解析生成，功能与XML类似。
