@@ -179,8 +179,10 @@ gcc编译的四个阶段：
 之前微码生成静态库塞到驱动，驱动提供动态库给应用层，比如
 
 ```
-gcc -shared -fPIC -o libhello.so hello.c /*-fPIC参数声明链接库的代码段是可以共享的，-shared参数声明编译为共享库*/
-gcc main.c -L. -lhello /*-L.告诉编译器在当前目录中查找库文件*/
+gcc -shared -fPIC -o libhello.so hello.c 
+/*-fPIC参数声明链接库的代码段是可以共享的，-shared参数声明编译为共享库*/
+gcc main.c -L. -lhello 
+/*-L.告诉编译器在当前目录中查找库文件*/
 ```
 
 gcc最基本的用法就是：gcc [options] [filenames] => gcc test.c （简洁不！）。
@@ -291,6 +293,7 @@ A=$(ls)
 | $*    | 全部位置参数（整体） |
 | $@    | 全部位置参数（分别） |
 | #     | 参数个数             |
+| ${#n} | 入参长度             |
 
 ### 预定义变量
 
@@ -377,13 +380,99 @@ mv $i vvv
 
 ## 10 Makefile
 
-## 11 Linux文本处理三剑客
+```
+CC = gcc
+
+CFLAGS = -Wall
+
+HPATH = ../               /*不要定义成系统变量PATH*/
+
+INCLUDE = -I$(HPATH)Times -I$(HPATH)APL/head  -I$(HPATH)MAST/head  -I$(HPATH)head
+
+SRCS = $(wildcard *.c)
+
+OBJS = $(patsubst %c,%o,$(SRCS))
+
+.PGHONY:clean
+	
+$(OBJS):$(SRCS)       /*左记会重复编译，应当使用 %.o:%.c */
+	$(CC) -c $^ $(INCLUDE) $(CFLAGS)
+	
+clean:
+	rm -f $(OBJS) $(TARGET)
+```
+
+## 11 Linux 文本处理三剑客
 
 ## 12 Linux 进程间通信机制
 
-主要有共享内存，消息队列，信号灯，管道，套接字（socket）等进程通信间机制。
+主要有共享内存，消息队列，信号灯，管道，套接字（socket）等5种进程通信间机制。
 
-### 管道
+### IPC
+
+IPC包括共享内存（share memory）,消息队列（message queue）,信号量（semaphore)。系统为IPC提供了一个统一系统调用ipc()，内核实现是sys.ipc()。
+
+相关命令有
+
+```
+ipcs [-a|-m|-q|-s]  /*ipc show all/memory/queue/semaphore */
+ipcrm [-q id]       /*ipc remove,以msgid删除队列消息 */
+ipcs -l             /*可以查看系统允许最大的信号量集，当出现'No space left on device'问题时*/
+```
+
+### Share Memory
+
+在多进程运行的设备上，进程之间相互通信，每个进程起来，初始化时就需要去attach其它进程的共享内存块或者建立本进程的共享内存块。比如某个程序的单体环境测试过程中，测试进程启动，因为其他进程提供的library的缺乏，需模拟函数库，模拟过程如下：
+
+1.调用getkey取得用户uid来设置key；（如此，可以保证多个测试人员启动进程时共享内存不冲突）
+
+2.调用shmget取得相应共享内存，存在则取得，不存在则新建；
+
+3.调用shmat，将共享内存映射到当前进程；（从进程虚拟地址来看，共享内存应该位于堆栈之间的中间区域，至于实际地址就不存在比较意义，零碎分布也有可能）
+
+4.调用fopen打开本地模拟数据文件；
+
+5.调用fgets取用本地模拟数据文件中数据与临时变量；
+
+5.调用str2den将临时变量中的数据串变成整型变量并存放于共享内存；
+
+6.程序结束时，调用shmdt，使进程detach共享内存。
+
+另外，注意_errno函数，使用系统调用函数或库函数时，出错时会被调用，如errno17表示File exists。
+
+### Message Queue
+
+消息队列函数由msgget、msgctl、msgsnd、msgrcv四个函数组成。
+
+在某个程序的单体环境构建过程中，可以自写工具程序用msgsnd发送消息队列到测试程序中，用msgrcv接受从而完成相关送受信测试，而msgget则用于发送接受之前的id取得。
+
+|        |                     |
+| ------ | ------------------- |
+| msgget | 取msgid，没有则新建 |
+| msgsnd | 发送队列消息        |
+| msgrcv | 接受队列消息        |
+
+### Semaphore
+
+信号量实际上是个计数器，用于多进程之间的同步与排他操作。
+
+注意与mutex互斥锁的区别：
+
+1.Semaphore是一件可以容纳N人的房间，如果人不满就可以进去，如果人满了，就要等待有人出来。对于N=1的情况，称为binary semaphore。一般的用法是，用于限制对于某一资源的同时访问；
+
+2.Mutex是一把钥匙，一个人拿了就可进入一个房间，出来的时候把钥匙交给队列的第一个。一般的用法是用于串行化对critical section代码的访问，保证这段代码不会被并行的运行。
+
+对于Binary semaphore与Mutex，这两者之间就存在了很多相似之处，的系统中Binary semaphore与Mutex是没有差异的。
+
+|        |                                            |
+| ------ | ------------------------------------------ |
+| semget | 既存信号量id取得或新建                     |
+| semctl | 根据入参不同，可设定初期值，亦可删除信号量 |
+| semop  | 进行上锁解锁操作，用来同步或者排他         |
+
+注意以上函数不是标准函数，位于<sys/sem.h>.
+
+### Pipe
 
 只适合父子进程间单向通信。如把两个命令连接起来
 
@@ -391,4 +480,132 @@ mv $i vvv
 ls -l | grep "4月"   /* 查找当前目录下4月份修改的文件 */
 ```
 
-## 13 常用字符集
+### Socket
+
+面向网络的进程间通信方式，比如：tcp,udp,http等。（大概两个QQ间聊天）
+
+(2020.3.3)
+
+## 13 Linux 线程相关函数库pthread
+
+### Linux pthread线程库历史
+
+1.Linux2.6之前不知道线程这个概念，自然不支持；
+
+2.Linux2.6之后，没法去操作内核函数起线程，便开发了pthread函数库用创建进程来模拟线程；
+
+3.Redhat公司的NPTL项目用clone实现线程，接近内核级线程。
+
+### 线程启动及结束过程
+
+一般来说一个进程起来，先会进行进程间通信IPC的初始化工作，然后开始起线程。
+
+1.pthread_attr_init,线程相关属性的初始化；
+
+2.调用相关属性设置函数；
+
+3.pthread_cond_init,线程间通信初始化；
+
+4.pthread_mutex_init,互斥锁初始化；
+
+5.pthread_create,启动线程，一般多线程就用一个循环，而线程各个属性包括线程入口函数可以做成一个全局变量的结构体；
+
+6.pthread_exit，在当前线程结束线程，如果用其他线程结束该线程，则调用pthread_cancel；
+
+7.pthread_cleanup_push和pthread_cleanup_pop是成对的线程资源清理函数，线程异常终止时（如被pthread_cancel终止），锁资源等需要释放。
+
+### 线程间通信的实现
+
+线程间通信的确可以用全局变量，也可以动态申请，但如何实现？
+
+|                       |                         |
+| --------------------- | ----------------------- |
+| pthread_mutex_init    | 互斥锁初期化            |
+| pthread_cond_init     | 线程间送受信初期化      |
+| malloc                | 申请动态内存            |
+| pthread_mutex_lock    | 线程1上锁               |
+| memcpy                | 拷贝数据到动态内存      |
+| pthread_cond_signal   | 发送通信信号            |
+| pthread_mutex_unlock  | 线程1解锁               |
+| pthread_mutex_lock    | 线程2上锁               |
+| pthread_cond_wait     | 线程2解锁，处于挂起状态 |
+|                       | 收到通信信号，线程2上锁 |
+| memcpy                | 从动态内存拷贝数据      |
+| pthread_mutex_unlock  | 线程2解锁               |
+| pthread_mutex_destroy | 终止互斥锁              |
+| pthread_cond_destroy  | 终止送受信              |
+| free                  | 释放动态内存            |
+
+以上，理解pthread_cond_wait是关键，其中隐含了对互斥锁的操作。
+
+（2020.12.25）
+
+## 14 TTL脚本
+
+目前为止接触的工程，都是Linux系统的远程服务器，当前的用Tera Term远程连接，Winscp文件交互，而TTL脚本正是Tera Term自动化脚本，以下是一个单体测试运行GDB的TTL脚本：
+
+```
+;; IP
+HOSTADDR = '186.32.120.27' 
+;; 用户名密码
+USERNAME = 's_kouha' 
+PASSWORD = 's_kouha' 
+
+;;GDB断点
+BREAKPOINTS = 'main'
+;============================================= 
+COMMAND = HOSTADDR 
+strconcat COMMAND ':23 /nossh /T=1'
+
+;;连接1 
+connect COMMAND
+ 
+;;登录
+wait	'login:' 
+sendln 	USERNAME 
+wait	'Password:' 
+sendln	PASSWORD
+
+;;进入测试环境
+sendln 'cd /home/user/s_kouha'
+;;运行程序
+sendln './Process'
+timeout = 3
+wait 'Continuing'
+unlink
+
+;;连接2 
+connect COMMAND
+ 
+;;登录
+wait	'login:' 
+sendln 	USERNAME 
+wait	'Password:' 
+sendln	PASSWORD
+
+sendln 'cd /home/user/s_kouha'
+
+;;本地建立文件存放脚本运行log
+getenv 'USERNAME' username
+sprintf2 filename '%s\GDB.log' '\\10.2.5.10\UDBlog' username 
+logopen filename 1 1 0 0 1
+
+;;gdb attach测试程序
+temp = '"./IFAT"'
+sprintf2 cmd "pid=$(ps u | grep Process | awk '{if($11==%s){print $2}}')" temp
+sendln cmd
+sendln 'gdb attach $pid'
+
+timeout = 3
+wait 'pause'
+
+BP = "b "
+strconcat BP BREAKPOINTS
+sendln BP 
+sendln 'c'
+timeout = 3
+wait 'Continuing'
+unlink
+```
+
+## 15 常用字符集

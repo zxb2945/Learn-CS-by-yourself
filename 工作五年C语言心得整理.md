@@ -326,10 +326,24 @@ BCD：Binary-Coded Decimal，二进码十进数。
 
 （2019.4.2）
 
-## 补充2 cJson
+## 补充2  cJson
 
-Json：JavaScript Object Notation.一种轻量的数据交换格式。
+Json：JavaScript Object Notation.一种轻量的数据交换格式，格式如下：
 
-cJson：以标准的C写的Json解释器，由cJson.h,cJson.c组成。可以将文本形式的Json解析成链表形式，之后用户可以自定义函数将链表形式转化成结构体形式。
+```
+{				
+    "a": 123456,				
+    "b": true,				
+    "c": "aaabbbccc",				
+    "d": [1,2,3],				
+    "e": {				
+        "g": false,				
+        "h": ["1000", "2000"]				
+    },				
+    "f": null				
+}				
+```
+
+cJson：以标准的C写的Json解释器，由cJson.h,cJson.c组成。可以将文本形式的Json解析成链表形式，之后用户可以自定义函数将链表形式转化成结构体形式，反过来也可以将自定义结构体转化为链表形式最后打印成Json文本形式。
 
 Json为文本格式，易于人阅读及机器解析生成，功能与XML类似。
