@@ -70,10 +70,6 @@ root:root 表示 组：名。
 
 -N表示显示行号（grep就必须用n，所以参数大小写就比较不统一）。
 
-### ls -l|wc -l
-
-表示当前目录下的文件数。
-
 ### zip -r obeject source
 
 -r表示压缩文件夹，否则data为0；
@@ -88,9 +84,21 @@ link,s表示软连接，即创建快捷方式。
 
 更改文件相应权限，777为所有权限。
 
-### ls -a
+### ls 
 
-查看隐藏文件。
+|              |                        |
+| ------------ | ---------------------- |
+| ls -a        | 查看隐藏文件           |
+| ls -lh       | 按M显示大小            |
+| ls -l\|wc -l | 表示当前目录下的文件数 |
+
+### ps
+
+|         |                |
+| ------- | -------------- |
+| ps u    | 当前用户的进程 |
+| ps -aux |                |
+| ps -ef  |                |
 
 ### touch filename
 
@@ -107,6 +115,40 @@ link,s表示软连接，即创建快捷方式。
 ### echo $$
 
 打印显示相关的值，如当前进程号。
+
+### scp -p ./files/abc.log  192.168.214.188:/tmp/
+
+将当前服务器下某文件传输到另一台服务器上。
+
+### cat /proc/cpuinfo
+
+查看cpu型号
+
+### man ascii
+
+查看ASCII码。
+
+### du -sh *
+
+查看当前目录下各个文件占用空间大小。
+
+### tree -L n
+
+用tree只表示n层（不穷根到底）。
+
+### diff 1.log 2.log
+
+比较文件。
+
+### tail -f -n0 debug.log
+
+-f用语监视File文件的增长，-n表示从第N行位置读取指定文件。
+
+### rename File file *.txt
+
+将当前目录下所有txt文件名中的File字段替换成file。
+
+（2020.10.26）
 
 ## 3 linux执行命令结果输出到文件
 
@@ -284,6 +326,8 @@ A=$(ls)
 
 直接使用export添加，只对当前shell及子进程有效；
 
+另外，C程序中获取当前系统环境变量可调用getenv().
+
 ### 位置参数变量
 
 | $n    | test.sh 1 2 3        |
@@ -378,31 +422,142 @@ mv $i vvv
 
 ## 9  shell脚本的运行问题
 
+### "."与"./"执行的区别
+
+"./"相当于新建一个shell，不继承父进程非export类型变量；
+
+"."的方式类似于将脚本中的每一行指令逐条在当前shell中执行，与"./"环境变量的作用域有区别；
+
+"./"只能执行拥有权限的文件，"."则可以暂时提升。
+
+### #!/bin/bash
+
+shell脚本中第一行#!/bin/bash到底其不起作用？
+
+起作用，但使用指定解释器运行脚本时，第一行自动失效。
+
+|            |                                   |
+| ---------- | --------------------------------- |
+| bash解释器 | BourneAgain Shell                 |
+| sh解释器   | Bourne Shell，Unix标准默认的shell |
+
+### 不同OS下修改对shell的影响
+
+在windows系统下修改的shell脚本放到linux上会出现的问题。主要是回车键在两个系统下操作不同，可以用":set ff"查看，":set ff=unix"修改。
+
 ## 10 Makefile
+
+Makefile会一层一层去找文件的依赖关系，直到完成第一个目标文件。所以在Makefile中规则顺序很重要，因为它只有一个最终目标。
+
+像clean，不被第一个目标直接关联，不会被自动执行。更为稳健的方式是 .PHONY:clean ,声明clean为伪目标。
+
+操作系统命令要以Tab键为开头，反斜杠为换行符。两个命令逻辑执行用“；”隔离，例如
+
+```
+	cd /home;pwd
+```
+
+大工程中嵌套执行make，传递某些变量到下一级make用 export，例如
+
+```
+export vari=vlaue
+```
+
+可使用条件语句，如ifeg,else与endif，也可使用函数，如循环函数foreach。
+
+$@表示目标文件，$^表示所有依赖文件，$<表示第一个依赖文件。
+
+另外，注意重编译时，makefile没法察觉.h文件被修改，从而不会对相应的.o文件重新编译，此时需要clean后重编译。
+
+下例是一个最简单的编译当前目录下所有c文件的makefile文件：
 
 ```
 CC = gcc
 
 CFLAGS = -Wall
 
-HPATH = ../               /*不要定义成系统变量PATH*/
+HPATH = ../                       /*不要定义成系统变量PATH*/
 
 INCLUDE = -I$(HPATH)Times -I$(HPATH)APL/head  -I$(HPATH)MAST/head  -I$(HPATH)head
+                                  /*-I表示在参数指定目录下寻找*/
 
-SRCS = $(wildcard *.c)
+SRCS = $(wildcard *.c)            /*取当前目录下所有c文件最为SRCS*/
 
-OBJS = $(patsubst %c,%o,$(SRCS))
-
+OBJS = $(patsubst %c,%o,$(SRCS))  /*$函数调用声明，patsubst为字符串替换函数*/
+                                  /*%.c是GNUmake语法层，*.c是linux shell语法层*/
 .PGHONY:clean
 	
-$(OBJS):$(SRCS)       /*左记会重复编译，应当使用 %.o:%.c */
+$(OBJS):$(SRCS)                   /*左记会重复编译，应当使用 %.o:%.c */
 	$(CC) -c $^ $(INCLUDE) $(CFLAGS)
 	
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -f $(OBJS) $(TARGET)       /*“-”表示强制执行 */
 ```
 
+（2019.7.12）
+
 ## 11 Linux 文本处理三剑客
+
+linux下一切皆文件。
+
+grep长于查找（单纯查找匹配），sed长于取行和替换（编辑匹配到的文件），awk长于取列（格式化文本）。
+
+### grep
+
+Global Regular Expression Print
+
+grep xxx [Options] [File]
+
+​                 -i 忽略大小写
+
+​                 -n 显示行号
+
+### sed
+
+流编辑器。每次处理一行，与vim全文本对照。
+
+例如，支持替换
+
+```
+sed 's/_/-/g'          
+sed -i 's/替/换/g' 文件名    /* -i表示直接文件中替换，终端输出 */
+```
+
+又如，当前路径下，所有文件中，某特定字符串特定替换
+
+```
+sed -i 's/替/换/g' `grep 替 -rl ./`    /* -rl 表示递归且输出所有匹配到文字串的文件 */
+```
+
+又如输出文件13行
+
+```
+sed -n '13p' xx.txt
+```
+
+### awk
+
+处理文本的编程语言工具，文本格式化能力。
+
+awk [option] 'pattern{action}' File
+
+pattern指查找内容，action指所执行的命令。
+
+例如指定分隔符打印
+
+```
+awk -F: '{print $1}' xx.sh   /* -F:指定 ： 为分隔符 */
+```
+
+若不指定分隔符，则默认空格为分隔符切割所逐行读入的文件，每行切片，逐行进行各种分析处理。
+
+可以与sed组合使用，如
+
+```
+par=view abc.log|sed -n '5p'|awk '{print $8}'|awk -F ':' '{print $2}'
+```
+
+（2019.10.17）
 
 ## 12 Linux 进程间通信机制
 
@@ -609,3 +764,30 @@ unlink
 ```
 
 ## 15 常用字符集
+
+### ASCII
+
+针对英文。
+
+### Unicode
+
+支持欧亚几乎所有文字，号称万国码，但各种语言之间不通，比如常见的电脑系统原本用日文形式编码的unicode文件若用中文形式解析，就乱码，反过来也是（即中日对同一个汉字unicode不同）。
+
+### UTF-8
+
+8-bit Unicode Transformation Format ，与Unicode相较而言，适配ASCII。
+
+### EUC
+
+Extended Unix Code，主要用于储存汉字，日语（EUC_JP），韩语文字。
+
+### SJIS
+
+Shift_JIS，日本电脑系统常用的编码表，支持假名，文字，拉丁字母...
+
+### GBK
+
+中国大陆汉字编码。
+
+（2019.12.12）
+
