@@ -187,7 +187,7 @@ strcpy(p1,"123456");
 
 数组相较结构体是C语言中的二等公民，后者可以作为函数参数和返回值，前者不行，传参时退化成一个指针。
 
-数组不能直接赋值，因为数组名是一个地址常量，常量不能被赋值。但是当一个数组是一个结构体成员时，可通过结构体之间的赋值间接达到数组整体复制的效果，即：
+数组不能直接赋值，因为数组名是**一个地址常量**，常量不能被赋值。但是当一个数组是一个结构体成员时，可通过结构体之间的赋值间接达到数组整体复制的效果，即：
 
 ```
 stru1.array = stru2.array;  /*非法*/
@@ -197,6 +197,50 @@ stru1 = stru2; /*合法*/
 汇编上，结构体赋值，采用类似memcpy的形式，而不是逐字copy。（类似C++中的浅拷贝，有指针的情况下留意，free不当，容易出现野指针。）
 
 （2019.8.2）
+
+```
+#include <stddef.h>
+#include <stdio.h>
+
+
+typedef struct{
+       int s1;
+       int s2;
+}Struct;
+
+
+int test()
+{
+	return 0;
+}
+
+int test2()
+{
+	return 0;
+}
+	
+int main()
+{
+	int array[3] = {1,2,3};
+	Struct stru = {1,2};
+	Struct sru2 = stru;
+	int a = 5;
+    void* p = NULL;
+
+	p = array;
+	printf("%x\n", p);
+	p = test;
+	printf("%x\n", p);
+	p = &stru;
+	printf("%x\n", p);
+	p = &a;
+	printf("%x\n", p);
+
+	return 0;
+}	
+```
+
+如上述代码所表示的，结构体名跟普通变量名一样，需要通过&来取地址，其是变量；而数组名和函数名一样本身就代表地址，是地址常量，如同`&stru2 = &stru`非法一样，数组名之间也无法赋值，进一步说，array是常量，而array[0]则是变量，这也是array与&array同样表示地址的原因。
 
 ### 7.2 字符串数组
 
