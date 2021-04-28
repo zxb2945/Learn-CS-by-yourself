@@ -41,7 +41,6 @@ GCC编译默认是C语言最早的GNU 89 version，如果要编译ISO C99 versio
 事实上，用怎样的规则存放，就用怎样的规则转换数据类型，我们不会特意用指针去操作一个int数据中的byte位，所以无论大端小端，C编码层面上一般不受影响。
 
 > The two formats--floating-point and the integer data--use defferent encoding schemes.
->
 
 算是常识，即两者表达同一个numeric value 12345，存放的byte patterns完全不同。
 
@@ -235,7 +234,6 @@ Negation-> 非，否定。
 > GCC and Linux
 >
 > the problem of out-of-bounds memory and buffer overflow attacks.
->
 
 ### 3.1 A Historical Perspective
 
@@ -244,7 +242,6 @@ Negation-> 非，否定。
 > designed to be backward compatible
 >
 > Moore's Law about semiconductor
->
 
 ### 3.2 Program Encodings 
 
@@ -253,12 +250,10 @@ the C preprocessor -> compiler -> assembler ->linker
 #### 3.2.1 Machine-Level Code
 
 > ISA: Instruction Set Architecture, such as x86、ARM v8、MIPS
->
 
 指令集决定CPU架构，进而决定汇编语言，可以推想到博通的微码对应的是不同于Haswell的芯片架构
 
 > the program memory is addressed using virtual addresses
->
 
 理解这一点很重要，比如堆栈之间的地址在哪里，因为不连续所以不重要
 
@@ -267,12 +262,10 @@ the C preprocessor -> compiler -> assembler ->linker
 #### 3.2.3 Notes on Formatting
 
 > AT&T or Intel assembly-code formats
->
 
 ### 3.3 Data Formats
 
 > Combining assembly code with C programs
->
 
 ### 3.4 Accessing Information
 
@@ -287,14 +280,12 @@ the C preprocessor -> compiler -> assembler ->linker
 介绍了不同类型指针间的赋值转化
 
 > The C operator '*' performs pointer dereferencing, and '&' creates a pointer.
->
 
 脱落与创造，与中文教科书截然相反的说明
 
 #### 3.4.4 Pushing and Popping Stack Data
 
 > stack: a "last-in, first-out" discipline
->
 
 ### 3.5 Arithmetic and Logical Operations
 
@@ -316,7 +307,6 @@ leaq 9(%rdx), %rax   #把9(%rdx)这个值所在的地址赋给%rax
 #### 3.5.4 Discussion
 
 > Only right shifting requires instructions that differentiate between signed versus unsigned data.
->
 
 #### 3.5.5 Special Arithmetic Operations
 
@@ -325,7 +315,6 @@ leaq 9(%rdx), %rax   #把9(%rdx)这个值所在的地址赋给%rax
 > Some constructions in C, such as conditionals, loops, and switches, require conditional execution.
 >
 > The condition code can be altered with a jump instruction.
->
 
 #### 3.6.1 Condition Codes
 
@@ -357,7 +346,6 @@ jmp Label
 #### 3.6.7 Loops
 
 > No loops corresponding instructions exist in machine code.
->
 
 while和for在machine code层面是一样的，均由test和jump来实现。
 
@@ -368,14 +356,12 @@ switch不仅使C语言更readable，而且在machine code层面更为efficient�
 ### 3.7 Procedures
 
 > first describing control, then data passing, and, finally, memory management.
->
 
 #### 3.7.1 The Run-Time Stack
 
 函数调用进出栈
 
 > Indeed, many functions do not even require a stack frame. This occurs when all of the local variables can be held in registers and the function does not call any other functions.
->
 
 #### 3.7.2 Control Transfer
 
@@ -391,7 +377,6 @@ ret
 > With x86-64, most of these data passing to and from procedures take place via registers.
 >
 > When  a function has more than six integal arguments, the other ones are passed on the stack.
->
 
 #### 3.7.4 Local Storage on the Stack
 
@@ -448,7 +433,6 @@ int var_ele(long n, int A[n][n], long i, long j){
 #### 3.9.1 Structure
 
 > C could represent an object as a struct.
->
 
 感觉 p-> item 像C为structure做的一个语法糖
 
@@ -457,14 +441,12 @@ int var_ele(long n, int A[n][n], long i, long j){
 #### 3.9.3 Data Alignment
 
 > The x86-64 hardware will work correctly regardless of the alignment of data. However, Intel recommends that data be aligned to improve memory system peformance.
->
 
 ### 3.10 Combining Control and dangData in Machine-Level Programs
 
 #### 3.10.1 Understanding Pointers
 
 > Pointers are a central feature of the C programming language.
->
 
 #### 3.10.2 Life in the Real World: Using the GDB Debugger
 
@@ -473,21 +455,18 @@ int var_ele(long n, int A[n][n], long i, long j){
 GDB可以打印寄存器 info registers
 
 > Using such as gets, strcpy, strcat, sprintf, or any function that can overflow storage is considered a bad programming practice.
->
 
 通过阅读gets的代码可以看到，它无视调用它的函数为形参分配的地址空间，可以一直读入造成踩内存。尽管一般来说，编译器会让上层函数多allocate大概16bytes作为buffer和return之间的Unused atack space。但不足以消除这个隐患。 
 
 #### 3.10.4 Thwarting Buffer Overflow Attacks
 
 > Worm(can run by itself) and virus(adds itself to other programs)
->
 
 因为buffer overflow是最常见通过网络攻击计算机的方法，所以操作系统或编译器会通过Stack randomization（防止黑客预测），Stack Corruption Detection（在特定寄存器周围设置余裕空间，踩到就报错），Limiting Executable Code Regions(separating the read and execute access modes)来防止此类攻击。
 
 #### 3.10.5 Supporting Variable-Size Stack Frames
 
 > All the functions have the property that the compiler can determine an advance the amount of space that must be allocated for their stack frames.
->
 
 这句话意思是函数栈提前allocate多少在编译时已经确定好了，而不是运行时确定的。但是x86-64利用一个frame pointer提供了一种可变方案，使特定函数（如下）的栈大小不会对其它函数产生影响。（具体细节没看懂...)
 
@@ -535,7 +514,6 @@ long vframe(long n, long idx, long *q){
 从x86-64简化而来的ISA。
 
 > The program counter (PC) holds the address of the instruction currently being executed.
->
 
 Y86-64 ISA由15个Program registers, 3个single-bit的conditons codes(CC),PC,一个status code Stat和Memory五部分组成。
 
@@ -546,26 +524,22 @@ mov,jmp等就是instruction，合起来就是instruction set。
 汇编语言由ISA决定，ATT只是一种assembly-code format,表现形式而已
 
 > Instruction encodings range between 1 and 10 bytes.An instruction consists of a 1-byte instruction specifier,possibly a 1-byte register specifier,and possibly an 8-byte constant word.
->
 
 Instruction encodings可以理解为机器码，1-byte register specifier最多可以表示两个4-bit的寄存器标识符，而余下8-byte可以表示一个地址，因而可以mov地址到寄存器，但不能mov地址到地址。
 
 #### 4.1.3 Instruction Encoding
 
 > The program registers are stored within the CPU in a register file, a small random access memory where the register IDs serve as address.
->
 
 意思指寄存器本质上也是RAM？
 
 > RISC processors have done very well in the market for embedded processors.
->
 
 x86-64的演化源CISC比ARM的演化源RISC更为历史悠久，后者更为简洁。
 
 #### 4.1.4 Y86-64 Exceptions
 
 > The status code Stat describes the overall state of the executing program. The processor will halt for any code other than Normal operation.
->
 
 #### 4.1.5 Y86-64 Programs
 
@@ -576,7 +550,6 @@ x86-64的演化源CISC比ARM的演化源RISC更为历史悠久，后者更为简
 ### 4.2 Logic Design and the Hardware Control Language HCL
 
 > Three major components are required to implement a digital system: combinational logic to compute functions on the bits, memory elements to store bits, and clock signals to regulate the updating of the memory elements.
->
 
 难怪可以作为《计算机组成与原理》的教材
 
@@ -585,7 +558,6 @@ x86-64的演化源CISC比ARM的演化源RISC更为历史悠久，后者更为简
 #### 4.2.2 Combinational Circuits and HCL Boolean Expressions
 
 > Logical expressions in C have the property that they might only be partially evaluated. For example:
->
 
 ```
 (a && !a) && fun(b,c)
@@ -594,25 +566,20 @@ x86-64的演化源CISC比ARM的演化源RISC更为历史悠久，后者更为简
 #### 4.2.3 Word-Level Combinational Circuits and HCL Integer Expressions
 
 > The output of the combinational circuits that tests whether two 64-bit words A and B are equal will equal 1 if and only if each bit of A and B are equal.  The outputs of these single-bit circuits are combined with an AND gate to form the circuit output.
->
 
 千里之堤，累于毫末
 
 > One important combinational circuit, known as an arithmetic/logic unit(ALU), perform one of four different arithmetic and logical operations : X+Y, X-Y, X&Y,X^Y. 
->
 
 #### 4.2.4 Set Membership
 
 #### 4.2.5 Memory and Clocking
 
 > Our Y86-64 processors will use clocked registers to hold the program counter(PC),the condition code(CC) and the program status(Stat). directly connected to the rest of the circuit by its input and output wires.
->
 
 > When necessary to avoid ambiguity ,we will call the two registers "hardware registers" and "program registers".
->
 
 > The register file is not a combinational circuit, since it has internal storage. 
->
 
 联系上下文，PC,CC,STAT等应该是属于hardware registers，与其它常规寄存器区别开来。
 
@@ -711,3 +678,141 @@ insert extra register into every stage.
 
 
 
+## 5 Optmizing Program Performance
+
+相比算法与数据结构对程序效率的影响，适配编译器优化就不在一个量级吧。
+
+### 5.1 Capabilities and Limitations of Optmizing Complier
+
+> For example, invoking GCC with the command-line option -Og (Optimization general) specifies that it should apply a basic set of optimizations. Invoking  GCC with option -O1 or higher (e.g. -O2 or -O3) will cause it to more extensive optimizations.
+
+讲述了一些优化上的逻辑困难：比如说纯函数与非纯函数（return值受全局变量影响），编译器无法区分。
+
+### 5.2 Expressing Program Performance
+
+介绍了一个性能指标单位CPE。
+
+### 5.3 Program Example
+
+"-O1" 效率上有时可以优化至一倍，展示了编译器优化能力。
+
+### 5.4 Eliminating Loop Inefficiencies
+
+```
+void lower1(char *s)
+{
+	long i;
+	
+	for(i=0;i<strlen(s);i++)
+		if(s[i]>='A' && s[i]<='Z')
+			s[i]-=('A'-'a')
+}
+
+void lower2(char *s)
+{
+	long i;
+	long len=strlen(s);
+	
+	for(i=0;i<len;i++)
+		if(s[i]>='A' && s[i]<='Z')
+			s[i]-=('A'-'a')
+}
+```
+
+上例中，因为编译器没法辨别strlen是否为纯函数，所以没法把lower2优化为lower1，随着字符串长度增长，其运行效率相差很大。So programmers must do such transformations themselves.
+
+### 5.5 Reducing Procedure calls
+
+简单来说，指尽量把loop中的函数调用移到loop外去。
+
+### 5.6 Eliminating Unneeded Memory References
+
+在loop中尽量少用指针，即消除多余地址参照。因为指针相对于变量在汇编层面重复了memory到register的交互过程。
+
+> Unfortunately, a compiler cannot make a judegement about the conditions under which a function might be used and what the programmer's intentions might be. So the conservative approach is to keep reading and writing memory, even though this is less efficient.
+
+简直有点手把手教你写代码了...
+
+### 5.7 Understanding Modern Processors
+
+> Up to this point, we have applied optimizations that did not rely on any features of machine. As we seek to push the performance further,  we must consider optimizations that exploit the microarchitecture of the processor.
+
+#### 5.7.1 Overall Operation
+
+介绍到 Instrution-level Parallelism 的物理构成实现上...
+
+#### 5.7.2 Functional Unit Performance
+
+Instrution-level Parallelism 好像用于花费多个clock cycle的计算，比如Division，对Addition没什么影响吧？
+
+#### 5.7.3 An Abstract Model of Processor Operation
+
+略复杂...
+
+### 5.8 Loop Unrolling
+
+> That is, the loop index i is incremented by 2 or more on each iteration.
+
+有必要至此吗...`gcc -O3`会利用Loop Unrolling来优化。
+
+### 5.9 Enhancing Parallelism
+
+#### 5.9.1 Multiple Accumulators
+
+先举例单偶各加的Loop Unrolling，即2x2 unrolling，可以平行处理。
+
+尽可能得利用Pipeline。
+
+#### 5.9.2 Reassociation Transformation
+
+兴趣阑珊，编译器做的事。
+
+### 5.10 Summary of Results for Optimizing Combining Code
+
+10x10 unrolling 策略可以比 -O1 优化效率提高十倍左右。
+
+### 5.11 Some Limiting Factors
+
+#### 5.11.1 Register Spilling
+
+寄存器数量会限制 Loop Parallelism，多出的会压入stack。
+
+#### 5.11.2 Branch Prediction and Misprediction Penalties
+
+### 5.12 Understanting Memory Performance
+
+> All modern processors contain one or more cache memories to provide fast access to such small amounts of memory.
+
+#### 5.12.1 Load Performance
+
+#### 5.12.2 Store Performance
+
+> writes a register value to memory.
+
+这几章草草浏览，简直是锱铢必较得提高效率，量级上不是算法那种质变，如同“内卷”。
+
+### 5.13 Life in the Real World: Performance Improvement Techniques
+
+> High-level design: Choose appropriate algorithms and data structures for the problem at hand.
+>
+> Basic-level principles: Avoid optimization blockers so that a compiler can generate efficient code.
+>
+> ​	Eliminate excessive function calls. Move computations out of the loop when possible.
+>
+> ​	Eliminate unnecessary references, introduce temporary variables to hold intermediate results.
+>
+> Low-level optimizations: Structure code to take advantage of the hardware capabilities.
+
+Low-level optimizations一般来说不考虑，看了也是屠龙之技。
+
+### 5.14 Identifying and Eliminating Performance  Bottlenecks
+
+#### 5.14.1 Program Profiling
+
+```
+gcc -Og -pg prog.c -o prog  #利用-pg 可以使程序运行时产生一个各个函数运行时间的分析文档
+```
+
+#### 5.14.2 Using a Profiler to Guide Optmization
+
+### 5.15 Summary
