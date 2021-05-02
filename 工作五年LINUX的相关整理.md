@@ -633,6 +633,8 @@ ipcs -l             /*可以查看系统允许最大的信号量集，当出现'
 | msgsnd | 发送队列消息        |
 | msgrcv | 接受队列消息        |
 
+Message Queue是一个存在于内存的消息的链表，相较于pipe，它所返回的id并不是文件标识符fd，所以并不存在Message Queue文件这种说法。
+
 ### Semaphore
 
 信号量实际上是个计数器，用于多进程之间的同步与排他操作。
@@ -655,13 +657,74 @@ ipcs -l             /*可以查看系统允许最大的信号量集，当出现'
 
 ### Pipe
 
-只适合父子进程间单向通信。如把两个命令连接起来
+Pipe不同于Message Queue，它不能区分字节流的边界。
+
+一般只适合父子进程间单向通信。如把两个命令连接起来
 
 ```
 ls -l | grep "4月"   /* 查找当前目录下4月份修改的文件 */
 ```
 
-(2020.3.3)
+以下代码展示了如何在父子进程间单向通信：
+
+```
+#include <stdio.h>  
+#include <unistd.h>  
+#include <string.h>  
+#include <errno.h>  
+int main()  
+{  
+    int fd[2];  
+    int ret = pipe(fd);  
+    //说到底就是这个pipe函数，给进程返回两个文件标识符，写端和读端
+    //这里的返回的文件事实上是Linux一种特殊的文件类型管道文件，它指向内核的一块缓冲区
+    if (ret == -1)  
+    {  
+        perror(”pipe error\n”);  
+        return 1;  
+    }  
+    pid_t id = fork();  
+    if (id == 0)  
+    {//child  
+        int i = 0;  
+        close(fd[0]); 
+        //子进程关闭写端管道文件
+        char *child = “I am  child!”;  
+        while (i<5)  
+        {  
+            write(fd[1], child, strlen(child) + 1);  
+            sleep(2);  
+            i++;  
+        }  
+    }  
+    else if (id>0)  
+    {//father  
+        close(fd[1]);
+        //关闭父进程读端的管道文件
+        char msg[100];  
+        int j = 0;  
+        while (j<5)  
+        {  
+            memset(msg,’\0’,sizeof(msg));  
+            ssize_t s = read(fd[0], msg, sizeof(msg));  
+            if (s>0)  
+            {  
+                msg[s - 1] = ’\0’;  
+            }  
+            printf(”%s\n”, msg);  
+            j++;  
+        }  
+    }  
+    else  
+    {//error  
+        perror(”fork error\n”);  
+        return 2;  
+    }  
+    return  0;  
+}  
+```
+
+(2021.5.2)
 
 ### Socket
 
