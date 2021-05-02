@@ -816,3 +816,139 @@ gcc -Og -pg prog.c -o prog  #利用-pg 可以使程序运行时产生一个各�
 #### 5.14.2 Using a Profiler to Guide Optmization
 
 ### 5.15 Summary
+
+
+
+## 6 The Memory Hierarchy
+
+### 6.1 Storage Technologies
+
+#### 6.1.1 Random Access Memory
+
+> RAM comes in two varieties - static and dynamic. SRAM is faster and more expensive than DRAM, It's used for cache memories. DRAM is used for the main memory plus the frame buffer of a graphics system.
+
+微观结构上，SRAM每个bit上有6个transistors，所以比每个bit 1个transistor的DRAM更稳定更快，因而也更贵。而DRAM相较SRAM更容易受干扰，没法像SRAM那样自动恢复，所以需要内存系统需要定期refresh DRAM。也是因此DRAM更显得dynamic.
+
+> SDRAM: Synchronous DRAM
+>
+> DDR SDRAM: Double Data-Rate SDRAM
+>
+> By 2010, most servers and desktop systems were built with DDR3 SDRAMs.
+
+SRAM和DRAM都属于volatile memory，像PC的BIOS( basic input/output system)就需要放在nonvolatile memory，就是ROMs: read-only memories。
+
+> PROM: programmable ROM, it can be programmed exactly once.
+>
+> EPROM: erasable PROM, it can be reprogrammed 1000 times.
+>
+> EEPROM: electrically EPROM, it can be reprogrammed 10^5 times.
+>
+> Flash memory is based on EEPROMs.
+>
+> SSD: solid state disk, it's based on Flash memory.
+
+某种程度上说，固态硬盘源于ROM，所以它读写次数有上限，但这个上限够用几百年，所以无所谓。
+
+#### 6.1.2 Disk Storage
+
+> Rotating disks: magnetic recording material.
+
+磁盘读写速度是SRAM的4万倍，DRAM的2500倍。
+
+> Before a disk can be used to store data, it must be formatted by the disk controller.
+
+这一章就有种《计算机组成与原理》的感觉了...
+
+> Unlike the system and memory buses, which are CPU-specific, I/O buses are independent of the underlying CPU. Although it is slower, it can accommodate a wide variety of third-party I/O devices, such as graphics adapter, USB(Universal Serial Bus ) controller, Disk controller, network adapter.
+
+三种buses汇聚在I/O bridge，此节点用来转换电子信号。内存和磁盘间直接通过DMA(Direct Memory Access)来进行通信，DMA不是一个的硬件设备，而是内存与磁盘独立于CPU的一个逻辑处理。
+
+#### 6.1.3 Solid State Disks
+
+#### 6.1.4 Storage Technology
+
+### 6.2 Locality
+
+The principle of locality: 经常访问的数据应当能被更快得访问到。
+
+#### 6.2.1 Locality of References to Program Data
+
+Temporal locality: 被引用过一次的存储器位置在未来会被多次引用（通常在Loop中）。
+
+Spatial locality: 如果一个存储器被引用，那么将来它附近的位置也会被引用。
+
+```
+int sumarrayrows(int a[M][N])
+{
+	int i,j,sum=0;
+	for(i=0;i<M;i++)
+		for(j=0;j<N;j++)
+		sum += a[i][j]
+	return sum;
+}
+```
+
+上例中，sum在每个loop中都被访问，所以它有好的temporal locality，而`a[i][j]`整个loop中只被访问一次，所以是poor temporal locality，但另一方面它的数据相邻，有好的spatial locality，所以整体而言上例有好的locality，但如果将两个loop换个顺序，它的spatial locality就变得poor了。
+
+#### 6.2.2 Locality of Instruction Fetches
+
+#### 6.2.3 Summary of Locality
+
+Locality跟Cache密切相关。
+
+### 6.3 The Memory Hierarchy
+
+|      |                          |                          |
+| ---- | ------------------------ | ------------------------ |
+| L0   | Registers                |                          |
+| L1   | Cache                    | SRAM                     |
+| L2   | Cache                    | SRAM                     |
+| L3   | Cache                    | SRAM                     |
+| L4   | Main memory              | DRAM                     |
+| L5   | Local secondary storage  | local disks              |
+| L6   | Remote secondary storage | distributed file systems |
+
+#### 6.3.1 Caching in the Memory Hierarchy
+
+这里的Cache更多指广义的层级间的设计模式，比如L6就是L5的Cache。
+
+#### 6.3.1 Summary of Memory Hierarchy Concepts
+
+### 6.4 Cache Memories
+
+#### 6.4.1 Generic Cache Memory Organization
+
+#### 6.4.2 Direct-Mapped Caches
+
+#### 6.4.3 Set Associative Caches
+
+#### 6.4.4 Fully Associative Caches
+
+#### 6.4.5 Issues with Writes
+
+#### 6.4.6 Anatomy of a Real Cache Hierarchy
+
+#### 6.4.7 Performance Impact of Cache Parameters
+
+### 6.5 Writing Cache-Friendly Code
+
+> Repeated references to local variables are good because the compiler can cache them in the register file(temporal locality);
+>
+> Stride-1 references patterns are good because caches at all levels of the memory hierarchy store data as contiguous blocks(spatial locality).
+
+简而言之: 1.少用指针；2.访问数组要row by row, 而不是column by column。
+
+### 6.6 Putting It Together: The Impact of Caches on Program Performance
+
+#### 6.6.1 The Memory Mountain
+
+> So even when a program has poor temporal locality, spatial locality can still come to the rescue and make a significant difference.
+
+换句话说，有时候即便去内存中读取一块连续数据(poor temporal locality)也要比从缓存中读取不连续数据(poor spatial locality)来得快。两者表示横竖轴，读取速度表示纵轴，就形成一座三维的山丘。
+
+#### 6.6.2 Rearranging Loops to Increase Spatial Locality
+
+#### 6.6.3 Exploiting Locality in Your Programs
+
+### 6.7 Summary
+
