@@ -952,3 +952,184 @@ Locality跟Cache密切相关。
 
 ### 6.7 Summary
 
+
+
+## 7 Linking
+
+### 7.1  Compiler Drivers
+
+> The GNU compilation system provide a compiler driver -- GCC that invokes the language preprocessor -- cpp, compiler -- cc1, assembler -- as, and linker -- ld, as needed on behalf of the user.
+
+确切说，GCC是一个Compiler Deiver, 而cc1才是compiler。
+
+> To run the executable prog, we type its name on the Linux shell's command line: ./prog  
+>
+> The shell invokes a code in the OS called the loader, which copies the code and data in the executable file into memory, and then transfers control to the beginning of the program.
+
+所以执行程序是由一个shell通过调用OS的loader函数来完成的，这个shell就是“执行器”。
+
+### 7.2 Static Linking
+
+> The two main tasks of the linker:
+>
+> 1. Symbol resolution : to associate each symbol reference with exactly one symbol definition.
+>
+> 2. Relocation
+
+### 7.3 Object Files
+
+> 1. Relocatable object file;
+>
+> 2. Ececutable object file;
+>
+> 3. Shared object file;
+>
+> Modern x86-64 Linux systems use Executable and Linkable Format (ELF)
+
+### 7.4 Relocatable Object Files
+
+> .bss is ab abbreviation for "Better Save Space"
+
+ELF文件中的.bss 与 .data 数据段的区别在于 其存放 uninitialized global and static C variables, 为什么要做这种区分呢？是为了节省文件空间，即.bss在磁盘上不占任何实际空间，只在文件头里（ELF header）有一个placeholder，程序载入时才分配内存空间。（否则最简洁的话，只要.text和.data就足够逻辑区分了）
+
+### 7.5 Symbols and Symbol Tables
+
+ELF文件中的.symtab段存储functions和global variables的相关信息（注意不是变量自身，要与.data区分）。
+
+> In C, source files play the role of modules. 
+
+在C中，凡是被static修饰的functions和global variables可以被看作是该模块private，不被static修饰的则为public。（联系C++ 和 JAVA）
+
+但当某模块引用其它模块的public变量时，需extern声明（单个），或者include包含其声明的头文件，否则gcc编译器一般会报“warning: implicit declaration ”的警告。
+
+（另一方面，而define定义只在该模块内有效。）
+
+对一个具体的module而言，存在三种Symbols:
+
+1. 本模块内的Global symbols;
+2. 别的模块里所定义的Global symbols；
+3. 本模块内的Static symbols.
+
+以上三种会被记录在.symtab中，不同模块的stacic symbol可以同名，编译器隐式地会在.symtab中作区分。而该模块中的local nonstatic variables不被包括，它们跟Linker就没什么关系。
+
+### 7.6 Symbol Resolution
+
+未定义的全局变量到链接阶段才会报错；
+
+> Overloaded functions in C++ work because the compiler encodes each unique method and parameter list combination into a unique name for the linker.
+
+#### 7.6.1 How Linkers Resolve Duplicate Symbol Names
+
+> Strong symbols: Functions and initialized global variables.
+>
+> Weak sumbols: Uninitialized global variables.
+>
+> Rule1: Muitiple strong symbols with the same name are not allowed;
+>
+> Rule2: Given a strong symbol and multiple weak symbols with the same name, choose the strong symbol;
+>
+> Rule3: Given muitiple weak symbols with the same name, choose any of the weak symbols.
+
+因为如上规则的存在，若遇到多个同名uninitialized global variables，编译器会将其放在COMMON段，而不是.bss段，如果Global variables有被初始化为0，则继续放在.bss段。而Static variables对同名无所谓，未初始化仍可继续放在.bss段。
+
+#### 7.6.2 Linking with Static Libraries
+
+> ISO C99 defines an extensive collection of standard I/O, string manipulation, and integer math funtions in the **libc.a** library. And also defines an extensive collection of floating-point math functions in the **libm.a** library.
+>
+> In fact, C compiler drivers always pass **libc.a** to the linker, it is unnecessary for gcc to mention it.
+
+`.a`文件可以看成一个可分解为多个`.o`文件的集合，一般程序只链接其中一部分`.o`文件即可，若将其编译成一个`.o`文件，则连未被参照的部分也需被链接，造成链接时间和磁盘空间两方面的浪费。
+
+#### 7.6.3 How Linkers Use Static Libraries to Resolve References
+
+> The general rule for libraries is to place them at the end of the command line.
+
+```
+gcc foo.c libx.a libz.a
+```
+
+否则，Linker因为链接时scan顺序的关系，造成foo.c中的reference无法匹配到libx.a中的defination。
+
+### 7.7 Relocation
+
+两个层面：1.将各个`.o`文件按各数据段合并；2.Relocating symbol references within sections.
+
+#### 7.7.1 Relocation Entries
+
+#### 7.7.2 Relocating Symbol References
+
+> Relocating PC-Relative References
+>
+> Relocating Absolute References
+
+### 7.8 Executable Object Files
+
+> Read-only memory segment: code segment
+>
+> Read/Write memory segment: data segment
+>
+> Symbol table and debugging info: not loaded into memory
+
+### 7.9 Loading Executable Object Files
+
+> When the shell runs a program, the parent shell process forks a child process that is a duplicate of the parent. The child process invokes the loader via the `execve` syetem call. The loader deletes the child's existing virtual memory segments and creates a new set of code, data, heap, and stack segments.
+
+| Kernel Memory                                 |
+| --------------------------------------------- |
+| User stack                                    |
+|                                               |
+| **Memory-mapped region for shared libraries** |
+|                                               |
+| Run-time heap                                 |
+| Read-only memory segment                      |
+| Read/Write memory segment                     |
+| **0地址**                                     |
+
+### 7.10 Dydamic Linking with Shared Libraries
+
+对于Shared Libraries而言，首先在Link阶段，它将Relocation and symbol table info编入Relocatable object file组成Partially linked executable object file, 然后在Load阶段，将Code and data部分通过Dynamic linker载入到Fully linked executable in memory。
+
+### 7.11 Loading and Linking Shared Libraries from Applications
+
+> Linux systems provide  simple interfaces ` dlopen` and `dlclose`  to the dynamic linker that allows applications to load and link shared libraries **at run time**.
+
+High-performance Web severs就用到这个技术直接调用相关函数，而不是去fork and execve一个子进程；
+
+还有从JAVA调用C/C++ functions时，可以将后者打包成一个Shared Libraries，通过`dlopen`接口去调用, 即JNI技术。
+
+### 7.12 Positon-Independent Code(PIC)
+
+GCC中链接Shared Libraries时的`-fPIC`选项代表了PIC，任何Shared Libraries在各个进程中装载时（参见7.9 Memory-mapped region for shared libraries的位置，共享库无论是数据部分还是代码部分都不嵌入到可执行文件的相应段中） ，code部分是共享的，而data部分是各自独立的。
+
+一般来说，模块内的code部分和data部分的相对地址是固定的，天然就可以做到绝对地址无关。但是不同模块之间，尤其是共享库之间code部分中的全局变量访问以及函数调用，就要借用GOT表做地址无关，即将code部分中的绝对地址引用放到data部分的GOT表（增加了一个跳转层），从而每个进程就可以通过独立的GOT表对共享库进行访问，从而共享库可以在载入时不用顾忌各个进程之间的引用冲突。
+
+进一步，为了减少程序启动时，进程对共享库函数调用GOT表构造所花费的时间（共享库中全局变量耦合度原因数量其实很少，对启动时间影响不大），又为函数调用增加了一个跳转层PLT--Lazy Binding，实现调用时再构造GOT表，从而减少程序启动时间。
+
+### 7.13 Libraries Interpositioning
+
+这是项什么技术呢？举例来说，你原有程序中调用Libraries中的malloc函数，你可以通过手动写的mymalloc来包裹它并代替它被调用，包裹层里你就可以加trace等信息来追踪malloc调用情况。（有点类似Python装饰器）
+
+#### 7.13.1 Compile-Time Interpositioning
+
+编译时需要解决的一个问题在于如何使wrapper中的malloc函数不被wrapper替换而造成递归呢？因为wrapper定义在自定义的malloc.h中，此时存在两个malloc.h: in the current directory and usual system directory. GCC编译时参数设置不同，编译器寻找malloc.h的顺序不同，就可以单独先编译wrapper。
+
+#### 7.13.2 Link-Time Interpositioning
+
+#### 7.13.3 Run-Time Interpositioning
+
+后两者就要利用Linker和Dynamic Linker(LD-LINUX.so)的相关mechanism了，不表。
+
+### 7.14 Tools For Manipulating Object Files
+
+`READELF` and `OBJDUMP`.
+
+### 7.15 Summary
+
+> Linkers manipulate **binary files** called object files, which come in three different forms: relocatable, excutable, shared;
+>
+> The two main tasks of linkers are symbol resolution and relocation;
+>
+> Muitiple object file can be concatenated in a single static library; (图书馆有很多书，形象！)
+>
+> At load time the loader maps the partially linked executable into memory and then calls a **dynamic linker**.
+
