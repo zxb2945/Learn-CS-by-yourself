@@ -1133,3 +1133,227 @@ GCC中链接Shared Libraries时的`-fPIC`选项代表了PIC，任何Shared Libra
 >
 > At load time the loader maps the partially linked executable into memory and then calls a **dynamic linker**.
 
+
+
+## 8 Exceptional Control Flow
+
+### 8.1 Exceptions
+
+#### 8.1.1 Exception Handling
+
+> Exception handlers run in kernel mode.
+
+Exception Handler处理完异常后，根据异常类型，会有三种后续处理可能：1.回到发生异常时的指令位置；2.回到发生异常时下一条指令位置；3.直接跳到内核中的abort routine里terminate当前进程。
+
+#### 8.1.2 Classes of Exceptions
+
+> **Interrupts**: Interrupts occur asynchronously as a result of signals from I/O devices that are external to the processor.
+
+所谓的硬件中断。
+
+> **Traps** and System Calls: Traps are intentional exceptions that occur as a result of executing an instruction. The most important use of traps is to provide a procedure-like interface between user programs and the kernel, known as a system call.
+
+所谓的软件中断，主要是系统调用。
+
+> **Faults**: Faults result from error conditions that a handler might be able to correct. A classic example of a fault is the Page fault exception.
+
+> **Aborts**: Aborts result from unrecoverable fatal errors, typically hardware errors such as parity errors that occur when DRAM or SRAM bits are corrupted.
+
+所以以上两者的区别主要在于错误是否可以被re-executing.
+
+#### 8.1.3 Exceptions in Linux/x86-64 Systems
+
+关于Linux常见的几种Faults和Aborts：
+
+1. Floating exceptions: 当进程中有被0除的处理，Unix不会去试图恢复这种errors。
+2. Segmentation faults: 当进程访问未定义地址，或者试图修改只读代码段。
+3. Page fault：内存磁盘读入读出操作时。
+4. Machine check：当进程觉察到硬件错误时。
+
+### 8.2 Processes
+
+进程如何做到独占CPU和独占内存的抽象，就是OS的核心了。
+
+本节基本上是OS知识，多进程图谱和虚拟地址，还是很好理解的。
+
+#### 8.2.1 Logical Control Flow
+
+#### 8.2.2 Concurrent Flows
+
+#### 8.2.3 Private Address Space
+
+#### 8.2.4 User and Kernel Modes
+
+#### 8.2.5 Context Switches
+
+### 8.3 System Call Error Handling
+
+> When Unix system-level functions encounter an error, they typically return -1 and set the global integer variable errno to indicate what went wrong.
+
+所以这个errno是个全局变量，用于记录Unix设计层面上为系统调用提供的错误记录。
+
+### 8.4 Process Control
+
+介绍Unix为C程序提供的系统调用接口。
+
+#### 8.4.1 Obtaining Process IDs
+
+```
+pid_t getpid(void);    返回当前进程pid
+pid_t getppid(void);   返回当前进程父进程（parent）的pid
+```
+
+#### 8.4.2 Creating and Terminating Processes
+
+```
+void exit(int status);  终止一个进程
+```
+
+```
+pid_t fork(void);   复制生成一个子进程,子进程返0，父进程返子进程id（非0）
+```
+
+> When the parent calls fork, the stdout file is open and directed to the screen. Because the child gets identical copied of any of the parent's open file descripters, the child inherits this file, and thus its output is also directed to the screen.
+
+可以看到，stdout就是个file，只是它被定向到screen上了而已。
+
+#### 8.4.3 Reaping Child Processes
+
+> When a process terminates for any reason, the kernel does not remove it from the system immediately. Instead, the process is kept around in a terminated state until it is reaped by its parent. A terminated process that has not yet been reaped is called a zombie.
+>
+> When a parent process terminates, the kernel arranges for the init process to become the adopted parent for any orphaned children. The init process, which has a PID of 1, is created by the kernel during system start-up, never terminates, and is the ancestor of every process.
+
+据上，所谓僵尸进程是因为它自生被终止，尚未被父进程收割前，称为僵尸。并不是因为父进程先于子进程终止一类的原因，这种情况下，init进程会代替成为其父进程。
+
+```
+pid_t waitpid(pid_t pid, int *status, int options);   
+#父进程用于收割被终止的子进程的系统调用，参数复杂...
+```
+
+#### 8.4.4 Putting Processes to Sleep
+
+```
+unsigned int sleep(unsigned int secs);
+int pause(void);   强制休眠，直到收到相应信号
+```
+
+#### 8.4.5 Loading and Running Programs
+
+```
+int execve(const char *filename, const char *argv[], const char *envp[]);
+#execve is called once and never return.
+```
+
+> By convention, argv[0] is the name of the executable file.
+
+> After execve loads filename, it calls the start-up code, the start-up code sets up the stack and passes control to the main routine of the new program.
+>
+> ```
+> int main(int argc, char **argv, char **envp);
+> ```
+
+所以对于一个进程而言，启动时配置的参数以及环境变量都是从main函数传进去的，它们会被率先压入stack中。而且应该是被压入内核栈里。因为需要一下系统调用对环境变量进行读取：
+
+```
+char *getenv(const char *name);
+int setenv(...);
+void unsetenv(const char *name);
+```
+
+#### 8.4.6 Using fork and execve to Run Programs
+
+> Programs such as Unix shell and Web servers make heavy use of the fork and execve functions.
+>
+> A shell is an interactive application-level program that runs other programs on behalf of the user.
+
+shell的本质。
+
+> The execve function loads and runs a new program in the context of the current process. While it overwrites the address space of the current process, it does not create a new process.
+
+要清楚fork和execve的区别...通力合作运行一个新的进程。
+
+### 8.5 Signals
+
+> Low-level hardware exceptions are processed by the kernel's exception handlers and would not normally be visible to user processes. Linux signals provide a mechanism for exposing the occurrence of such exceptions to user processes.
+
+#### 8.5.1 Signal Terminology
+
+#### 8.5.2 Sending Signals
+
+1.Sending Signal with the /bin/kill Program
+
+kill当然算是个程序，能够发送signal给别的进程，某种程度上讲也算是进程间的通信；
+
+2.Sending Signals from Keyboard
+
+Typing Ctrl+C: terminate the foreground process group.
+
+Typing Ctrl+Z: stop(suspend) the foreground process group.
+
+两者还是略微不同；
+
+3.Sending Signals with the kill Function
+
+程序kill估计就是包裹kill函数吧；
+
+4.Sending Signal with the alarm Function
+
+大概是硬件中断等Exceptions有时候只是通知kernel，kernel就直接操作进程了，而signal就是kernel通知进程的过程了，所以确切说，不是进程间的通信，而是kernel与进程之间的通信。
+
+#### 8.5.3 Receiving Signals
+
+> Each signal type has a predefined defaults action, which is one of the folowing:
+>
+> 1.The process terminates;
+>
+> 2.The process terminates and dump core;
+>
+> 3.The process stops(suspends) until restarted by a SIGCONT signal;
+>
+> 4.The process ignores the signal;
+
+#### 8.5.4 Blocking and Unblocking Signals
+
+#### 8.5.5 Writing Signal Handlers
+
+存在几个难点：
+
+1.Handlers事实上与main program是线程级别的并发，所以要注意多线程编程的注意点，许多库函数并不是线程安全的；
+
+2.多个signal过来的时候，并不是queue缓存；
+
+3.像read，accept等slow sysytem calls会被signal打断；
+
+#### 8.5.6 Synchronizing Flows to Avoid Nasty Concurrency Bugs
+
+#### 8.5.7 Explicitly Waiting for Signals
+
+### 8.6 Nonlocal Jumps
+
+```
+int setjmp(jmp_buf env);  
+#将当前Program Counter,Stack Pointer等运行环境信息存储在jmp_buf结构体中。
+int longjmp(jmp_buf env, int retval); 
+#取出之前的运行环境信息，并return到之前setjmp处，并初始化运行环境
+```
+
+以上两个函数配合，可以无视the normal call-and-return sequence, 达到不同函数间跳转的效果。
+
+主要用途有两个：
+
+1.比如在层层嵌套函数深处出现error，可以直接跳回最外层函数，就栈的情况来说，越深处的函数的栈越往下，即往低地址方向延伸，longjmp后直接跳回高地址，得到外层函数的栈信息，然后配合相应的寄存器信息，就完成了跳转，至于低地址处嵌套函数的栈信息，就舍弃了，反正也不需要特地去初始化为0.
+
+> The exception mechanisms provided by C++ and JAVA are higher-level, more structured version of the C setjmp and longjmp functions. You can think of a catch clause inside a try statement as being akin to a setjmp function. Similayly, a throw statement is similar to a longjmp function.
+
+C++和JAVA的异常处理机制就源于C这个特性实现的。事实上，还可以配合抓取Signal，比如Typing Ctrl+C不去终止进程，而是跳到该进程某一位置，从而形成不断Ctrl+C，不断循环的结果。
+
+2.进一步，可以根据此，实现协程。比如在golang语言中的for几个go关键字，相当于设置多个setjmp，然后在main routine中，longjmp按照分配器算法选择其中一个setjmp跳，在所跳到的协程中，根据相应条件longjmp到另外一个setjmp中，从而完成协程之间的切换。
+
+### 8.7 Tools for Manipulating Processes
+
+### 8.8 Summary
+
+> Exceptional control flow(ECF) occurs at all levels of a computer system and is a basic mechanism for providing concurrency in a computer system.
+
+
+
