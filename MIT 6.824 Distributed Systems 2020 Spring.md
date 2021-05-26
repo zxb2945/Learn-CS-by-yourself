@@ -261,3 +261,11 @@ election timer -> start election ->timer++ ->request votes
 
 所以当leader宕机，它不能有任何通知，只能等余下的其中一个server竞选时间片耗尽，发起选举，选举成功之后，其它server其实也不知道哪一个是leader，只是能够正常收到append log一类的信息就行。
 
+
+
+## Chapter 7 Fault Tolerance RAFT(2) 20210527
+
+Election Restriction
+
+vote yes only if  high term on last entry, or same last term >> not log length
+
