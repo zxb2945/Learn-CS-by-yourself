@@ -272,3 +272,20 @@ vote yes only if  high term on last entry, or same last term >> not log length
 Persistence
 
 一个server reboot之前最好能够保持 LOG, Current Term, Voted for等信息在永久性存储设备上，然而如果存储到disk上，就有Synchronous disk update方面的问题，一次IO，大量新的requests就来了，也许就需要disk之外的存储设备如flash，甚至特制的DRAM等...
+
+Install Snapshots
+
+感觉上向leader为了便于followers 回溯log流，在某一个时间节点做的数据记录...
+
+Linearizability
+
+如果一个client过来的requests or responses 流并不是overlap的，有明确时间上的先后顺序，那么我们说这个execution history 是 linearizable.
+
+
+
+
+
+
+
+
+
