@@ -279,7 +279,13 @@ Install Snapshots
 
 Linearizability
 
-如果一个client过来的requests or responses 流并不是overlap的，有明确时间上的先后顺序，那么我们说这个execution history 是 linearizable.
+如果一个client过来的requests or responses 流并不是overlap的，有明确时间上的先后顺序，那么我们说这个execution history 是 linearizable. 比如对某一个位置的write要在read前，各个request有先后顺序，所以避免在graph中形成cycle，那样的话就矛盾了。比如：
+
+read 1 -> write 1  (X)
+
+write 1 ->  write 2 -> read 1  (X)
+
+
 
 
 
