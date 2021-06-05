@@ -23,7 +23,6 @@ performance
 Lab 1:MapReduce
 
    	2: Raft for fault tolerance
-   	
    	3: Key value server
 
 ​      4:shared key value server
@@ -245,6 +244,12 @@ virtual machine monitor主要用来Primary machine跟Backup machine同步，避�
 
 RAFT:
 
+> Raft是一种易于理解的一致性算法
+>
+> 一致性是分布式容错系统的基本功能
+>
+> Raft是专门针对Paxos难以理解的缺陷而重新设计的新算法，为使算法容易理解，采用了模块化设计方法，将整个过程划分为若干子过程，包括Leader选举，日志分发，确保一致性。
+
 Split Brain
 
 两个client访问两个server，发现一对一能访问，但每个client不能同时访问两个server（分布式的意义所在），这个时候最有可能的就是network部分线路有问题，这样的问题叫做split brain。
@@ -286,6 +291,31 @@ read 1 -> write 1  (X)
 write 1 ->  write 2 -> read 1  (X)
 
 
+
+## Chapter 8 Zookeeper 20210605
+
+> zookeeper，它是一个分布式服务框架，是Apache Hadoop 的一个子项目，它主要是用来解决分布式应用中经常遇到的一些数据管理问题，如：统一命名服务、状态同步服务、集群管理、分布式应用配置项的管理等。
+>
+> 上面的解释有点抽象，简单来说zookeeper=文件系统+监听通知机制。
+
+
+
+zookeeper允许client直接访问副本服务器，前提是只读访问，这样可提高效率。但这个也带来一个问题，恰好主机正在做更改，还没通知到followers，事实上这就不是linearizable. 
+
+所以zookeeper只能做到linearizable writes，并且保证client request order做到FIFO，这样的话，虽然没法保证client读到最新状态的值，但一定程度上只要等待一定长的时间，总能得到正确的值。
+
+进一步而言，当zookeeper做write操作时：
+
+1. delete ready file
+2. write f1
+3. create ready file
+
+当client往follower读时候：
+
+1. exist（true？）
+2. read f1
+
+当client在follower里读的时候，master又开始修改的情况，follower会在response前收到notification。
 
 
 
