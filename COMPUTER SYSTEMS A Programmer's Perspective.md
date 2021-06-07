@@ -1357,3 +1357,93 @@ C++和JAVA的异常处理机制就源于C这个特性实现的。事实上，还
 
 
 
+## 9 Virtual Memory
+
+### 9.1 Physical and Virtual Addressing
+
+> Dedicated hardware on the CPU chip called the **memory management unit**(MMU) translates virtual addresses.
+
+### 9.2 Address Spaces
+
+> The concept of an address space is important because it make a clean distinction between data objects (bytes) and their arributes(addresses).
+
+简而言之，就是指针和值的区别，确实是当年入门C时候一个重要的概念区分。
+
+### 9.3 VM as a Tool for Caching
+
+#### 9.3.1 DRAM Cache Organization
+
+这里应该就指内存，内存换进换出的算法。因为内存也是可以看成disk的cache嘛。
+
+#### 9.3.2 Page Tables
+
+#### 9.3.3 Page Hits
+
+#### 9.3.4 Page Faults
+
+#### 9.3.5 Allocating Pages
+
+> For example, as a result of calling `malloc`.
+
+#### 9.3.6 Locality to the Rescue Again
+
+因为Locality的关系，Page Faults没有预想中的频繁。
+
+### 9.4 VM as a Tool for Memory Management
+
+> **Simplify linking**: A separate address space allows each process to use the same basic format for its memory image, regardless of where the code and the data actually reside in physical memory.
+>
+> **Simplifying loading**
+>
+> **Simplifying sharing**：For example, every process must call the same operating system kernel code, and every C program makes calls to rountines in the standard C library such as printf.
+>
+> **Simplifying memory allocation**：When a user process requests additional heap space, it can be located anywhere in physical memory.
+
+### 9.5 VM as a tool for Memory Protection
+
+### 9.6 Address Translation
+
+讲MMU的工作原理，这个太深了...
+
+MMU就像Virtual Memory的边界物理墙，CPU到MMU这一段是Virtual Memory，之后就是实际地址了。
+
+#### 9.6.1 Integrating Caches and VM
+
+讲程序访问SRAM的缓存是否用VM，好像大部分OS直接用physical address.
+
+#### 9.6.2 Speeding Up Address Translation with a TLB
+
+MMU中也有一小块cache叫做translation lookaside buffer(TLB).
+
+#### 9.6.3 Multi-Level Page Tables
+
+就是多级索引吧，pass
+
+#### 9.6.4 Putting It Together: End-to-End Address Translation
+
+Pass, 没啥兴趣
+
+### 9.7 Case Study: The Intel Core i7/Linux Memory System
+
+VM其实有两部分——CPU和OS组成，之前OS课程中就不太会涉及MMU这一块。
+
+#### 9.7.1 Core i7 Address Translation
+
+#### 9.7.2 Linux Virtual Memory System
+
+| The virtual memory of a Linux process            |
+| ------------------------------------------------ |
+| PCB, kernel stack(Different for each process)    |
+|                                                  |
+| Kernel code and data(Identical for each process) |
+| User stack                                       |
+|                                                  |
+| Memory-mapped region for shared libraries        |
+|                                                  |
+| Run-time heap                                    |
+| Read-only memory segment                         |
+| Read/Write memory segment                        |
+| **0地址**                                        |
+
+### 9.8 Memory Mapping
+
