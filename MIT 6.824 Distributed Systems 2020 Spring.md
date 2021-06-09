@@ -319,6 +319,38 @@ zookeeper允许client直接访问副本服务器，前提是只读访问，这�
 
 
 
+Zookeeper is based on RAFT.
+
+然后介绍了Zookeeper的一些增删改查的API
+
+当一个client发给Zookeeper修改信息时，create+set data两步才能确保这一行为完成，但是这两步之间不是atomic，所以会增加一个版本变量，来验证中间是否有其它client进行了修改，若有，则反错，loop回来，重新接受修改request.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
