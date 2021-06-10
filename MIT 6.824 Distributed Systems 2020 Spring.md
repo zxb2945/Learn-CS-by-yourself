@@ -22,8 +22,8 @@ performance
 
 Lab 1:MapReduce
 
-   	2: Raft for fault tolerance
-   	3: Key value server
+2: Raft for fault tolerance
+3: Key value server
 
 ​      4:shared key value server
 
@@ -325,19 +325,168 @@ Zookeeper is based on RAFT.
 
 当一个client发给Zookeeper修改信息时，create+set data两步才能确保这一行为完成，但是这两步之间不是atomic，所以会增加一个版本变量，来验证中间是否有其它client进行了修改，若有，则反错，loop回来，重新接受修改request.
 
+这样来说的话，上例就形成了一个sequence，就有点atomic，就是个database的atomic transaction.
+
+也可以每一个client过来，就lock，再做处理，就是另一种方案。
+
+但是以上两者都没法解决上千个client同时request过来的HERD问题（具体是什么问题？）
 
 
 
+LOCK without HERD
+
+ACQUIRE
+
+1. CREATE SEQ "f" -  EPHEM-T
+
+2. LIST f*
+
+3. IF NO LOWER #FILE, RETURN
+
+4. IF EXISTS( NEXT LOWER #, WATCH=T)
+
+5. WAIT
+6. GOTO 2
+
+上述方案的优点在于：同时有上千个client访问时，第一个acquire lock的client创造一系列的文件（似乎此时同时会给所有waiting中的client标上序号），当第一个client完成操作，它只向下一个低序号的client发出release信号，这样的话，就不会存在上千个client同时竞争一个lock的现象。
+
+上述方案被称为scalable lock. 细究之下，其实它不具有atomicity，因为如果在途中机器crash了，LOCK自动release，下一个client就会碰到一堆garbage。这里倾向于两种解决方案，第一是下一个client去分析这是不是garbage，需不需要delete；另一种方案像MapReduce，就由MapReduce自身来做这个分析恢复工作。
 
 
 
+> Why zk
+>
+> API general purpose coord service （raft只是一个库，不能直接再app中使用）
+> N倍的机器，N倍的吞吐量
+> 大多数系统是读多写少的系统。让客户端去follower读取数据，可以达到增加服务器提升系统吞吐量的效果。写数据还是在leader
+>
+> 写请求 leader 读 replia （在replica读数据，为了保证一致性，前提是replcia的数据up to date）
+>
+> ZK guarantees:
+>
+> Linearizable writes
+> 即使客户端并发写请求，但是系统会表现的像是某种顺序一次执行一个写请求。
+> FIFO client order
+> 如果有很多个客户端读，写。zookeeper的写操作顺序完全与client端发起的写请求顺序保持一致。（writes client specified order）
+>
+> Section 2.3
+> 使用zookeeper读取配置数据的场景：
+>
+> ```
+> write order         read order
+> 
+> delete("ready")
+> write F1
+> write f2
+> create("ready")
+>                     exists("ready")   // 写完再读，这种场景下不会有问题
+>                     read f1
+>                     read f2
+> ```
+>
+> ```
+> write order         read order
+> 
+> create ready
+> 
+>                     exists("ready"),watch = true    // 写和读交错发生，这种场景下，需要设置watch，来保证读到的数据是最新的
+>                     read f1
+> 
+> del ready
+> write f1
+> write f2
+>                     read f2
+> ```
 
+> 设置了watch， 如果有人删除了ready，就会通知client。client再读取任何日志中的信息之前，会优先处理接受到的这个watch通知。
+>
+> More Actions(用途)
+>
+> configuration info 配置消息同步
+>
+> Master elect （leader 选举）
+>
+> Lock（分布式锁）
+>
+> zookeeper看起来像一个文件系统，具有目录层次结构。每个应用再不同的目录下。
+>
+> /App1/x
+>
+> NODES：
+>
+> REGULAR
+>
+> EPHEM
+>
+> SEQ：zookeeper保证同一时间如果有多个client端同时创建sequential文件，zookeeper生成的这些文件名的序号永远不会相同。
+>
+> ```
+> CREATE(PATH, DATE, FLAGS)     // exclusive，同一时间只有一个client能够创建成功
+> 
+> DELETE(PATH, VERSION)
+> 
+> EXISTS(PATH, WATCH)
+> 
+> GETDATA(PATH, WATCH)
+> 
+> SETDATA(PATH, DATA, VERSION)
+> 
+> LIST(PATH)
+> ```
+>
+> EXAMPLE - COUNT (K/V system) 有个系统计数器，类似于K/V system。
+>
+> PUT(K,V) GET(K) -> V
+>
+> ```
+> GET(K)
+> 
+> PUT(K, X+1)
+> 
+> not atomic
+> ```
+>
+> 正确处理方式：
+>
+> ```
+> WHILE TRUE
+>     X,V = GETDATA("f")
+>     IF SETDATA("f",  X+1, V)  // 类似CAS,V不是最新的，就会set失败，然后重试
+>         BREAK
+>     redo...
+> ```
+>
+> 再负载很高的情况下，如果有1000个客户端同时做计数操作，效率很低。O（N平方）herd effect，只适用于低负载的情况。
+>
+> ### LOCK(un scalable lock)
+>
+> ```
+> ACQUIRE LOCK
+> 
+> 1 IF CREATE("F", EPHEM = T) RETURN
+> 2 IF EXISTS("F", WATCH = T)   // 等待其他client释放锁，锁释放后所有client都收到通知
+> 3     WAIT
+> 4 GOTO 1
+> ```
+>
+> herd effect。每次释放锁，所有剩下的clients都会收到watch通知，所有剩下的clients都会返回到步骤一发送create请求。
+>
+> ### LOCK WITHOUT HERD(scalable lock)
+>
+> ```
+> 1 CREATE SEQUENCE "F" // zookeeper会保证以连续的升序创建文件
+> 2 LIST F*
+> 3 IF NOT LOWER FILE, RETURN
+> 4 IF EXISTS(NEXT LOWER NUMBER FILE, WATCH=T)  // 此时只有一个获取锁的client收到通知，避免了herd effect
+> 5    WAIT 
+> 6 GOTO 2
+> ```
+>
+> // 如果我们不是lock的获得者，如果前面还有很多文件，我们需要做的就是等待前一个命名文件的创建client获得锁，并等待它释放锁
 
-
-
-
-
-
+> ————————————————
+> 版权声明：本文为CSDN博主「Tyella」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+> 原文链接：https://blog.csdn.net/ty13572053785/article/details/115363720
 
 
 
