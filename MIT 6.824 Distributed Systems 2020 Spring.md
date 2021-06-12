@@ -379,23 +379,25 @@ ACQUIRE
 > write F1
 > write f2
 > create("ready")
->                     exists("ready")   // 写完再读，这种场景下不会有问题
->                     read f1
->                     read f2
+>                  exists("ready")   // 写完再读，这种场景下不会有问题
+>                  read f1
+>                  read f2
 > ```
+>
+> 
 >
 > ```
 > write order         read order
 > 
 > create ready
 > 
->                     exists("ready"),watch = true    // 写和读交错发生，这种场景下，需要设置watch，来保证读到的数据是最新的
->                     read f1
+>                  exists("ready"),watch = true    // 写和读交错发生，这种场景下，需要设置watch，来保证读到的数据是最新的
+>                  read f1
 > 
 > del ready
 > write f1
 > write f2
->                     read f2
+>                  read f2
 > ```
 
 > 设置了watch， 如果有人删除了ready，就会通知client。client再读取任何日志中的信息之前，会优先处理接受到的这个watch通知。
@@ -490,9 +492,30 @@ ACQUIRE
 
 
 
+## Chapter 9 More Replication, CRAQ 20210612
+
+chain replication
+
+> Chain replication是一种备份协议，用于支持大规模存储（更多是kv存储），获取高吞吐量和高可用性同时提供强一致性保障，提供分布式存储服务。链式备份本质上是主从备份的一种更高效的复用
+>
+> a. 更新：只能发生在数据头节点,然后更新逐步后移，直到更新到达尾节点，尾节点逐步向前确认已经完成更新，并由尾节点向客户确认更新成功。写操作的向后传播是顺序的，即：每个节点上已完成的更新操作是其predecessor节点的子集。
+>    b. 查询：为保证强一致性，客户查询只能在尾节点进行
+> ————————————————
+> 版权声明：本文为CSDN博主「zimuxiaxi」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+> 原文链接：https://blog.csdn.net/zimuxiaxi/article/details/84597257
+
+chain replication的话类似链表嘛，就是从head写到tail，读的时候反方向，这样就可以保证强一致性。
+
+但是呢，中间两台server网络断了，就造成split brain的问题了，这时候似乎得借助于额外的configuration management来处理，而这个又是基于另一种算法（？）raft的。
+
+宏观来说，chain replication 和raft，paxos一样是种分布式策略。（包括zookeeper?）
 
 
 
+CRAQ : **(Chain Replication with Apportioned Queries )**
+
+>  相对于Chain Replication的扩展的CRAQ流行于读为主的分布式存储架构中，它通过允许向任意的数据节点发送读请求来增强读的读取速率，同时它依旧提供强一致性的保证v. 
+>
 
 
 
