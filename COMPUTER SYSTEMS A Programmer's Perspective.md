@@ -1272,6 +1272,8 @@ shell的本质。
 
 要清楚fork和execve的区别...通力合作运行一个新的进程。
 
+补足：fork与execve的区别在于， 前者是同一个program在不同process之间的复制，而后者是同一个process中不同program的替换。从这里也可以看出程序与进程的区别。
+
 ### 8.5 Signals
 
 > Low-level hardware exceptions are processed by the kernel's exception handlers and would not normally be visible to user processes. Linux signals provide a mechanism for exposing the occurrence of such exceptions to user processes.
@@ -1447,3 +1449,147 @@ VM其实有两部分——CPU和OS组成，之前OS课程中就不太会涉及MM
 
 ### 9.8 Memory Mapping
 
+回顾ELF文件中的.bss 与 .data 数据段的区别，为什么未初始化以及初始化为0的global varient和static varient要被放在.bss数据段，是因为在memory mapping 阶段Linux把其当作Anonymous file(包括Stack, Heap, .bss)处理，不用特地去磁盘swap in，No data are actually transferred between disk and memory.
+
+#### 9.8.1 Shared Objects Revisited
+
+进程之间read-only的physical memory基本是共享的，诸如同一程序不同进程的代码区，又如C program requires functions from the standard C library such as printf.
+
+但是，值得注意的是，对于某些进程的private area，也存在共享的可能性，先给其标read-only的flag，然后进程一旦试图去写入，就trigger a protection fault，然后it creates a new copy of the page in physical memory. 也就是说不更改不copy，便于节省空间。这被称为`copy-on-write`技术。
+
+#### 9.8.2 The `fork` Function Revisited
+
+紧接上节，fork函数就是基于`copy-on-write`技术的。
+
+#### 9.8.3  The `execve` Function Revisited
+
+> Loading and running a.out requires the following steps；
+>
+> 1. Delete existing area.
+> 2. Map private areas.
+> 3. Map shared areas.
+> 4. Set the program counter(PC)
+
+#### 9.8.4 User-Level Memory Mapping with the `mmap` function
+
+Linux中的两种共享内存方式：IPC(shm)和存储映射I/O(mmap).
+
+传统的read/write对文件的操作：
+
+1. 从disk往内存缓存copy.
+2. 再从内核缓存往用户空间copy.
+
+而mmap只需要从disk到用户空间一次数据copy，效率更高，并可实现不同进程间共享内存，相互通信的方式。
+
+### 9.9 Dynamic Memory Allocation
+
+> A dynamic memory allocator maintains an area of a process's virtual memory known as the heap.
+>
+> Explicit allocators: malloc package...
+>
+> Implicit allocators: garbage collectors in such as Lisp, Java...
+
+#### 9.9.1 The `malloc` and `free` Functions
+
+事实上，这里隐含着如何malloc与free堆上内存的策略，做得高效率和高利用率。
+
+#### 9.9.2 Why Dynamic Memory Allocation
+
+比如你在编译时不能确定数组的大小，需要动态分配。（必须用的场景也没那没多...）
+
+#### 9.9.3 Allocator Requirements and Goals
+
+速度与利用率之间的平衡。
+
+#### 9.9.4 Fragmentation
+
+指存储空间不能充分利用，有两类：
+
+1. internal fragmentation : 指heap内部因为alignment等问题碎片化。
+2. external fragmentation : 指外部没有连续物理内存分配给heap了。
+
+#### 9.9.5 Implementation Issues
+
+#### 9.9.6 Implicit Free Lists
+
+heap分成许多块block，每一块block需要一个structure来记载block size + Allocated/Free等信息。
+
+#### 9.9.7 Placing Allocated Blocks
+
+#### 9.9.8 Splitting Free Blocks
+
+#### 9.9.9 Getting Additional Heap Memory
+
+#### 9.9.10 Coalescing Free Blocks
+
+1. 申请一块内存用于heap.
+2. malloc空间不够了，Coalesce一下.
+3. 仍不够，调用sbrk函数向kernel再申请.
+
+#### 9.9.11 Coalescing with Boundary Tags
+
+一种提高coalescing效率的改进机制。
+
+#### 9.9.12 Putting It Together: Implementing a Simple Allocator
+
+#### 9.9.13 Explicit Free Lists
+
+> A better approach is to organize the free blocks into some form of explicit data structure.
+
+另一种block的组织方式，比如说 
+
+> The heap can be organized as a doubly linked free list by including a pred and succ pointer in each free block.
+
+#### 9.9.14 Segregated Free Lists
+
+类似于二叉树的一种block组织方式？查询与合并空闲块更快的一种算法与数据结构。
+
+### 9.10 Garbage Collection
+
+#### 9.10.1 Garbage Collector Basics
+
+> A garbage collector's view of memory as a directed **graph**:
+>
+> Root nodes: Root nodes correspond to locations not in the heap that contain pointers into the heap. These locations can be registers, variables on the stack, or global variables.
+>
+> Heap nodes:   Reachable / Unreachable( garbage )
+
+> Collectors can run as separate threads in parallel.
+>
+> The key idea is that the collector calls `free` instead of the application.
+
+#### 9.10.2 Mark&Sweep Garbage Collectors
+
+#### 9.10.3 Conservative Mark&Sweep for C Programs
+
+因为
+
+> C does not tag memory locations with any type information.
+
+所以会过于保守，而没法确保清除干净。
+
+### 9.11 Common Memory-Related Bugs in C Programs
+
+#### 9.11.1 Dereferencing Bad Pointers
+
+#### 9.11.2 Reading Uninitialized Memory
+
+这里提到heap并不被loader初始化为0，与9.8节将Run-time heap视为demand-zero page是矛盾的...
+
+#### 9.11.3 Allowing Stack Buffer Overflows
+
+#### 9.11.4 Assuming That Pointers and the Objects They Point to Are the Same Size
+
+#### 9.11.5 Making Off-by-One Errors
+
+#### 9.11.6 Referencing a Pointer Instead of the Object It Points To
+
+#### 9.11.7 Misunderstanding Pointer Arithmetic
+
+#### 9.11.8 Referencing Nonexistent Variables
+
+#### 9.11.9 Referencing Data in Free Heap Blocks
+
+#### 9.11.10 Introducing Memory Leaks
+
+### 9.12 Summary
