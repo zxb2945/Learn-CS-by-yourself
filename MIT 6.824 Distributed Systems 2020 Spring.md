@@ -515,17 +515,43 @@ chain replication的话类似链表嘛，就是从head写到tail，读的时候�
 CRAQ : **(Chain Replication with Apportioned Queries )**
 
 >  相对于Chain Replication的扩展的CRAQ流行于读为主的分布式存储架构中，它通过允许向任意的数据节点发送读请求来增强读的读取速率，同时它依旧提供强一致性的保证v. 
->
 
 
 
+## Chapter 10 Cloud Replicated DB, Aurora 20210617
 
+AURORA
 
+HISTORY:
 
+​	EC2->         它适用于给客户提供服务器service，但是database一旦crash，没有备份...
 
+| Web server              | Database | 。。。 |
+| ----------------------- | -------- | ------ |
+| Linux                   | Linux    | 。。。 |
+| Virtual machine monitor | ——       | ——     |
 
+ 	EBS->        同一个data center（比如一幢大楼里许多计算机）中多台计算机去备份这个database，然后EC2来mount这个EBS，解决单台EC2 crash的问题，但是进一步，如果整个data center crash的话怎么办？
 
+{
 
+首先我们得了解
+
+DB Tutorial  ->  Crash Recovery
+
+DB先在cache里操作数据，同时写入一个日志文件（万一crash，用来溯源），等完成之后再把结果反映到disk里去（这个时候也许要更新整个page页，数据量就会远远超过修改量），然后删除日志文件。
+
+}
+
+​	RDS->      比EBS更进一步，在多个data center进行备份，问题是通过网络传输的数据量要远大于修改量，就会降低速度。
+
+ 	Aurora->  与RDS相比，多个data center之间只是传输日志文件，这就提高了performance.
+
+​					  另外，假设Aurora在三个data center备份了6台计算机，那么只要其中最快的4台完成备份，它就可以返给client OK了，这是另外一个提高performance的trick -- QUORUM
+
+ 			（据说，以上两个trick，帮助Aurora比RDS快了35倍）
+
+​	
 
 
 
