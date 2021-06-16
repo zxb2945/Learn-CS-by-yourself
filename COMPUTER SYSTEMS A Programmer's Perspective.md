@@ -1593,3 +1593,49 @@ heap分成许多块block，每一块block需要一个structure来记载block siz
 #### 9.11.10 Introducing Memory Leaks
 
 ### 9.12 Summary
+
+
+
+## 10 System-Level I/O
+
+### 10.1 Unix I/O
+
+### 10.2 Files
+
+### 10.3 Opening and Closing Files
+
+### 10.4 Reading and Writing Files
+
+是否可以这样理解，Linux下一切皆文件，而System-Level I/O就是操作这些文件，所以Open, Close, Read，Write理所当然是最主要的几个接口了。
+
+> In some situation, `read` and `write` transfer fewer bytes than the application requests. Such `short counts` do not indicate an error. They occur for a number of reasons:
+>
+> 1. Encountering EOF on reads.
+> 2. Reading text lines from a terminal.
+> 3. Reading and writing network sockets.
+
+所谓的`short count`就是`read`或`write`的时候，读到或写入的字节数比所设定参数值要少，这是I/O里一个重要issue.
+
+尤其值得注意的是第三点：
+
+> If open file corresponds to a network socket, then internal buffering constraints and long network delays can cause `read` and `write` to return short counts. Short counts can also occur when you call `read` and `write` on a Linux `pipe`, an interprocess communication mechanism that is beyond our scope.
+
+### 10.5 Robust Reading and Writing with the `RIO` Package
+
+> The RIO (Robust I/O) package provides convenient, robust, and efficient I/O in applications such as network programs that are subject to short counts.
+
+#### 10.5.1 `RIO` Unbuffered Input and Output Functions
+
+主要是`RIO` Package中的`rio_writen`跟UNIX I/O级别的`write`一样不带缓冲（只是增加了错误类型修复，见本节引用1），所以它相对于带缓冲且支持格式化输入输出的标准IO库的`fwrite`更适合网络编程。原因见本节引用2.
+
+> RIO还帮助我们处理了可修复的错误类型:EINTR。考虑`read`和`write`在堵塞时被某个信号中断，在中断前它们还未读取/写入不论什么字节，则这两个系统调用便会返回-1表示错误，并将errno置为EINTR。这个错误是能够修复的。而且应该是对用户透明的。用户无需在意read 和 write有没有被中断。他们仅仅须要直到read 和 write成功读取/写入了多少字节，所以在RIO的`rio_read()`和`rio_write()`中便对中断进行了处理。
+
+> 试想一个场景。你正在写一个http的请求报文，然后将这个报文写入了相应socket的文件描写叙述符的缓冲区。假设缓冲区大小为8K。该请求报文大小为1K。那么，假设缓冲区被设置为被填满才会自己主动将其真正写入文件（而且一般也是这样做的）。那就是说假设没有提供一个刷新缓冲区的函数手动刷新，我还须要额外发送7K的数据将缓冲区填满。这个请求报文才干真正被写入到socket其中。所以。一般带有缓冲区的函数库都会一个刷新缓冲区的函数，用于将在缓冲区的数据真正写入文件其中。即使缓冲区没有被填满，而这也是C标准库的做法。然而，假设一个程序猿一不小心忘记在写入操作完毕后手动刷新。那么该数据（请求报文）便一直驻留在缓冲区，而你的进程还在傻傻地等待响应。
+> ————————————————
+> 版权声明：本文为CSDN博主「五张牌」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+> 原文链接：https://blog.csdn.net/qq_41570835/article/details/112859497
+
+#### 10.5.2 `RIO` Buffered Input Functions
+
+而`RIO` Package中的`rio_readnb`与标准IO库一样是可以带有缓冲的，意思是它在内核区可以申请一块缓存区，而且是为每个file descriptor分配，在`rio_reaninitb`中申请，所以是线程安全的。相对于UNIX I/O级别的`read`而言，避免了频繁地在用户态与内核态之间进行切换，不言而喻效率更高。
+
