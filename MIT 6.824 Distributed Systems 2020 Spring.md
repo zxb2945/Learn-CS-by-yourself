@@ -581,3 +581,63 @@ How Aurora deal with big data?
 
 最后，因为read request远多于write request的实际情况，除了一台main database server之外，还可以加许多read only database server，可以在不打扰main的情况下直接去读storage server。
 
+
+
+
+
+## Chapter 11 Cache Consistency, Frangipani 20210620
+
+| User programs | 调用system call访问Frangipani，位于许多个work stations（协同工作） |
+| ------------- | ------------------------------------------------------------ |
+| Frangipani    | 本地的file system，位于kernel. 之后调用remote procedure call访问Petal.  事实上，这边可以看成一个cache，而且是write-back的。 |
+|               |                                                              |
+|               |                                                              |
+|               |                                                              |
+| Petal         | Share virtual disk，on a separate set of machines , like a disk driver used over a network |
+| Physical disk |                                                              |
+
+在group协同工作中，其实大部分users只是read/write他们各自的files，顶多是去read别人的files，这就给Frangipani作为一个write-back cache的速度优势了。
+
+
+
+以上的模型最关键的问题在于如下三个：three of these challenges
+
+1.Cache coherence
+
+The property of a caching system that even if I have an old version of something cached, if someone modifies it in their cache, then their cache will automatically reflect their modifications.
+
+2.Atomicity
+
+不能发生2个文件同时创建，一个覆盖另一个的情况。
+
+3.Crash recovery of individual server
+
+We won't be able to have my workstation crash without disturbing the activity of anybody else using the same shared system even if they look at my dictionary in my files, they should see something sensible.
+
+
+
+1.Cache coherence
+
+coherence protocol
+
+> 首先要了解的一个内容就是 在Frangipani的系统中有一个lock server（LS）的模块，用来提供全局的锁管理。
+>
+> 对于第一个问题，Frangipani是采用缓存一致性协议解决的。其协议主要有以下三个原则：
+> （1）、只有获得锁，才可以cache data
+> （2）、必须先获得锁，然后在可以从petal中读取
+> （3）、释放锁之前必须先write-back
+>
+> 这里介绍一下其简化的流程：
+> （1）、WS在进行文件的读写之时需要从LS中请求其对应的锁lock
+> （2）、LS在收到WS的请求之后，查看其保护的锁元信息，如果此时锁lock没被其他WS占用（或者被占用但是其lock状态是idle），则将lock分配给WS。否则返回失败。
+> (3)、如果WS获取到lock之后，则可以从petal中把对应的data复制到期cache中，修改之后，暂时不进行write-back，也暂时不释放锁。
+>
+> （4）、此时WS2如果来请求相同的文件读写，则向LS请求对应的锁
+> （5）、LS查看对应的锁是否被占用并且其状态是idle，如果lock处于这个状态，则LS要求WS释放锁（revoke）
+> （6）、WS收到LS发来的释放锁的请求之后，先把dirty data 回写到petal中，然后释放锁。
+> （7）、LS返回lock给WS2
+> （8）、WS2收到锁授权之后，即可进行文件的读写。
+> ————————————————
+> 版权声明：本文为CSDN博主「BLSxiaopanlaile」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+> 原文链接：https://blog.csdn.net/plm199513100/article/details/108310623
+
