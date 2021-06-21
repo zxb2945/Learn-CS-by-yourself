@@ -1639,3 +1639,43 @@ heap分成许多块block，每一块block需要一个structure来记载block siz
 
 而`RIO` Package中的`rio_readnb`与标准IO库一样是可以带有缓冲的，意思是它在内核区可以申请一块缓存区，而且是为每个file descriptor分配，在`rio_reaninitb`中申请，所以是线程安全的。相对于UNIX I/O级别的`read`而言，避免了频繁地在用户态与内核态之间进行切换，不言而喻效率更高。
 
+### 10.6 Reading File Metedata
+
+> An application can retrieve information about a file (sometimes called the file's metadata) by calling the `stat` and `fstat` functions.
+
+### 10.7 Reading Directory Contents
+
+就各种各样前所未闻的IO。
+
+### 10.8 Sharing Files
+
+在fd与inode之间其实还有一个File table，文件被读取时，记录着相应的位置等信息，当子进程复制父进程时，所拷贝的正是这个File table.
+
+如果你用一个`open`函数打开同一个文件名两次，就会产生指向同一个inode的两个File table.
+
+### 10.9 I/O Redirection
+
+文件redirection的原理事实上就是将fd指向另一个File table.
+
+相应的IO函数为`dup2`.
+
+### 10.10 Standard I/O
+
+> The C language defines a set of higher-level I/O functions, called the **standard I/O library**( libc, <stdio.h>). 
+>
+> The standard I/O library model an open file as a **stream**.
+
+对于libc而言的话，倾向于将stream放在buffer里来减少频繁地system call，这大概是其整体设计策略.
+
+### 10.11 Putting It Together: Which I/O Functions Should I Use?
+
+> Standard I/O functions: fopen, fread, fwrite, fclose, fflush, fseek, fgets, fputs,  scanf, printf...
+>
+> Rio functions: rio_readinitb, rio_readlineb, rio_writen...
+>
+> Unix I/O functions: open, read, write, close, lseek...
+
+### 10.12 Summary
+
+> Linux provides a small number of system-level functions, based on the Unix I/O model, that allow applications to open, close, read, write files, to fetch file metadata, and to perform I/O redirection.
+
