@@ -641,3 +641,21 @@ coherence protocol
 > 版权声明：本文为CSDN博主「BLSxiaopanlaile」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
 > 原文链接：https://blog.csdn.net/plm199513100/article/details/108310623
 
+
+
+2.Atomicity
+
+3.Crash recovery
+
+对于一个workstation收到petal要求其release lock的请求之后，先把write log给petal，然后再write modified block，最后才是release lock。
+
+所以当这个workstation crash的时候，其它ws可以根据其write log来完成其未完成的操作...
+
+而且会给这个write log一个version number.
+
+
+
+Frangipani会适应于一些小型的协同工作的情况，但一般不太用来设计为大型系统，比如大数据计算，因为cache毕竟容量有限。
+
+
+
