@@ -659,3 +659,40 @@ Frangipani会适应于一些小型的协同工作的情况，但一般不太用�
 
 
 
+## Chapter 12 Distributed Transactions  20210624
+
+concurrency control + atomic commit => transactions
+
+Transactions现在多用于database中，但是其实它是一种普遍的设计思想
+
+
+
+ACID:
+
+Atomic
+
+Consistent
+
+Isolated  -> serializable
+
+Durable
+
+
+
+Serializable: if 存在 serial order of execution of transactions that yields same result.
+
+比如说两个transactions同时操作同一数据，t1修改，t2读取，虽然说同时，其实还是串行，只要其顺序确定，最后的结果是不变的，不会出现t2读到一半被t1修改了。
+
+This definition allows truly parallel execution of transactions as long as they don't use the same data.
+
+
+
+Concurrency control有两种strategies:
+
+1.pessimistic
+
+就是获得lock改数据，否则delay，修改成本大
+
+2.optimisitc
+
+就是直接改，最后check有没有其他人修改，有的话abort重来
