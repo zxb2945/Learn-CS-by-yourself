@@ -1679,3 +1679,117 @@ heap分成许多块block，每一块block需要一个structure来记载block siz
 
 > Linux provides a small number of system-level functions, based on the Unix I/O model, that allow applications to open, close, read, write files, to fetch file metadata, and to perform I/O redirection.
 
+
+
+## 11 Network Programming
+
+### 11.1 The Client-Server Programming Model
+
+> It is important to realize that clients and servers are processes and not machines, or hosts as they are often called in this context.
+
+### 11.2 Networks
+
+> Encapsulation is the key.
+
+### 11.3 The Global IP Internet
+
+#### 11.3.1 IP Addresses
+
+> It would make more sense to define a scalar type for IP addresses, but it is too late to change now because of the enormous installed base of applications.
+
+#### 11.3.2 Internet Domain Names
+
+> Each Internet host has the locally defined domain name `localhost`, which always maps to the loopback address 127.0.0.1
+
+#### 11.3.3 Internet Connections
+
+> The port in the client's socket address is assigned automatically by the kernel when the client makes a connection request and is known as an `ephemeral port`.
+
+客户端端口任意，服务端端口固定。
+
+### 11.4 The Sockets Interface
+
+#### 11.4.1 Socket Address Structures
+
+#### 11.4.2 The `socket` Function
+
+#### 11.4.3 The `connect` Function
+
+> The `connect` function blocks until either the connection is successfully established or an error occurs.
+
+#### 11.4.4 The `bind` Function
+
+#### 11.4.5 The `listen` Function
+
+> A server calls the `listen` function to tell the kernel that the descriptor will be uesd by a server instand of a client.
+
+告诉kernel本进程是服务器。
+
+#### 11.4.6 The `accept` Function
+
+> The distinction between a listening descriptor and a connected descriptor confuses many students. The listening descriptor serves as an end point for client connection requests. It is typically created once and exists for the lifetime of the server. The connected descriptor is the end point of the connection that is established between the client and the server. It is created each time the server accepts connection requests and exists only as long as it takes the server to service a client.
+
+#### 11.4.7 Host and Service conversion
+
+> The `getaddrinfo` Function
+>
+> The `getnameinfo` Function
+>
+> The property allows us to write clients and servers that are independent of any paticular version of the IP protocol.
+
+就是加一层中间层转化为统一格式给socket用。
+
+#### 11.4.8 Helper Functions for the Sockets Interface
+
+本书自己做的一个一键打开listen fd函数？
+
+#### 11.4.9 Example Echo Client and Server
+
+### 11.5 Web server
+
+#### 11.5.1 Web Basics
+
+> What distinguishes Web services from conventional file retrievel services such as FTP? The main difference is that Web content can be written in a language known as HTML. An HTML program(page) contains instrctions(tags) that tell the browser how to display various text and graphical objects in the page.
+
+视角不一样，Web services其实也是从去远端服务器拿文献这一行为发展过来的。
+
+#### 11.5.2 Web Content
+
+> Web servers provide content to clients in two different ways:
+>
+> Fetch a disk file and return its contents to the client. The disk file is known as **static content** and the process of returning the file to the client is known as **serving static content**.
+>
+> Run an executable file and return its output to the client. The output produced by the executable at run time is known as **dynamic content**, and the process of running the program and returning its output to the client is known as **server dynamic content**.
+
+这个就是存储静态资源的Apache和存储动态资源的Tomcat的由来。
+
+#### 11.5.3 HTTP Transactions
+
+> The `telnet` program has been largely supplanted by SSH as a remote login tool, but it can also be used to request the homepage from Web server.
+
+可以在Linux命令行上用telnet去request某网站的html页面。
+
+#### 11.5.4 Serving Dynamic Content
+
+> How does the client pass program arguments to the server?
+
+Arguments for GET requests are passed in the URL.
+
+> How does the server pass arguments to the child?
+
+`fork`+`execve`启动一个符合CGI standard的进程, 通过设置环境变量形式传进去。
+
+> Where does the child send its output?
+
+It uses the Linux `dup2` function to redirect standard output to the connected descriptor that is associated with the client.
+
+#### 11.6 Putting It Together: The Tiny Web Server
+
+在发送response往body写入阶段，连续多次调用没有缓存的write不会造成随写随发，对端收报文时断断续续的现象吗？大概内核的TCP/IP这一部分会对其做一次整合后再发送。所以write和TCP/IP也许有两个层次的缓存。
+
+### 11.7 Summary
+
+> Every network application is based on the client-server model.
+>
+> A simple but functioning Web server that serves both static and dynamic content can be implemented in a few hundred lines of C code.
+
