@@ -1,5 +1,70 @@
 # COMPUTER SYSTEMS A Programmer's Perspective
 
+## 1 A Tour of Computer Systems
+
+### 1.1 Information Is Bits + Context
+
+> Files such as `hello.c` that consist exclusively of ASCII characters are known as **text files**.  All other files are known as **binary files**.
+
+虽说 `hello.c` 归根到底也是二进制object，text files和binary files还是有给人读和给机器读的区分。
+
+> The only thing that distinguishes different data objects is the context in which we view them. For example, in different contexts, the same sequence of bytes might represent an integer, floating-point number, character string, or machine instruction.
+
+一个看待程序语言的重要观点。
+
+### 1.2 Programs Are Translated by Other Programs into Different Forms
+
+四个阶段：
+
+1. Preprocessing phase
+2. Compilation phase
+3. Assembly phase
+4. Linking phase
+
+### 1.3 It Pays to Understand How Compilation System Work
+
+### 1.4 Processors Read and Interpret Instructions Stored in Memory
+
+#### 1.4.1 Hardware Organization of a System
+
+#### 1.4.2 Running the `hello` Program
+
+### 1.5 Caches Matter
+
+### 1.6 Storage Devices Form a Hieraychy
+
+### 1.7 The Operating System Manages the Hardware
+
+#### 1.7.1 Processes
+
+#### 1.7.2 Threads
+
+#### 1.7.3 Virtual Memory
+
+#### 1.7.4 Files
+
+### 1.8 Systems Communicate with Other Systems Using Networks
+
+### 1.9 Important Themes
+
+#### 1.9.1 Amdahl's Law
+
+> The main idea is that when we speed up one part of a system, the effect on the overall system performance depends on both how significant this part was and how much it sped up.
+
+#### 1.9.2 Concurrency and Parallelism
+
+1. Thread-Level Concurrency
+2. Instruction-Level Parallelism
+3. Single-Instruction, Multiple-Data(SIMD) Parallelism
+
+#### 1.9.3 The Importance of Abstractions in Computer Systems
+
+> On the processor side, the **instruction set architecture** provides an abstraction of the actual processor hardware. On the OS side, we have introduced **three** abstractions: files as an abstraction of I/O devices, virtual memory as an abstraction of program memory, and processes as an abstraction of a running program.
+
+### 1.10 Summary
+
+
+
 ## 2 Representing and Manipulating Information
 
 核心就是建立在Two-valued signals的integer和floating-pointer数据类型。
