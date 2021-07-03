@@ -734,7 +734,9 @@ Transaction Coordinator
 
 
 
+## Chapter 13 Spanner 20210703
 
+前二十分钟讲基于paxos与Two-Phase commit之上的transaction的流程，但是没看懂...
 
 
 
