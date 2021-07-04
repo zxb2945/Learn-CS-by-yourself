@@ -748,7 +748,11 @@ spanner（Google）是为数不多全球分布多个数据中心的分布式数�
 
 ->Two-Phase commit是针对一个transaction而言的，而不是针对一个paxos group.  这就意味着所谓的coordinater及其它是针对不同的数据而言，比如存储于两个不同的paxos group的trasaction部分，所以我们可以推测coordinater应该是其中一个group的leader.
 
+因为paxos原因，不用担心Two-Phase commit的availability.
 
+
+
+相对于read/write操作，read不需要lock，不需要Two-Phase commit，用timestamp来serializable.(被称为 snapshot isolation)
 
 
 
