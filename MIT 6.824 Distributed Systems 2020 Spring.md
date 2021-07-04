@@ -736,9 +736,17 @@ Transaction Coordinator
 
 ## Chapter 13 Spanner 20210703
 
+spanner（Google）是为数不多全球分布多个数据中心的分布式数据库，它提供统一的更新时间，强一致性来处理read-only commit和一小部分的read-write commit.
+
+基于paxos算法，对于A部分数据而言，它有一个分布于不同数据中心的paxos group，其中一个为leader. 不同部分的数据可以parallel, 许多google服务承载于其上. 采用paxos来备份基于两个原因，1是众所周知防止crash，2是比如中国的用户可以直接转去香港的服务器rather than 加利福尼亚，从而更快. 另外它似乎也支持quorum机制。
+
+> raft是paxos的改进版
+
+
+
 前二十分钟讲基于paxos与Two-Phase commit之上的transaction的流程，但是没看懂...
 
-
+->Two-Phase commit是针对一个transaction而言的，而不是针对一个paxos group.  这就意味着所谓的coordinater及其它是针对不同的数据而言，比如存储于两个不同的paxos group的trasaction部分，所以我们可以推测coordinater应该是其中一个group的leader.
 
 
 
