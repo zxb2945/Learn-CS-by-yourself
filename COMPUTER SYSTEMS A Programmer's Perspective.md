@@ -1908,3 +1908,164 @@ IPC: Inter Process Communications.
 
 相对于process-based designs, I/O Multiplexing各个event之间的通信更为方便，因为有相同的上下文。但是It's vulnerable to a malicious client that sends only a partial text line and halts. Because as long  as some logical flow is busy reading a text line, no other logical flow can make progress. 另外也不方便适配multi-core processors.
 
+### 12.3 Concurrent Programming with Threads
+
+#### 12.3.1 Thread Execution Model
+
+> The **main** thread is distinguished from other threads only in the sense that it is always the first thread to run in the process. The main impact of this notion of a pool of **peers** is that a thread can kill any of its peers or wait for any of its peers to terminate.
+
+相比进程，就没什么父子线程之说。
+
+#### 12.3.2 Posix Threads
+
+> Posix threads( Pthreads ) is a standard interface for manipulating threads from C programs.
+
+#### 12.3.3 Creating Threads
+
+`pthread_create`: 略
+
+`pthread_self`: 获取当前线程ID
+
+#### 12.3.4 Terminating Threads
+
+四种情况：
+
+1. 隐式地随着上一级线程的return而终止；
+2. 该线程自身调用`pthread_exit`显式终止，如果该线程是main thread，则会等所有peer threads终止后，终止整个process；
+3. 调用`exit`直接终止process，所有线程都会随之终止；
+4. 当前线程想终止其它线程，需要调用`pthread_cancel`.
+
+#### 12.3.5 Reaping Terminated Threads
+
+`pthread_join`: 使当前线程block，直到某一特定其它线程终止，去reaps any memory resources held by the terminated thread.
+
+#### 12.3.6 Detaching Threads
+
+Thread的一个重要属性就是它是否可以被其它线程killed和reaped，如果可以，则为**joinable**,  Its memory resources(such as the stack) not freed until it is reaped by another thread. 
+
+In contrast, 如果不可以，则为**detached**，Its memory resources are freed automatically by the system when it terminates.
+
+By default, threads are created **joinable**. `pthread_detach` 可以将其变成**detached**.
+
+#### 12.3.7 Initializing Threads
+
+`pthread_once`: It is useful whenever you need to dynamically initialize global variables that are shared by multiple threads.  
+
+> 这种情况一般用于某个多线程调用的模块使用前的初始化，但是无法判定哪个线程先运行，从而不知道把初始化代码放在哪个线程合适的问题。
+> 当然，我们一般的做法是把初始化函数放在main里，创建线程之前来完成，但是如果我们的程序最终不是做成可执行程序，而是编译成库的形式，那么main函数这种方式就没法做到了。
+
+顾名思义，可以写到多个threads中，但全程只被调用一次。
+
+#### 12.3.8 A Concurrent Server Based on Threads
+
+需要注意的一点，从main thread 创建peer thread时，传进去的参数尽管位于前者的stack，但仍然是共享的。
+
+### 12.4 Shared Variable in Threaded Programs
+
+#### 12.4.1 Threads Memory Model
+
+thread有各自的stack，但你特意要去访问其它线程的stack，其实也行，并没强制的保护措施。
+
+#### 12.4.2 Mapping Variable to Memory
+
+> Global variables
+>
+> Local automatic variables
+>
+> Local static variables
+
+#### 12.4.3 Shared Variables
+
+> It's important to realize that local automatic variables such as `msgs` can also be shared.
+
+只要这个局部变量msgs被全局指针确定地址。
+
+### 12.5 Synchronizing Threads with Semaphores
+
+因为在汇编层面，全局变量会暂时转移至寄存器进行相关计算，而寄存器是不会共享的，所以两个线程各自独立累加某个全局变量的情况，即便代码只有一行，也不能保证原子性，仍会出错。
+
+#### 12.5.1 Progress Graphs
+
+用图来表达critical section和mutual exclusion的概念。
+
+#### 12.5.2 Semaphores
+
+概括来说就是两个操作：
+
+ 	1. P(s)：如果s不为0，则减一返回，为0则suspend the thread;
+ 	2. V(s):   就是将s增一返回，如果当前thread从0变成非0，则restart;
+
+#### 12.5.3 Using Semaphores for Mutual Exclusion
+
+> A semaphore that is used in this way to protect shared variables is called a **binary semaphore** because its value is always 0 or 1. Binary semaphores whose purpose is to provide mutual exclusion are often called **mutexes**. Performing a P operation on a mutex is called locking the mutex.
+
+#### 12.5.4 Using Semaphores to Schedule Shared Resources
+
+> Producer-Consumer Problem: For example, the producer detects mouse and keyboard events and insert them in the buffer. The consumer removes the events from the buffer in some priority-based manner and paints the screen.
+
+此处的关键在于不仅producers和consumers之间需要互斥(mutex)，而且producer和consumer之间还有先后顺序(schedule)，这就要求需要互斥锁和信号量组合使用。
+
+```
+void insert()
+{
+	P(slot);     /*Wait for available slot*/
+	P(mutex);    /*Lock*/
+	/*Insert the item*/
+	V(mutex);    /*Unlock*/
+	V(item);     /*Announce available item*/
+}
+
+void remove()
+{
+	P(item);     /*Wait available item*/
+	P(mutex);    /*Lock*/
+	/*Remove the item*/
+	V(mutex);    /*Unlock*/
+	V(slot);     /*Announce for available slot*/
+}
+```
+
+两个函数头尾semaphores不同来schedule! 
+
+实质上上例总共使用了三组semaphores.
+
+形象地说，Producer先查看仓库有没有空间，有的话生产，然后告诉Consumer仓库里有东西了，然后Consumer先查看仓库里有没有东西，有的话消费，然后告诉Producer仓库里有空间了。而仓库空间假若说有十个东西可以存储，就可以够十个Producers和Consumers同时忙活。
+
+
+
+> Readers-Writes Problem: For example, in a online airline reservation system, an unlimited number of customers are allowed to concurrently inspect the seat assignments, but a customer who is booking a seat must have exclusive access to the database.
+
+就Readers可以同时处理critical section，而Writers需要排他。
+
+```
+void reader()
+{
+	P(mutex);
+	readcnt++;
+	if(readcnt==1)  /*first in*/
+		P(write);
+	V(mutex);
+	
+	/* Critical section*/
+	
+	P(mutex);
+	readcnt--;
+	if(readcnt==0)  /*last out*/
+		V(write);
+	V(mutex);	
+}
+
+void writer()
+{
+	while(1){
+		P(write);
+		
+		/*critical section*/
+		
+		V(write);
+	}
+}
+```
+
+上例中的mutex仅仅是为了计数安全，并不重要。归结而言，Reader是头个读者Lock和最后一个读者Unlock，从而保证各个Readers之间不排它，而每个Writer都要要Lock，保证互相之间排他并且和Readers排他.
+

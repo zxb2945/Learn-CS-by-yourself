@@ -655,6 +655,8 @@ Message Queue是一个存在于内存的消息的链表，相较于pipe，它所
 
 注意以上函数不是标准函数，位于<sys/sem.h>.
 
+(2021.7.6)补充：信号量有两种实现：传统的System V信号量和新的POSIX信号量。POSIX信号量来源于POSIX技术规范的实时扩展方案(POSIX Realtime Extension)，常用于线程；system v信号量，常用于进程的同步。这两者非常相近，但它们使用的函数调用各不相同。前一种的头文件为semaphore.h，函数调用为sem_init(), sem_wait(), sem_post(), sem_destory()等等。后一种头文件为<sys/sem.h>,函数调用为semctl(), semget(), semop()等函数。
+
 ### Pipe
 
 Pipe不同于Message Queue，它不能区分字节流的边界。
