@@ -1858,3 +1858,53 @@ It uses the Linux `dup2` function to redirect standard output to the connected d
 >
 > A simple but functioning Web server that serves both static and dynamic content can be implemented in a few hundred lines of C code.
 
+
+
+## 12 Concurrent Programming
+
+Concurrency含义比较广，包括第八章的logical control flows, 只要they overlap in time. 但是一般来说，我们讲Application-level concurrency, 主要是以下三种：
+
+1. Processes;
+2. I/O multiplexing;
+3. Threads.
+
+### 12.1 Concurrent Programming with Processes
+
+#### 12.1.1 A Concurrent Server Based on Processes
+
+> A natural approach for building a concurrent server is to accept client connection requests in the parent and then create a new child process to service each new client using `fork` and `exec`.
+
+#### 12.1.2 Pros and Cons of Processes
+
+> Processes have a clean model for sharing state information between parents and children: file tables are shared and user address spaces are not.
+
+IPC: Inter Process Communications.
+
+没看懂章名的意思...但就是笼统讲了进程间可以怎么通信吧。=> 优缺点的意思。
+
+### 12.2 Concurrent Programming with I/O Multiplexing
+
+> Suppose you are asked to write an echo server that can also respond to interactive commands that the user types to standard input. In this case, the server must respond to two independent I/O events, which event do we wait for first?
+>
+> One solution to this dilemma is a technique called I/O multiplexing. The basic idea is to use the `select` function to ask the kernel to suspend the process, returning control to the application only after one or more I/O events have occurred.
+
+事实上，就是instead of waiting for a connection request by calling the `accept` function, we call the `select` function, which blocks until either the listening descriptor or standard input( 两个不同的fd ) is ready for reading. 这样的解决方法仍然会存在一个问题：因为其仍然是同一个线程，虽然解决了顺序难题，但进行一个I/O时仍无法去回应另一个I/O. 即if you type a command to standard input when the server connects to a client, you will not get a response until it is finished with the client.
+
+#### 12.2.1 A Concurrent Event-Driven Server Based on I/O Multiplexing
+
+> I/O multiplexing can be used as the basis for concurrent **event-driven programs**, where flows make progress as a result of certain events. The general idea is to model logical flows as **state machine**.
+
+原来这也是一种状态机。
+
+> State machine for a logical flow in a concurrent event-driven echo server:
+>
+> 1. Input event: "descriptor A is ready for reading"  =>`select`
+> 2. State: "waiting for A to be ready for reading" =>`accept`
+> 3. Transition: "read a text line from A" =>`read` and `close`
+
+`select`一开始只监视listenfd，之后再在监视池里陆续加入listenfd中收到的connfd。So the server calls the `select` function to detect two different kinds of input events: 1. a connection request arriving from a new client, and 2. a connected descriptor for an existing client being ready for reading.
+
+#### 12.2.2 Pros and Cons of I/O Multiplexing
+
+相对于process-based designs, I/O Multiplexing各个event之间的通信更为方便，因为有相同的上下文。但是It's vulnerable to a malicious client that sends only a partial text line and halts. Because as long  as some logical flow is busy reading a text line, no other logical flow can make progress. 另外也不方便适配multi-core processors.
+
