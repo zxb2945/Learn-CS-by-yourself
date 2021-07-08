@@ -2069,3 +2069,45 @@ void writer()
 
 上例中的mutex仅仅是为了计数安全，并不重要。归结而言，Reader是头个读者Lock和最后一个读者Unlock，从而保证各个Readers之间不排它，而每个Writer都要要Lock，保证互相之间排他并且和Readers排他.
 
+#### 12.5.5 Putting It Together: A Concurrent Server Based on Prethreading
+
+类比12.2.1
+
+### 12.6 Using Threads for Parallelism
+
+> A parallel program is a concurrent program running on multiple processors. Thus, the set of parallel programs is a proper subset of the set of concurrent programs.
+
+这里的parallel概念就是并发之上的并行。
+
+> Synchronization overhead is expensive and should be avoided if possible.
+
+### 12.7 Other Concurrency Issues
+
+#### 12.7.1 Thread Safety
+
+> A function is said to be thread-safe if and only if it will always produce correct results when called repeatedly from multiple concurrent threads.
+
+#### 12.7.2 Reentrancy
+
+> The set of reentrant functions is a proper subset of the thread-safe functions.
+
+大概可以理解为纯函数吧， 入参确定，返回值就一定的感觉。
+
+#### 12.7.3 Using Existing Library Functions in Threaded Programs
+
+> Common thread-unsafe library functions:
+>
+> `rand`, `strtok`, `asctime`, `ctime`, `gethostbyaddr`, `gethostbyname`, `inet_ntoa`, `localtime`.
+
+#### 12.7.4 Races
+
+比如main thread传递local变量给peer thread时，因为两个线程trajectory并不会总如人所愿有固定地前后，造成抵达某一逻辑点顺序不同，导致结果不同，称为race.  在例子的情况，可以考虑用heap变量代替local变量。
+
+#### 12.7.5 Deadlocks
+
+> Mutex lock ordering rule: Given a total ordering of all mutexes, a program is dead-free of each thread acquires its mutexes in order and release them in reverse order.
+
+就一条rule。
+
+### 12.8 Summary
+
