@@ -788,7 +788,29 @@ Commit wait： read/write操作commit之际，似乎要进行一定的延迟？
 
 
 
+## Chapter 14 Optimistic Concurrency Control 20210708
 
+FaRM:  相较Spanner来说还不完善，并且不同于Spanner拥有多个data centers,  FaRM就只有一个，尽管FaRM也有Primary, Backup的fault tolerance机制，加之其相较使用disk，为了提高速度（速度可以比Spanner快上几百倍）使用的都是RAM，所以一旦整个data center断电，它采用的是每台service都有独立备用电池...
+
+1. Non-Volatile RAM: 就是为了应对datacenter power failure，在备用电池短暂运作时间里将RAM数据迁移到Disk中的一个trick.
+2. Kernel Bypass: Application越过kernel，不用system call，直接访问Network Interface Card的stack告诉它怎么做，然后网卡通过DMA直接访问Application的memory. 实现这个trick需要对OS进行一定修改.
+3. RDMA( Remote Direct Memory Access):  本地电脑直接通过两个网卡交互，直接访问远端Application的memory，不仅不经过kernel，甚至远端Application也不知道，这就需要两个网卡提供一种类似kernel中的TCP协议栈的protocol来保证reliability.
+4. Optimistic Concurrency Control: 因为transaction和RDMA看起来不怎么兼容，所以引进OCC.
+
+
+
+Pessimistic: 
+
+1. Locks -> like 2PC;
+
+2. Conflicts -> Block.
+
+Optimistic:  实现one-side RDMA
+
+1. read without locks;
+2. buffer writes;
+3. commit -> validation;
+4. conflict -> abort;
 
 
 
