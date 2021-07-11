@@ -282,6 +282,19 @@ struct bf{
 
 （2019.7.18）
 
+（2021.7.11）补充：关于结构体的alignment问题，以4整除单位，如下例，应该为24byte长。
+
+```
+struct exm{
+	char a;
+	int b;          //a与b之间有3byte dummy
+	char c;
+	double d;       //c与d之间有7byte dummy
+}
+```
+
+
+
 ## 8 define
 
 ### 8.1 关于C函数可变参数占位符`...`
