@@ -1341,6 +1341,8 @@ shell的本质。
 
 ### 8.5 Signals
 
+> We have seen how hardware and software cooperate to provide the fundamental **low-level exception** mechanism. In this section, we will study a **higher-level software form** of exceptional control flow, known as a Linux signal, that allows processes and the kernel to interrupt other processes.
+
 > Low-level hardware exceptions are processed by the kernel's exception handlers and would not normally be visible to user processes. Linux signals provide a mechanism for exposing the occurrence of such exceptions to user processes.
 
 #### 8.5.1 Signal Terminology
