@@ -814,6 +814,30 @@ Optimistic:  实现one-side RDMA
 
 
 
+> 乐观并发控制：
+> Execute Phase
+> 读取值和版本号。计算结果暂时写到本地。
+> Commit Phase
+> 四个步骤：
+> LOCK、锁住要写的region
+> VALIDATE、 检查读过的region版本号未改变
+> COMMIT-BACKUP、将新值直接写入到backup的log
+> COMMIT-PRIMARY、叫primary将新值写入
+>
+> 四个步骤与RDMA：
+> LOCK需要对方CPU参与
+> 因为单纯RDMA没有办法实现compare-and-swap。
+> 加锁需要CM利用单边RDMA write将加锁请求放到primary的log中，等对方CPU执行一个CAS操作。
+> 对方通过LOCK-REPLY消息答复加锁是否成功。
+> VALIDATE和COMMIT-BACKUP是RDMA单边读、RDMA单边写
+> 完全不用对方cpu参与
+> COMMIT-BACKUP和COMMIT-PRIMARY都只等硬件答复ACK。不等对方CPU真正把log应用到数据区Region。
+> 这样速度快。log应用到数据区与CM处理事务可以并行。
+>
+> ————————————————
+> 版权声明：本文为CSDN博主「颛顼子」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+> 原文链接：https://blog.csdn.net/hohomi77/article/details/102511679
+
 
 
 
