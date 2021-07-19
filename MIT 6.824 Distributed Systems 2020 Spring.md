@@ -840,5 +840,25 @@ Optimistic:  实现one-side RDMA
 
 
 
+## Chapter 15 Big Data - Spark 20210719
+
+Spark 与 MapReduce 类似，但是对于比如一个PageRank算法，会有更少的I/O操作。
+
+视频通过讲解一段代码（存在loop）在Spark上逐行运行来说明整个PageRank流程，完全云里雾里，难道类似于MapReduce的map，shuffle，reduce全部在这一段代码中全部实现吗？那这一小段代码是如何去操作整个分布式计算框架？另外，所谓分布式框架的并行的运算单位，是一小段代码还是一小块数据呢？
+
+从HDFS中input file以chunk的形式被不同的workers所read，然乎这些workers各自独立map，把各自的chunk分类成各种<key,value>，到此为止都是narrow处理。然后每台workers在以一个key为主，去其它workers那里进行此key的集约，叫distinct，这就开始了wide阶段，有各种交互，非常expensive。
+
+（以上看来，narrow处理阶段就相当于MapReduce的map阶段，而wide阶段就是Reduce阶段）
+
+以上来看，这个分布式框架，是每台worker都运行同一段代码，处理不同的数据，中间有一个GroupByKey的交互。相比MapReduce，Spark在各个worker交互过程中用的是内存，而不是磁盘。
+
+最后稍微提了一下single node lose时候的fault tolerance.
+
+（大概所谓大数据云计算，MapReduce就是一个典型框架吧）
+
+
+
+
+
 
 
