@@ -858,6 +858,25 @@ Spark 与 MapReduce 类似，但是对于比如一个PageRank算法，会有更�
 
 
 
+## Chapter 16 Cache Consistency - Memcached at Facebook 20210720
+
+Facebook的Web服务器在Apache等Front-ends服务器和数据库服务器之间，加了层硬件改造更为快速的缓存服务器Memcache。所以缓存服务器与数据库服务器之间的数据一致性就成了issue，另一方面因为缓存服务器承担了绝大部分的访问，一旦crash，Front-ends直接访问数据库的话，数据库服务器承受不住，所以需要在缓存服务器这一层做fault tolerance.
+
+关于缓存服务器与数据库服务器之间的数据一致性，不用在意秒级的，即稍微不一致也可以，但是对于用户自己所更新的数据，就有更高的要求。
+
+此架构的read/write操作流程：
+
+```
+read:
+value=get(key)  from Memcached
+if value is null
+	value = fetch from DB
+	set(key) to Memcached
+wirte:
+send <key,value> to DB
+delete key from Memcached
+```
+
 
 
 
