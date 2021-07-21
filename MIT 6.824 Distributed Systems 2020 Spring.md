@@ -860,7 +860,7 @@ Spark 与 MapReduce 类似，但是对于比如一个PageRank算法，会有更�
 
 ## Chapter 16 Cache Consistency - Memcached at Facebook 20210720
 
-Facebook的Web服务器在Apache等Front-ends服务器和数据库服务器之间，加了层硬件改造更为快速的缓存服务器Memcache。所以缓存服务器与数据库服务器之间的数据一致性就成了issue，另一方面因为缓存服务器承担了绝大部分的访问，一旦crash，Front-ends直接访问数据库的话，数据库服务器承受不住，所以需要在缓存服务器这一层做fault tolerance.
+Facebook的Web服务器在Apache等Front-ends服务器和数据库服务器之间，加了层硬件改造更为快速的缓存服务器Memcached( 其实就是利用CPU利用率高，内存利用率低的计算机 )。所以缓存服务器与数据库服务器之间的数据一致性就成了issue，另一方面因为缓存服务器承担了绝大部分的访问，一旦crash，Front-ends直接访问数据库的话，数据库服务器承受不住，所以需要在缓存服务器这一层做fault tolerance.
 
 关于缓存服务器与数据库服务器之间的数据一致性，不用在意秒级的，即稍微不一致也可以，但是对于用户自己所更新的数据，就有更高的要求。
 
@@ -876,6 +876,30 @@ wirte:
 send <key,value> to DB
 delete key from Memcached
 ```
+
+因为write时候的顺序，这里存在没法取到最新修改的数据的可能性。
+
+进一步，假若有大量front-end在 访问这个修改的key，全部miss，全部去database，就比就糟糕。这个时候可以采用write的时候在memcached里立个bit，告诉其它request等一等。同样，在一个read miss时候复写缓存时，这中间如果有write，delete操作的话，这里也需要立个bit，告诉无需复写了。以上可以归结为Race问题。
+
+
+
+Two main way to get extra hardware high performance: Partition, Replication (针对hot key效果不同，不太理解...)  =>  它的意思是多台memcached的情况下，这些memcahced分别存储不同的数据，即partition，还是同样的数据，即replication.
+
+然后众多web服务器和众多Memcached服务器会组成一个个cluster. 然后各cluster之间还有共享的memcached机群,称为regional pool。来存储那些并不那么hot的key（从这个意义上讲，各cluster之间数据是replication？)
+
+接着讲了，如果新增一个cluster的时候，一开始其中的memecached没有任何数据，大概率hit不了cache，要去database取，就会有一段cold time，这个时候可以直接去既存的cluster中取来代替。
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
