@@ -891,17 +891,47 @@ Two main way to get extra hardware high performance: Partition, Replication (针
 
 
 
+## Chapter 17 COPS, Causal Consistency 20210728
+
+> COPS是保序系统的集群(Clusters of Order Preserving System)的简称。
+>
+> COPS系统能够提供因果+一致性causal+ consistency，设计为支持复杂的在线应用，这些应用托管在少量的大规模数据中心，每个应用都是有前端服务器(COPS客户端)以及后端key-value数据存储，COPS在本地数据中心以线性化方式执行所有的put写操作和get读操作，然后会跨数据中心以因果一致性的顺序在后台进行复制。
+>
+> 下面看看什么是因果一致性。我们假设一个key-value数据存储，有两个基本操作: put(key,val) 和 get(key)=val. 这个类似于在单机的共享内存系统中的读操作和写操作(可参考：Go语言Goroutine与Channel内存模型)。
+>
+> 　　我们约定遵循下面三个规则表示潜在一致性，用符号表达 ->：
+>
+> 　　在同一执行线程：. 如果a 和 b 是一个执行线程中的两个操作，如果操作a发生在操作b之前，那么a ->b;
+>
+> 　　不同线程Gets From. 如果 a是一个put放入操作，且b是一个获得操作，能返回被a放入的写操作结果值，那么a->b;
+>
+> 　　传递性Transitivity. 对于操作a, b, 和 c, if a -> b 且 b -> c, 那么 a -> c.
+>
+> 　　这些规则在同一个线程内的操作之间以及在与数据存储交互的不同线程的操作之间创建了潜在的因果关系，这个模型，并不允许线程直接通讯，而是通过数据存储进行通讯。
 
 
 
+假若有3个data center，local client可以就近迅速从data center读写数据，然后此data center维护一个queue去给其它data centers传递数据修改消息。对于一data center而言，它有自己从client收到的，也有其他data center转送过来的，这些消息是乱序的，此时可以给各个消息加 time stamps. 【这就是spanner的机制了】
+
+Lamport Clocks: Tmax = highest v# seen; T = MAX(Tmax + 1, real time)
+
+Conflict write: 如果两个data center同时向另一个data center传递对同一数据的修改，则last writer win policy.
 
 
 
+【Dynamo（Amazon 公司的一个分布式 key/value 存储引擎）】
+
+>  Cassandra在2008年7月被Facebook开源。Cassandra最初的版本主要是由亚马逊(Amazon)和微软(Microsoft)的一名前雇员编写的。它深受亚马逊首创的分布式key/value数据库Dynamo的影响。
 
 
 
+Eventual Plus Barrier:
+
+如果你放一张photo，然后为它添一个link这两个操作，到其它data center的时候，先收到link，然后去点这个link的那一瞬间是看不到photo的，关键在于photo与link之间有规定的先后顺序，需要对收到的这两个操作进行synchronize, 这事实上就需要client的相关操作不得不wait.
+
+另一种solution，是为每一个data center配一个log server，通过传递操作log来linearizable，但是在很大的数据量的情况下，log server会有越来越慢的缺点。
 
 
 
-
+(接下来才正式介绍Cops：)
 
