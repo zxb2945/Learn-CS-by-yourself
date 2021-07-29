@@ -935,3 +935,19 @@ Eventual Plus Barrier:
 
 (接下来才正式介绍Cops：)
 
+一个问题：所谓操作的order是谁规定的？Client？每个value给一个version，但这个version怎么确定？也许是Client所在的程序编码者来组织吧...但programmer不可能知道version啊...
+
+比如一个put(z,x,y)操作以两个get(x),get(y)操作为前提，那么这个put操作所在的server就要向其他server询问相应version的x,y，这里肯定有delay，比如万一这个x也有其他的dependency呢。这里隐含着操作的前提信息需要该server来保存。
+
+上面那个photo例子也可以用Cops来解决。
+
+接下来介绍了The definition of causal consistency，即：
+
+> 在同一执行线程：. 如果a 和 b 是一个执行线程中的两个操作，如果操作a发生在操作b之前，那么a ->b;
+>
+> 不同线程Gets From. 如果 a是一个put放入操作，且b是一个获得操作，能返回被a放入的写操作结果值，那么a->b;
+>
+> 传递性Transitivity. 对于操作a, b, 和 c, if a -> b 且 b -> c, 那么 a -> c.
+
+a ->b理解为b depends on a.
+
