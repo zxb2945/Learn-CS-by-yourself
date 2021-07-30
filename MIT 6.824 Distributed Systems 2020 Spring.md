@@ -951,3 +951,6 @@ Eventual Plus Barrier:
 
 a ->b理解为b depends on a.
 
+
+
+Causal consistent system is faster than linearizable system.
