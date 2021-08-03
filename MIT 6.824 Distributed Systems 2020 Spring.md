@@ -1046,3 +1046,59 @@ Fork Attack -> Equivocation
 
 Merkel log consistency proof: 事实上append log造成的STH变动其实是父子节点的增加，可以用prefix和suffix等操作来确认？？没大听明白
 
+
+
+## Chapter19 Peer-to-peer, Bitcoin 20210803
+
+The goal is we want agreement on a single transaction log because we want prevent double spending.
+
+(所谓double spending 就是一个节点Y先后向Q,Z发送transaction，记入log时顺序由于各种原因与发送顺序不同)
+
+为此引入了 Block Chain的设计框架，即一个节点发送一个transaction，需要flooding all over the system. 
+
+个人理解是Block Chain按一定顺序组织，所以按这一顺序遍历就不存在double spending？？那速度肯定会很慢？另外某人付你bitcoin，产生新的block什么意思？一个transaction一个block？？
+
+This action of creating a new block is called **mining**, and the technique that's used to produce a new block is often also called proof of work, in the sense that it requires a lot of CPU time to produce a new block, and so the production of a new block essentially proves that you control a real live CPU, and you're not just mining new blocks on a fake computer. 
+
+What a mining computers do is that they try different by different values for the nonce, just pick one with a random number generator that'll stick it in there copy of the block they are trying to mine, and then they'll compute the hash on the block.
+
+ 以上看来mining就是去计算block上的hash，那这个block就是bitcoin？
+
+
+
+> ### 比特币的原理和运转机制
+>
+> 首先，对比特币有一个整体的了解，比特币实际上可以理解为一个文件，确切的说可以理解为一个账本。
+>
+> 在比特币世界中，是没有账户余额概念的，只有一笔笔的从一个账户转到另外账户的转账信息。每当发起一比交易的时候，比特币系统会先通过你的比特币地址查到你之前的所有交易记录，看你是否有足够的钱去支付这笔交易。
+>
+> 这个账本不同于私人账本或者是银行的账本，它是一个全网都有的账本，不归属于某个人，而且全网都一样，每个网络节点人手一份，而且都是相同的。
+>
+> 当某个人A想要向B转账5个比特币，A会在比特币网络中广播这个消息，收到消息的节点一边将账本的副本信息更新，一边将这个消息继续广播，直到全网所有节点都收到。
+>
+> 如何来判断这个A转账到B5个比特币的消息是正确的呢？
+> 针对每一笔交易，除了有转账信息，还会有一个数字签名，这个数字签名是有比特币地址账号唯一的私钥将转账消息的数字摘要加密创建生成的，每个网络节点拿着A的公钥对数字签名进行解密验证，就可以判断消息的准确性。
+> 如果把转账信息比作是一份合同，那这个数字签名，你就可以理解为是类似于合同上一个亲笔签名的东西，来确保消息的准确性。
+> 比特币系统中，每时每刻都会有无数多的交易在发生，比特币系统将这些交易信息按组分配，每个组称之为一个区块(block)，然后将这些区块按照时间顺序用链表一个一个的串起来，称之为区块链(the block chain)。区块链中的每个区块会引用前一个区块，你可以反向追踪至第一个区块中的交易信息。未在区块链中的信息是“未交易”或者未排序的信息，任何节点都有能力将一组未经确定的交易打包进区块，然后将它打包进区块的事实广播出去。
+> 比特币系统显然不会让所有节点都参打包区块，这样非乱死不可，比特币系统会以每十分钟为一个周期，出一道计算题，这个计算题超级难，让全网的节点参与计算，这道计算题其实就是对当前区块的全部内容做一个特殊计算，得到一个哈希值，全网的所有网络节点通过比拼计算速度，强行匹配出哈希的值，最先计算出哈希值的节点将取得打包区块的权利，生成一个新的块block并连入现有的区块链，然后广播至所有其他节点，其他节点开始同步更新；最先计算出结果的节点除了拥有“记账”的权利，还可以获得一定量的比特币，这其实就是比特币的发行过程。参与打包区块的过程其实就是“挖矿”，参与“挖矿”的节点就是“矿工”。
+> 比特币是如何保持总量恒定的呢？
+>
+> 随着越来越多的计算机加入比特币网络，“矿工”的计算能力会越来越强，为了让“矿工”恒定在每十分钟打包一个区块发行一次比特币，中本聪设计矿工挖矿的难度每过2016个区块动态提高一次，使得调整后的难度保持在十分钟。
+> 每个比特币可以细分到小数点后八位，也就是说可以拿着0.00000001个比特币来交易。
+> 刚开始每打包一个区块发行50个比特币，每21万个区块后，打包一个区块发行的比特币减半，比特币系统规定每十分钟打包一个区块，这样打包21万个区块需要四年的时间，直至2140年，比特币将无法细分，比特币发行完毕，发行总量约为2100万枚。
+> ————————————————
+> 版权声明：本文为CSDN博主「菜刚」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+> 原文链接：https://blog.csdn.net/i6448038/article/details/80184525
+
+
+
+Bitcoin peers之间怎么communicate？
+
+I'm a new peer, you know I've install a new computer, I get Bitcoin software installed on my computer, and I want to join the Bitcoin network. How do I know who to talk? The straightforward answer to that is that the Bitcoin software has built into it on the IP address of a whole bunch of current peers and so your software when you first fire it up into  the source whatever, the Bitcoin software has a whole bunch of IP addresses, and you try to make TCP connections to those existing peers. Look I'm new, please give me a copy of the blockchain as it exist now, and they'll send you the current block team.
+
+
+
+到目前为止，认识是每台computer都可以拥有一个完整的Blockchain，Blockchain中的一个Block记载的是一部分交易信息，每十分钟会产生一个新的Block并由这个Block来记载新的交易信息，然后遍历全部网点，产生这个新的Block需要计算一个hash，计算出这个hash的computer会被奖励一定量的比特币。
+
+问题是众多Transactions如何被集约到一个Block呢？节点之间是怎么通信来保证consistency的？
+
