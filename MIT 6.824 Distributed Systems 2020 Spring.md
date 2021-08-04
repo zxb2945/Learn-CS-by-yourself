@@ -1054,6 +1054,30 @@ The goal is we want agreement on a single transaction log because we want preven
 
 (所谓double spending 就是一个节点Y先后向Q,Z发送transaction，记入log时顺序由于各种原因与发送顺序不同)
 
+> 数字货币的提出，也带来了很多问题，最主要的问题是双花问题（double-spending problem）。双花问题即是使用同一货币进行多次支付，从而达到欺诈的目的。
+>
+> 根据网上的资料，可以了解到有两种手段可以达成该目的：
+>
+> 1、0确认
+>
+> 例如A共有1个比特币，并先后支付给B和C各一个比特币购买商品。若B和C尚未等该笔交易写入新的区块（比特币每10分钟产生一个新的区块，包含前一区块信息和这十分钟所发生的交易），就提供商品，那么B能收到比特币，C不能收到，受到欺诈。
+>
+> 这个问题会对交易的及时性产生一定影响，需要收款方等待一定时间，完成确认后进行交易就能避免这种情况发生。
+>
+> 2、算力攻击
+>
+> 区块链存在一个特性，当同时产生多个正确区块时，产生支链。矿工按自己受到区块广播的先后顺序，把先到达的区块作为上一区块进行计算。经过一段时间后，最长的支链被确认成为主链，其他被抛弃。根据这一特性，当A支付一笔比特币后，若能更改交易记录，并使错误记录成为主链后，就能完成欺诈。
+> 为了解决这一问题，许多数字货币采用了POW，以太坊正在往POS与DPOS过渡。
+>
+> POW是Proof of Work的缩写，即工作证明，是中本聪受到Adam Back的哈希现金（Hashcash）算法的启发。哈希现金主要用于垃圾邮件的过滤，让发邮件的人完成一个难以计算却容易验证的问题，在内容后添加后缀，使计算的hash值前指定位数为0。因为后缀对hash值的影响难以预料，只能通过不断试错的方式进行。对于普通的邮件发送者，发送少量的邮件只需让计算机进行几秒的计算，对于垃圾邮件发送者，大量的计算会耗费大量的算力。对于区块链来说，每个区块的产生也需要指定该区块头hash值的0的位数，0位越多，计算难度越高，难度会根据全网算力动态调整。
+>
+> 回到算力攻击，使用算力占全网算力的比例来代表挖到新区块的概率。中本聪在论文中指出，若恶意攻击者的算力小于可信矿工的算力，那么随着时间过去，恶意攻击者让错误区块成为主链的可能性迅速下降。POW的作用是让可信矿工用算力来证明自己的可信度。但是若恶意攻击者掌握全网51%的算力，那么算力攻击可能实现。
+> ————————————————
+> 版权声明：本文为CSDN博主「fusun523」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+> 原文链接：https://blog.csdn.net/ywy19930523/article/details/80104824
+
+
+
 为此引入了 Block Chain的设计框架，即一个节点发送一个transaction，需要flooding all over the system. 
 
 个人理解是Block Chain按一定顺序组织，所以按这一顺序遍历就不存在double spending？？那速度肯定会很慢？另外某人付你bitcoin，产生新的block什么意思？一个transaction一个block？？
@@ -1101,4 +1125,18 @@ I'm a new peer, you know I've install a new computer, I get Bitcoin software ins
 到目前为止，认识是每台computer都可以拥有一个完整的Blockchain，Blockchain中的一个Block记载的是一部分交易信息，每十分钟会产生一个新的Block并由这个Block来记载新的交易信息，然后遍历全部网点，产生这个新的Block需要计算一个hash，计算出这个hash的computer会被奖励一定量的比特币。
 
 问题是众多Transactions如何被集约到一个Block呢？节点之间是怎么通信来保证consistency的？
+
+所有即时产生的transaction会记录到新产生的Block中。
+
+并且，产生Fork现象时，abandoned fork上的信息如何处置？
+
+产生Fork时，其中一条chain如果slightly longer，就会聚集大量的mining，从而形成长的越长的局面。而另一条chain上的信息就会被遗弃，不merge，所以要求只有确定本chain是winning chain后，其上的transaction才会被正式确认。
+
+如果malicious attacker有超过51%的CPU power，就可以强行开出一条更快的Fork chain。
+
+另外，Bitcoin支付至少得花费十分钟来确认，至于其anonymous，相对于credit card固然是好，但每个用户需要提供Public key，一笔交易后人家还是会弄清楚你是谁。
+
+
+
+Centralization or Decentralization
 
