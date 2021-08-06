@@ -957,7 +957,7 @@ Causal consistent system is faster than linearizable system.
 
 
 
-## Chapter18 Fork Consistency, Certificate Transparency 20210801
+## Chapter 18 Fork Consistency, Certificate Transparency 20210801
 
 1995年，man-in-the-middle attack：截获client发往DNS的包，发fake reply获取用户的密码，代替其登录相应server。
 
@@ -1048,7 +1048,7 @@ Merkel log consistency proof: 事实上append log造成的STH变动其实是父�
 
 
 
-## Chapter19 Peer-to-peer, Bitcoin 20210803
+## Chapter 19 Peer-to-peer, Bitcoin 20210803
 
 The goal is we want agreement on a single transaction log because we want prevent double spending.
 
@@ -1140,3 +1140,44 @@ I'm a new peer, you know I've install a new computer, I get Bitcoin software ins
 
 Centralization or Decentralization
 
+
+
+## Chapter 20 BlockStack  20210806
+
+先介绍了现在普遍的中心化的Web sites构成的优缺点(high performance, low privacy)，然后介绍Decentralized Architecture:
+
+终端上的APP将数据存储于用户独立的Cloud上，而不是所有用户的数据存储于服务器Database中，
+
+其它终端通过一定的权限认证可以来此用户的Cloud上访问数据。
+
+
+
+Naming
+
+human names - "Robert"
+
+1. name -> data location
+
+2. name -> public key
+
+     ACLs -> names: 
+
+      1. unique - global
+
+      2. human- readable
+
+      3. decentralized
+
+         以上三点很难同时满足
+
+PKI: Public Key Infrastructure
+
+
+
+We can stick transactions into bitcoin log.
+
+Naming  on Bitcoin
+
+first-come first-server scheme: 先登记有效，后登记被忽略
+
+以上利用Bitcoin就可以同时满足上文提到的三点
