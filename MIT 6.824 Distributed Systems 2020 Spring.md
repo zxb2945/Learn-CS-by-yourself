@@ -1181,3 +1181,42 @@ Naming  on Bitcoin
 first-come first-server scheme: 先登记有效，后登记被忽略
 
 以上利用Bitcoin就可以同时满足上文提到的三点
+
+
+
+Bitcoin提供三点同时满足的name后，专门会有一个中间层ATLAS去记录name关联的data location, public key等信息，然后再去链接叫GAIA的storage.
+
+> 这个过程分4步：
+>
+> 1. 在虚拟链中查找名称以获得(名称、散列)对。
+> 2. 将用户名解析为数据(通过BNS和Atlas网络控制)，以获得相应的区域文件。
+> 3. 从zonefile中发现存储后端URI，并查找连接到存储后端的URI。
+> 4. 从gaia服务规范中获取数据。
+
+Blockstack naming  system (BNS) server -> 名字转换还需要中心化的服务器？
+
+register name need to pay, free lead to waste domain.
+
+> 在Blockstack命名系统中，通过使用智能定价功能，可以防止域名在DNS上被抢注。较小的名称和名称空间更昂贵，因为它们可能更受欢迎。没有数字的名字比有数字的名字更受欢迎。
+
+> #### Blockstack的4层架构:
+>
+> **第一层：** 像比特币这样的区块链存储了关于系统状态的权威全球共识。
+>
+> **第2层-虚拟链:** 一个与区块链无关的层，它接受来自区块链的输入，可以创建任意类型的状态机。例如，DNS状态机可以与标识状态机不同。这一层也可以处理任何你想要的区块链，但可靠性和安全性将是基础区块链的衍生物。Virtuachain还将名称绑定到它们的值。zonefile的散列存储在这个层中。
+>
+> **第3层路由:** 该层实现一个DHT，它存储值的路由信息。Blockstack使用像zonefile这样的DNS来指示数据的最终存储位置。基本上，第3层的任务是发现与给定名称关联的最终数据。任何用户都可以通过验证存储在第2层中的散列来验证zonefile的完整性。
+>
+> **第4层-存储:** 这是存储所有值的地方。这可以是在AWS或dropbox或任何第三方供应商。这里有两种类型。
+
+终端上的APP需要通过Blockstack browser(存储private key的特定软件)来访问
+
+Bitcoin ->BNS -> Bitcoin ->Atlas -> Gaia
+
+
+
+Certificate Transparency 相对于 Bitcoin没法解决 name conflics的问题。
+
+
+
+讲师对Blockstack应用的前景不是太看好，相较于中心化服务器，编程上会更麻烦...
