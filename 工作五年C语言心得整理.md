@@ -293,8 +293,6 @@ struct exm{
 }
 ```
 
-
-
 ## 8 define
 
 ### 8.1 关于C函数可变参数占位符`...`
@@ -310,6 +308,20 @@ struct exm{
 可以去除定义范围所有的Dbg函数。
 
 并且，甚至可以不加参数，在消除Dbg函数基础上，还可以消除相关变量。
+
+通常来说，Dbg形式如下：
+
+```
+#if defined(DBG_PRINT)            
+#define DbgFDbg	DbgFPrintf2
+#else
+#define DbgFDbg(...)
+#endif
+```
+
+在编译阶段，可以在gcc之后加参数`-D DBG_PRINT`来定义`defined(DBG_PRINT)`，`DbgFPrintf2`就是实体打印函数，如果不加参数，就去除定义范围所有的Dbg函数，相当于一个debug开关作用。
+
+（2021.8.23）
 
 ### 8.3 `#define`的用法
 
