@@ -325,7 +325,7 @@ struct exm{
 
 ### 8.3 `#define`的用法
 
-```
+```c
 #if defined(DbgTxt)
 #undef DbgTxt            取消宏标识符
 #define DbgTxt(p1) __FILE__,(p1),0  
@@ -336,7 +336,7 @@ struct exm{
 
 大规模开发过程中，define最重要的作用就是条件编译。
 
-```
+```c
 #ifndef _test.h_
 #define _test.h_
 #endif
@@ -354,7 +354,7 @@ struct exm{
 
 C语言中嵌入汇编代码可以提高运行效率（现在的编译器优化得足够出色），实现C语言不具备的机器要用到的功能。GNU GCC( AT&T汇编语言 )格式如下：
 
-```
+```c
 int main()
 {
 	int  input,output,temp;
@@ -414,7 +414,7 @@ gcc -o xx.s -S xx.c -m32
 
 例如如下函数：
 
-```
+```c
 strcpy(char *dest,const char *src,int n);
 ```
 
@@ -423,6 +423,21 @@ strcpy(char *dest,const char *src,int n);
 C/C++中容易造成缓冲区溢出的函数：strcpy(),gets(),strcat()...数组下标越界，或打印字符串时无终止符。许多病毒就是利用缓冲区溢出漏洞对操作系统进行攻击的。
 
 （2019.6.17）
+
+## 11 运算符优先级问题
+
+一般来说，遵循加括号原则。
+
+但偶尔也有注意不到的时候，比如遇到下例情况：
+
+```c
+//*pp_edtinf->lteSjtCom.sjtkind = ( UCHAR )subject;
+(*pp_edtinf)->lteSjtCom.sjtkind = ( UCHAR )subject;
+```
+
+很容易以为`*`优先级很高，而忽略`->`何尝不是一个运算符！联想Python中的点运算符。
+
+（2021.9.1）
 
 ## 补充1 BCD码
 
