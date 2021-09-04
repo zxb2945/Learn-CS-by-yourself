@@ -244,7 +244,7 @@ C语言是不可以这样做的，因为编译阶段，函数进栈，首先要�
 
 
 
-JAVA主要四种数据类型：boolean, char, int, double （从6.2.1开始继续看）
+JAVA主要四种基础数据类型：boolean, char, int, double
 
 这些类型实际上都有相对应的包裹类型，其包裹类型有许多系统自带的方法，比如
 
@@ -259,6 +259,20 @@ JAVA主要四种数据类型：boolean, char, int, double （从6.2.1开始继�
 这个`Integer`就是`int`的包裹类型，而`Character`就是`char`的包裹类型。
 
 
+
+字符串类型为`String`，首字母大写，表明它不是JAVA中的基础数据类型，而是由此发展而来的包裹类型，包裹类型实际上是系统自带的类！JAVA所谓的包裹类型正是C语言所没有的。
+
+```java
+        String input = in.next();
+        if( input.equals("bye"))
+        {
+            System.out.println("OK");
+        }
+```
+
+从上述角度来说，JAVA中的数组类型严格意义上也应该是包裹类型。
+
+字符串因为是个对象，所以它自带点符号而来的字符串操作，而不用像C语言需要借助库函数。
 
 
 
