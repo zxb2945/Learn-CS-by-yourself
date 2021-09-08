@@ -279,7 +279,7 @@ JAVA主要四种基础数据类型：boolean, char, int, double
 ## 8.1.0 对象的识别 20210907
 
 ```java
-package clock;
+package display;
 
 
 public class display {
@@ -344,8 +344,76 @@ public class display {
 > 版权声明：本文为CSDN博主「羽生少年」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
 > 原文链接：https://blog.csdn.net/jusu10/article/details/109220349
 
-据以上分析，`static`成员估计实在类这一层次唯一存储，没有复制这一说，而成员函数，因为有默认参数`this`的存在，其实用不着复制各自分配内存，同样在类这一层次分配一次就足够了。
+据以上分析，`static`成员估计是在类这一层次唯一存储，没有复制这一说，而成员函数，因为有默认参数`this`的存在，其实用不着复制各自分配内存，同样在类这一层次分配一次就足够了。
+
+=》课程中把`static`称为类变量，同样有类函数，如
+
+```java
+    public static void main(String[] args) {
+        // TODO Auto-generated method stub
+        display D = new display(24);
+        
+        for(;;)
+        {
+           D.increase();
+           System.out.println(D.getvalue());
+        }
+```
+
+这就表明该函数属于类，而不是具体一个对象。当然调用时，无论对象还是类均可以。
+
+类函数就内存存储上其实与一般函数一样，难道区别仅仅是类函数没有默认的`this`参数？？？好像是哦，上例中的`main`里面创建了一个该类的对象然后通过对象才能去访问相关函数，所以它不属于任何对象，里面倒是可以直接访问类变量，仅此而已。
 
 
 
 另外需要注意一点：类中方法内的本地变量和类的成员变量有生存期上的区别。
+
+
+
+## 8.2.1 对象的交互 20210908
+
+### 问题7：为什么`private`关键词要强调本类，而不是本对象？
+
+好像有点没意思的问题...暂且不管
+
+
+
+### 问题2：package与 import机制？
+
+`pakage`实质是文件目录，一个工程一般有`src`和`bin`两个目录，前者下面的文件名就是`pakage`，然后其中就是一个或多个`.java`文件，这些`.java`文件自动被标记为该`pakage`。所以它是`src`和`.java`之间的一个文件目录层次。当然这并不意味着JAVA工程只能有一层目录，可以用`pakage1.pakage2`的形式多层目录，换句话说，即`src`与`.java`之间所有文件层次均为`pakage`。
+
+而`import`一个其它`pakage`中的类，可以使当前调用方的类省略名字，类似起一个名命空间的 作用，当然也可以不`import`，直接写全名，所以没有像`include`那样是强制的。另外一般推荐`import`到类为止，而不是直接就把整个`pakage`塞进去，这样容易名命冲突，也就是说JAVA不自动解决这种冲突。
+
+一个点`.java`文件是一个编译单元，一个编译单元可以有多个类，但是只有一个类可以为`public`，而且这个`public`类必须与文件名相同。为什么呢？因为其它`.java`文件`import`时表面上是到某个类为止，但实质上是到某个`.java`文件为止，所以它们应当同名，便于理解。
+
+`pakage`是JAVA对包的管理机制由上体现。
+
+```java
+package clock;
+
+import display.display;
+
+public class clock {
+
+    private display Hour = new display(24);
+    private display Minute = new display(60);
+    
+    public void start() {
+        while(true) {           
+            Minute.increase();
+            if(Minute.getvalue()==0) {
+                Hour.increase();
+            }
+            System.out.printf("%02d:%02d\n",Hour.getvalue(),Minute.getvalue());
+        }
+    }
+    
+    public static void main(String[] args) {
+        // TODO Auto-generated method stub
+        clock Clock = new clock();
+        Clock.start();
+    }
+
+}
+```
+
