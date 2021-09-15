@@ -198,7 +198,7 @@ stru1 = stru2; /*合法*/
 
 （2019.8.2）
 
-```
+```c
 #include <stddef.h>
 #include <stdio.h>
 
