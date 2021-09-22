@@ -109,6 +109,23 @@ GCC编译默认是C语言最早的GNU 89 version，如果要编译ISO C99 versio
 
 算是常识，即两者表达同一个numeric value 12345，存放的byte patterns完全不同。
 
+附录：可以用以下代码测试大端小端
+
+```c
+int checkCPU()
+{
+　{
+　　union w
+　　{
+　　　int a;
+　　　char b;
+　　} c;
+　　c.a = 1;
+　　return (c.b == 1);
+　}
+}
+```
+
 #### 2.1.4 Representing Strings
 
 #### 2.1.5 Representing Code
