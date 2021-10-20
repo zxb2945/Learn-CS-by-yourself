@@ -792,3 +792,87 @@ Swing中实现Inversion of Control：
 
 
 MVC：Model+View+Control 设计模式  Model跟数据相关
+
+
+
+## 8.8.4 异常 20211020
+
+```java
+package hello;
+
+import java.util.Scanner;
+
+public class Hello {
+
+    public static void main(String[] args) {
+        // TODO Auto-generated method stub               
+        int[] a = new int [10];
+        int idx;
+        Scanner in = new Scanner(System.in);
+        idx = in.nextInt();
+        try {
+            a[idx] = 10;
+            System.out.println("hello");
+        }catch(ArrayIndexOutOfBoundsException e){
+            System.out.println("catch");
+        }
+                    
+    }
+}
+```
+
+
+
+假若说try里不断嵌套函数，并且函数中又有捕捉其它异常的try，JAVA的机制是就近check，从内而外，直到catch到相应的异常。这里就有个问题：发生异常的语句是否先验知道自己处于try语句中，还是发生异常后，层层出去detect？如果是后者，那么要出去到main才能终结吧...抛出异常走过的路还不少...
+
+还可以在catch里添加`throw`，继续往外层抛，不然就在这一层面处理掉了。
+
+为什么要用异常抛出机制？比如对于open,read,close的文件操作流，C语言中用return也能搞定，但是可读性就很差...没有try+catch来得明了，后者可以清晰地分离业务逻辑处理和异常处理，而不是像前者那样混杂在一起。
+
+
+
+> ```java
+> //必须声明它会抛出 BadException
+> public void takeTisk() throws BadException {
+>     if(abandonallHopes) {
+>         //创建 Exception 对象并抛出
+>         throw new BadException();
+>     }
+> }
+> ```
+>
+> ```java
+> public void crossFingers() {
+>     //如果不用 try - catch包裹起来, 就必须声明 throws BadException  
+>     try {
+>         anObject.takeRisk();
+>     } catch (BadException ex) {
+>         System.out.println("Aaargh");
+>         ex.printStackTrace();
+>     }
+> }
+> 作者: Rikka
+> 链接: https://www.bilibilianime.com/2020/12/27/Java%20%E5%9F%BA%E7%A1%80/Java_abc_11/
+> 来源: 极东魔术昼寝结社
+> 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+> ```
+>
+> 3. 什么东西可以扔出来
+> 任何继承了 Throwable 类的对象
+> Exception 类继承了 Throwbale
+> throw new Exception();
+> throw new Exception(“Something”);
+>
+> 4. catch 是怎样捕捉异常的
+> 抛出子类的异常会被捕捉父类异常的 catch 捕捉到, 如 catch(Exception e){}会捕捉到所有的异常
+> 运行时刻异常
+> 像 ArrayIndexOutOfBoundsException 这样的异常不需要声明
+> 5. 异常遇到继承
+> 父类中的某个 Method 在子类中覆盖时, 必须保证子类中的同名方法不声明更多的异常抛出
+> 子类的构造器中必须声明父类的全部异常
+>
+> 作者: Rikka
+> 链接: https://www.bilibilianime.com/2020/12/27/Java%20%E5%9F%BA%E7%A1%80/Java_abc_11/
+> 来源: 极东魔术昼寝结社
+> 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
