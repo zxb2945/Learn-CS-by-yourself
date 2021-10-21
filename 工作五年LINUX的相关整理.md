@@ -156,7 +156,7 @@ link,s表示软连接，即创建快捷方式。
 
 
 
-**du -sh ***
+`du -sh *`
 
 查看当前目录下各个文件占用空间大小。
 
@@ -180,7 +180,7 @@ link,s表示软连接，即创建快捷方式。
 
 
 
-**rename File file *.txt**
+`rename File file *.txt`
 
 将当前目录下所有txt文件名中的File字段替换成file。
 
