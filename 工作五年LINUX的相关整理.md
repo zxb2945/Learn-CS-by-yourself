@@ -846,6 +846,10 @@ telnet hostname/ip,登录远程计算机；
 
 tcpdump,分析网络中传运的数据包；
 
+```
+tcpdump -v -i any -s 4096  port 9000  -w http.cap
+```
+
 netstat,检验各端口的情况；
 
 lsof -i, list open file.
