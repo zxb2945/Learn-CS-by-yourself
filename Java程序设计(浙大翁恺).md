@@ -876,3 +876,51 @@ public class Hello {
 > 来源: 极东魔术昼寝结社
 > 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 
+
+
+## 8.8.8 流 20211025
+
+所有IO操作如read等都要配着异常机制一起搞...
+
+Eclipse多行注释=》 Ctrl+/
+
+```java
+package hello;
+
+import java.io.IOException;
+import java.util.Scanner;
+
+public class Hello {
+
+    public static void main(String[] args) {
+        // TODO Auto-generated method stub        
+        
+        System.out.println("hello world!");
+        byte[] buffer = new byte[1024];  //byte也是JAVA中一种基本类型
+        try {
+            int len = System.in.read(buffer);
+            String s = new String(buffer,0,len); //将byte类型转化为字符串（重载）然后打印
+            System.out.println(s);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+                           
+    }
+}
+```
+
+> char是Java中的保留字，与别的语言不同的是，char在Java中是16位的，因为Java用的是Unicode。不过8位的ASCII码包含在Unicode中，是从0~127的。
+>
+> Java中使用Unicode的原因是，Java的Applet允许全世界范围内运行，那它就需要一种可以表述人类所有语言的字符编码。Unicode。但是English，Spanish，German, French根本不需要这么表示，所以它们其实采用ASCII码会更高效。这中间就存在一个权衡问题。
+>
+> char c='c'; //字符，可以是汉字，因为是Unicode编码
+>
+> char 在java中是2个字节。java采用unicode，2个字节（16位）来表示一个字符。
+>
+> 
+>
+> char与byte的区别:
+>
+> **byte** 是字节数据类型 ，是有符号型的，占1 个字节；大小范围为-128—127 。**char** 是字符数据类型 ，是无符号型的，占2字节(Unicode码 ）；大小范围 是0—65535 ；char是一个16位二进制的Unicode字符，JAVA用char来表示一个字符 。
+
