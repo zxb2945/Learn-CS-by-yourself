@@ -2,6 +2,8 @@
 
 ## CreateDB.sh
 
+核心是shell中数组作为database存储容器的应用。
+
 ```shell
 # Debug Flag
 #DEBUGFLAG=1
@@ -96,145 +98,6 @@ LCK_PTN_CNT=`expr ${#LCK_PTN[@]} - 1`
 # 综上，LCK_PTN_CNT就是数组末尾下标值
 #********************************************************
 #
-# WIPE Pattern
-#   TMNO:759,TMNO:752,TMNO:763,TMNO:401,TMNO:414,PMNO:750,TMNO:761,PMNO:363,PMNO:460,PMNO:301,TMNO:325,TMNO:333,TMNO:308,TMNO:310,TMNO:322,PMNO:573
-WPE_PTN=(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-1,1,1,1,1,1,0,0,0,0,0,0,1,1,0,0
-1,1,1,0,0,1,0,0,0,0,0,0,1,1,0,0
-1,0,0,1,1,1,0,0,0,0,0,0,1,1,0,0
-1,0,0,0,0,1,0,0,0,0,0,0,1,1,0,0
-0,0,0,1,1,1,0,0,0,0,0,0,1,1,0,0
-0,0,0,0,0,1,0,0,0,0,0,0,1,1,0,0
-0,0,0,1,1,0,0,0,0,0,0,0,1,1,0,0
-1,0,1,0,0,1,0,0,0,0,0,0,1,1,0,0
-0,0,0,1,1,1,1,1,0,0,0,0,1,1,0,0
-0,0,0,1,1,1,1,2,0,0,0,0,1,1,0,0
-0,0,0,1,1,1,1,3,0,0,0,0,1,1,0,0
-0,0,0,1,1,1,0,0,1,0,0,0,1,1,0,0
-0,0,0,1,1,0,0,0,1,0,0,0,1,1,0,0
-1,0,1,0,0,1,0,0,1,0,0,0,1,1,0,0
-0,0,0,1,1,1,1,1,1,0,0,0,1,1,0,0
-0,0,0,1,1,1,0,0,2,0,0,0,1,1,0,0
-0,0,0,1,1,0,0,0,2,0,0,0,1,1,0,0
-1,0,1,0,0,1,0,0,2,0,0,0,1,1,0,0
-0,0,0,1,1,1,1,1,2,0,0,0,1,1,0,0
-1,0,1,0,0,1,0,0,0,0,1,0,1,1,0,0
-0,0,0,1,1,0,0,0,0,0,1,0,1,1,0,0
-0,0,0,0,0,0,0,0,0,0,1,0,1,1,0,0
-1,0,1,0,0,1,0,0,0,0,0,1,1,1,0,0
-0,0,0,1,1,0,0,0,0,0,0,1,1,1,0,0
-0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0
-1,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0
-0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-1,0,1,0,0,1,0,0,0,0,0,0,0,1,1,0
-0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0
-0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0
-1,0,1,0,0,1,0,0,0,1,1,0,1,1,0,0
-0,0,0,1,1,0,0,0,0,1,1,0,1,1,0,0
-0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0
-1,0,1,0,0,1,0,0,0,1,0,0,0,1,0,0
-0,0,0,1,1,0,0,0,0,1,0,0,0,1,0,0
-0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0
-1,0,1,0,0,1,0,0,0,2,0,1,1,1,0,0
-0,0,0,1,1,0,0,0,0,2,0,1,1,1,0,0
-0,0,0,0,0,0,0,0,0,2,0,1,1,1,0,0
-1,0,1,0,0,1,0,0,0,2,0,0,1,0,0,0
-0,0,0,1,1,0,0,0,0,2,0,0,1,0,0,0
-0,0,0,0,0,0,0,0,0,2,0,0,1,0,0,0
-1,0,1,0,0,1,0,0,0,2,0,0,1,1,1,0
-0,0,0,1,1,0,0,0,0,2,0,0,1,1,1,0
-0,0,0,0,0,0,0,0,0,2,0,0,1,1,1,0
-1,0,1,0,0,1,0,0,0,0,0,0,1,1,0,2
-)
-WPE_PTN_CNT=`expr ${#WPE_PTN[@]} - 1`
-#
-# ReSEND Pattern
-#   THSC_759,THSC_752,THSC_763,THSC_401,THSC_414,PHSC_750,THSC_761,PHSC_363,PHSC_460,PHSC_435,PHSC_436,PHSC_301,THSC_325,THSC_308,THSC_321,PHSC_461,THSC_366_476,RegSMDO,HSC_573,PHSC_422,Sdm-IF
-#
-RSN_PTN=(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,99,99
-0,0,0,0,0,0,0,0,2,0,0,0,0,1,0,0,1,0,0,99,99
-0,0,0,0,0,1,1,0,1,0,0,0,0,1,0,0,1,0,0,99,99
-0,0,0,0,0,1,1,0,2,0,0,0,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,1,1,0,1,0,0,0,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,1,1,0,2,0,0,0,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,0,0,0,1,0,0,0,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,0,0,0,2,0,0,0,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,1,1,0,1,0,0,0,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,1,1,0,1,0,0,0,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,1,1,0,1,0,0,0,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,1,1,1,2,0,0,0,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,1,1,2,2,0,0,0,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,1,1,3,2,0,0,0,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,0,0,1,1,1,0,0,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,1,1,2,1,1,0,0,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,1,1,3,1,1,0,0,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,0,0,0,2,1,0,0,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,1,1,0,2,1,0,0,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,1,1,1,2,1,0,0,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,0,0,0,1,0,2,0,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,1,1,0,1,0,2,0,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,1,1,1,1,0,2,0,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,0,0,0,2,0,2,0,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,1,1,0,2,0,2,0,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,1,1,1,2,0,2,0,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,1,1,0,1,0,0,2,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,1,1,0,2,0,0,2,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,0,0,1,1,0,0,2,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,0,0,0,2,0,0,2,0,1,0,0,1,0,0,99,99
-0,0,0,0,0,0,0,0,1,0,0,2,0,1,0,0,1,0,0,99,99
-0,0,0,0,0,0,0,0,2,0,0,2,0,1,0,0,1,0,0,99,99
-0,0,0,1,1,1,1,0,1,0,0,0,1,1,0,0,1,0,0,99,99
-0,0,0,1,1,1,1,0,2,0,0,0,1,1,0,0,1,0,0,99,99
-0,0,0,1,1,0,0,0,1,0,0,0,1,1,0,0,1,0,0,99,99
-0,0,0,1,1,0,0,0,2,0,0,0,1,1,0,0,1,0,0,99,99
-0,0,0,0,0,0,0,0,1,0,0,0,1,1,0,0,1,0,0,99,99
-0,0,0,0,0,0,0,0,2,0,0,0,1,1,0,0,1,0,0,99,99
-0,0,0,1,1,1,1,0,1,0,0,0,0,0,0,0,1,0,0,99,99
-0,0,0,1,1,1,1,0,2,0,0,0,0,0,0,0,1,0,0,99,99
-0,0,0,1,1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,99,99
-0,0,0,1,1,0,0,0,2,0,0,0,0,0,0,0,1,0,0,99,99
-0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,99,99
-0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,1,0,0,99,99
-0,0,0,1,1,1,1,0,1,0,0,0,0,1,1,0,1,0,0,99,99
-0,0,0,1,1,1,1,0,2,0,0,0,0,1,1,0,1,0,0,99,99
-0,0,0,1,1,0,0,0,1,0,0,0,0,1,1,0,1,0,0,99,99
-0,0,0,1,1,0,0,0,2,0,0,0,0,1,1,0,1,0,0,99,99
-0,0,0,0,0,0,0,0,1,0,0,0,0,1,1,0,1,0,0,99,99
-0,0,0,0,0,0,0,0,2,0,0,0,0,1,1,0,1,0,0,99,99
-0,0,0,1,1,0,0,0,1,0,0,0,0,1,0,1,1,0,0,99,99
-0,0,0,1,1,1,1,0,1,0,0,0,0,1,0,1,1,0,0,99,99
-0,0,0,1,1,1,1,0,1,0,0,0,0,1,0,1,1,0,0,99,99
-0,0,0,1,1,0,0,0,2,0,0,0,0,1,0,1,1,0,0,99,99
-0,0,0,1,1,1,1,0,2,0,0,0,0,1,0,1,1,0,0,99,99
-0,0,0,1,1,1,1,1,2,0,0,0,0,1,0,1,1,0,0,99,99
-0,0,0,1,1,0,0,0,2,0,0,0,0,1,0,0,0,0,0,99,99
-0,0,0,1,1,1,1,0,2,0,0,0,0,1,0,0,0,0,0,99,99
-0,0,0,1,1,1,1,1,2,0,0,0,0,1,0,0,0,0,0,99,99
-0,0,0,1,1,0,0,0,1,0,0,0,0,1,0,0,1,1,0,99,99
-0,0,0,1,1,1,1,0,1,0,0,0,0,1,0,0,1,1,0,99,99
-0,0,0,1,1,1,1,1,1,0,0,0,0,1,0,0,1,1,0,99,99
-0,0,0,1,1,0,0,0,2,0,0,0,0,1,0,0,1,1,0,99,99
-0,0,0,1,1,1,1,0,2,0,0,0,0,1,0,0,1,1,0,99,99
-0,0,0,1,1,1,1,1,2,0,0,0,0,1,0,0,1,1,0,99,99
-0,0,0,1,1,1,1,0,1,0,0,0,0,1,0,0,1,0,2,99,99
-0,0,0,1,1,1,1,0,2,0,0,0,0,1,0,0,1,0,2,99,99
-0,0,0,1,1,0,0,1,1,0,0,0,0,1,0,1,1,0,0,0,99
-0,0,0,1,1,1,1,0,1,0,0,0,0,1,0,1,1,0,0,0,99
-0,0,0,1,1,0,0,0,2,0,0,0,0,1,0,1,1,0,0,0,99
-0,0,0,1,1,1,1,0,2,0,0,0,0,1,0,1,1,0,0,0,99
-0,0,0,1,1,0,0,0,1,0,0,0,0,1,0,1,1,0,0,7,1
-0,0,0,1,1,1,1,0,1,0,0,0,0,1,0,1,1,0,0,7,1
-0,0,0,1,1,0,0,0,2,0,0,0,0,1,0,1,1,0,0,7,1
-0,0,0,1,1,1,1,0,2,0,0,0,0,1,0,1,1,0,0,7,1
-0,0,0,1,1,0,0,0,1,0,0,0,0,1,0,1,1,0,0,7,0
-0,0,0,1,1,1,1,0,1,0,0,0,0,1,0,1,1,0,0,7,0
-0,0,0,1,1,0,0,0,2,0,0,0,0,1,0,1,1,0,0,7,0
-0,0,0,1,1,1,1,0,2,0,0,0,0,1,0,1,1,0,0,7,0
-)
-RSN_PTN_CNT=`expr ${#RSN_PTN[@]} - 1`
-
 # Sub 
 # Usage
 func_USAGE()
@@ -405,75 +268,14 @@ func_REG_SUB_LOCK()
 
     func_DEBUG "${LINENO}: func_REG_SUB: Lock/Unlock END"
 }
+#********************************************************
+# Q&A: `echo ${set_ptn} | cut -d , -f 1`的意思？
+# cut用来从标准输入或文本文件中剪切列或域。
+# 一般格式为：cut [options] file1 file2
+# -d  指定与空格和t a b键不同的域分隔符。
+# -f field  指定剪切域数。
+#********************************************************
 #
-# Set Subscriber (WIPE)
-func_REG_SUB_WIPE()
-{
-    local in_msn_=${1}
-    local in_imui=${2}
-    local set_ptn=${WPE_PTN[${3}]}
-    func_DEBUG "${LINENO}: func_REG_SUB: WIPE START"
-
-    THSC_759 ${in_imui} `echo ${set_ptn} | cut -d , -f 1`
-    THSC_752 ${in_imui} `echo ${set_ptn} | cut -d , -f 2`
-    THSC_763 ${in_imui} `echo ${set_ptn} | cut -d , -f 3`
-    THSC_401 ${in_imui} `echo ${set_ptn} | cut -d , -f 4`
-    THSC_414 ${in_imui} `echo ${set_ptn} | cut -d , -f 5`
-    PHSC_750 ${in_msn_} `echo ${set_ptn} | cut -d , -f 6`
-    PHSC_761 ${in_msn_} `echo ${set_ptn} | cut -d , -f 7`
-    PHSC_363 ${in_msn_} `echo ${set_ptn} | cut -d , -f 8`
-    PHSC_460 ${in_msn_} `echo ${set_ptn} | cut -d , -f 9`
-    PHSC_301 ${in_msn_} `echo ${set_ptn} | cut -d , -f 10`
-    THSC_325 ${in_imui} `echo ${set_ptn} | cut -d , -f 11`
-    THSC_333 ${in_imui} `echo ${set_ptn} | cut -d , -f 12`
-    THSC_308 ${in_imui} `echo ${set_ptn} | cut -d , -f 13`
-    THSC_310 ${in_imui} `echo ${set_ptn} | cut -d , -f 14`
-    THSC_322 ${in_imui} `echo ${set_ptn} | cut -d , -f 15`
-    PHSC_573 ${in_msn_} `echo ${set_ptn} | cut -d , -f 16`
-
-    func_DEBUG "${LINENO}: func_REG_SUB: WIPE END"
-}
-#
-# Set Subscriber (ReSend)
-func_REG_SUB_ReSEND()
-{
-    local in_msn_=${1}
-    local in_imui=${2}
-    local set_ptn=${RSN_PTN[${3}]}
-    func_DEBUG "${LINENO}: func_REG_SUB: ReSEND START"
-
-    THSC_759 ${in_imui} `echo ${set_ptn} | cut -d , -f 1`
-    THSC_752 ${in_imui} `echo ${set_ptn} | cut -d , -f 2`
-    THSC_763 ${in_imui} `echo ${set_ptn} | cut -d , -f 3`
-    THSC_401 ${in_imui} `echo ${set_ptn} | cut -d , -f 4`
-    THSC_414 ${in_imui} `echo ${set_ptn} | cut -d , -f 5`
-    PHSC_750 ${in_msn_} `echo ${set_ptn} | cut -d , -f 6`
-    PHSC_761 ${in_msn_} `echo ${set_ptn} | cut -d , -f 7`
-    PHSC_363 ${in_msn_} `echo ${set_ptn} | cut -d , -f 8`
-    PHSC_460 ${in_msn_} `echo ${set_ptn} | cut -d , -f 9`
-    PHSC_435 ${in_msn_} `echo ${set_ptn} | cut -d , -f 10`
-    PHSC_436 ${in_msn_} `echo ${set_ptn} | cut -d , -f 11`
-    PHSC_301 ${in_msn_} `echo ${set_ptn} | cut -d , -f 12`
-    THSC_325 ${in_imui} `echo ${set_ptn} | cut -d , -f 13`
-    THSC_308 ${in_imui} `echo ${set_ptn} | cut -d , -f 14`
-    THSC_321 ${in_imui} `echo ${set_ptn} | cut -d , -f 15`
-#=============================================================
-#   PHSC_461 ${in_imui} `echo ${set_ptn} | cut -d , -f 16`
-#   ==> 設定通知再送開始・成功日時 は、個別設定を行う.
-#       CreateDB.sh pdb DDDDDDDDDD 461 yyyymmddHHMM
-#=============================================================
-    PHSC_476 ${in_msn_} `echo ${set_ptn} | cut -d , -f 17`
-    smdo_TAC            `echo ${set_ptn} | cut -d , -f 18`
-    PHSC_573 ${in_msn_} `echo ${set_ptn} | cut -d , -f 19`
-    PHSC_422 ${in_msn_} `echo ${set_ptn} | cut -d , -f 20`
-#=============================================================
-#   Sdm-IF 
-#   ==> FSCP マルチ構成(FSCP×2台)向けの試験の場合使用   
-    PHSC_496          ${in_msn_} `echo ${set_ptn} | cut -d , -f 21`
-#=============================================================
-
-    func_DEBUG "${LINENO}: func_REG_SUB: ReSEND END"
-}
 #
 # Check TYPE + PTN
 func_CHK_PATTERN()
@@ -483,8 +285,6 @@ func_CHK_PATTERN()
     local ptn_max=0
     case "${in_type}" in
         "lck")     ptn_max=${LCK_PTN_CNT}  ;;
-        "wpe")     ptn_max=${WPE_PTN_CNT}  ;;
-        "rsd")     ptn_max=${RSN_PTN_CNT}  ;;
     esac
     if [ ${in_ptn_} -gt ${ptn_max} ]; then
         echo; echo "[Error] 範囲超え(TYPE=${in_type} 範囲=1～${ptn_max} 指定値=${in_ptn_})."
@@ -492,6 +292,11 @@ func_CHK_PATTERN()
     fi
 }
 #
+#********************************************************
+# Q&A: shell脚本函数如何传参？
+# 上例$1, $2就是两个参数值，所以要与脚本主体的$1,$2作区分。
+# 脚本主体入参实质就是程序入参，跟C程序名后添参数一样。
+#********************************************************
 # Set Subscriber( SSFS + PHSC + THSC + chg_mprg )
 func_REG_SUB()
 {
@@ -509,8 +314,6 @@ func_REG_SUB()
 
     SSFS_REG ${in_msn_} ${in_imui}
     PHSC_509 ${in_msn_} 1
-#    PHSC_670 ${in_msn_} 1
-#	 PHSC_685 ${in_msn_} 0
 	PHSC_686 ${in_msn_} 1
 	PHSC_687 ${in_msn_} 2
     THSC_366 ${in_imui}
@@ -518,52 +321,12 @@ func_REG_SUB()
 
     case "${in_type}" in
         "lck")     func_REG_SUB_LOCK   ${in_msn_} ${in_imui} ${in_ptn_}     ;;
-        "wpe")     func_REG_SUB_WIPE   ${in_msn_} ${in_imui} ${in_ptn_}     ;;
-        "rsd")     func_REG_SUB_ReSEND ${in_msn_} ${in_imui} ${in_ptn_}     ;;
     esac
     func_NSMA ${DEF_NSMA_CLR}
 
     func_DEBUG "${LINENO}: func_REG_SUB: MAIN END"
 }
 #
-# Get Subscriber(All)
-func_GET_SUB_ALL()
-{
-    local in_msn_=${1}
-    local in_imui=${2}
-    func_DEBUG "${LINENO}: func_GET_SUB_ALL START"
-
-    func_CMD "### 加入者情報収集"
-    func_CMD view_psdt ALL MSN:${in_msn_}
-    func_CMD view_ftsr MSN:${in_msn_}
-    func_CMD nb
-    func_CMD PHSC CL MSN:${in_msn_}
-    func_CMD THSC CL MODE:IMT IMUI:${in_imui}
-    func_CMD nb
-
-    func_DEBUG "${LINENO}: func_GET_SUB_ALL END"
-}
-# Get Subscriber
-func_GET_SUB_MID()
-{
-    local in_msn_=${1}
-    local in_imui=${2}
-    func_DEBUG "${LINENO}: func_GET_SUB_MID START"
-
-    func_CMD "### 加入者情報収集"
-    #func_CMD PHSC CL MSN:${in_msn_} MNO:0909 MNO:0309 MNO:0464 MNO:0573 MNO:685 MNO:686 MNO:687
-    #2021.10.21 収集項目追加
-    func_CMD PHSC CL MSN:${in_msn_} MNO:0909 MNO:0309 MNO:476 MNO:0464 MNO:685 MNO:686 MNO:687 MNO:761 MNO:0460 MNO:0461 MNO:0573
-    func_CMD nb
-
-    func_CMD "### 移動機情報収集"
-    #func_CMD THSC CL MODE:IMT IMUI:${in_imui} MNO:303 MNO:301 
-    #2021.10.21 収集項目追加
-    func_CMD THSC CL MODE:IMT IMUI:${in_imui} MNO:303 MNO:301 MNO:366 
-    func_CMD nb
-
-    func_DEBUG "${LINENO}: func_GET_SUB_MID END"
-}
 #
 # Clear Subscriber
 func_CCL_SUB()
@@ -593,17 +356,6 @@ func_PHSC_SET()
     esac
 }
 #
-# 個別 THSC 設定
-func_THSC_SET()
-{
-    local in_imui=${1}
-    local in_mno_=${2}
-    local in_val_=${3}
-
-    case ${in_mno} in
-    esac
-}
-
 
 #********************************************************
 #
@@ -637,22 +389,10 @@ case ${2} in
         _TYPE____=${5}
         _PATTERN_=${6}
         ;;
-    "all")
-        func_DEBUG "${LINENO}: Check Para(Before)"
-        [ ${INPARA_CNT} -ne ${BEFPARA_MAX} ] && func_USAGE 
-        _FSCP_NM_=${1}
-        _STEP____=${DEF_STEP_BEF}
-        _MSN_____=${3}
-        _IMUI____=${4}
-        ;;
-    "mid")
-        func_DEBUG "${LINENO}: Check Para(middle)"
-        [ ${INPARA_CNT} -ne ${MIDPARA_MAX} ] && func_USAGE 
-        _FSCP_NM_=${1}
-        _STEP____=${DEF_STEP_MID}
-        _MSN_____=${3}
-        _IMUI____=${4}
-        ;;
+#********************************************************
+# Q&A: Shell逻辑运算总结？
+# 见附录1
+#********************************************************        
     "del")
         func_DEBUG "${LINENO}: Check Para(after )"
         [ ${INPARA_CNT} -ne ${AFTPARA_MAX} ] && func_USAGE 
@@ -812,129 +552,10 @@ PHSC_301()
   func_CMD nb
 }
 
-# P2: 0: 未契約加入者
-#     1: 基本契約者番号
-#     2: 付加番号1
-#     3: 付加番号2
-#     4: ハイパーマルチ基本契約者番号
-#     5: ハイパーマルチ付加番号
-#     6: 新2in1A番号
-#     7: 新2in1B番号
-#     8: WS3 Aナンバー
-#     9: WS3 Fナンバー
-#    99: 設定無し  
-PHSC_422(){
-  [ ${2} -eq 99 ] && func_CMD "### ビジネスナンバー加入者種別 未設定" && exit
-  func_CMD "### ビジネスナンバー加入者種別 設定"
-    if [ ${2} -eq 1 ]; then func_CMD PHSC SE MODE:IMT MSN:${1} MNO:422=1
-  elif [ ${2} -eq 2 ]; then func_CMD PHSC SE MODE:IMT MSN:${1} MNO:422=2
-  elif [ ${2} -eq 3 ]; then func_CMD PHSC SE MODE:IMT MSN:${1} MNO:422=3
-  elif [ ${2} -eq 4 ]; then func_CMD PHSC SE MODE:IMT MSN:${1} MNO:422=4
-  elif [ ${2} -eq 5 ]; then func_CMD PHSC SE MODE:IMT MSN:${1} MNO:422=5
-  elif [ ${2} -eq 6 ]; then func_CMD PHSC SE MODE:IMT MSN:${1} MNO:422=6
-  elif [ ${2} -eq 7 ]; then func_CMD PHSC SE MODE:IMT MSN:${1} MNO:422=7
-  elif [ ${2} -eq 8 ]; then func_CMD PHSC SE MODE:IMT MSN:${1} MNO:422=8
-  elif [ ${2} -eq 9 ]; then func_CMD PHSC SE MODE:IMT MSN:${1} MNO:422=9
-                       else func_CMD PHSC SE MODE:IMT MSN:${1} MNO:422=0
-  fi
-  func_CMD nb
-}
+# ...........#
+# ...........#
+# ...........#
 
-# P2: 0: 未再送 
-#     1: 再送中 
-#     2: 端末ロック再送中 
-#     3: 初期設定再送中 
-PHSC_460()
-{
-  func_CMD "### 設定通知再送表示 設定 "
-    if [ ${2} -eq 1 ]; then func_CMD PHSC SE MODE:IMT MSN:${1} MNO:460=1
-  elif [ ${2} -eq 2 ]; then func_CMD PHSC SE MODE:IMT MSN:${1} MNO:460=2
-  elif [ ${2} -eq 3 ]; then func_CMD PHSC SE MODE:IMT MSN:${1} MNO:460=3
-                       else func_CMD PHSC SE MODE:IMT MSN:${1} MNO:509=0
-  fi
-  func_CMD nb
-}
-
-# P2: 0: 開通(未登録)
-#     1: 未開通(登録)
-PHSC_435()
-{
-  func_CMD "### 自動開通表示 設定"
-    if [ ${2} -eq 1 ]; then func_CMD PHSC SE MODE:IMT MSN:${1} MNO:435=1
-                       else func_CMD PHSC SE MODE:IMT MSN:${1} MNO:435=0
-  fi
-  func_CMD nb
-}
-
-# P2: 0: 非許容 (Default)
-#     1: 許容(契約者)
-#     2: モジュール
-#     3: 予備
-PHSC_436()
-{
-  func_CMD "### FOMAスイッチホン契約種別 設定" 
-    if [ ${2} -eq 1 ]; then func_CMD PHSC SE MODE:IMT MSN:${1} MNO:436=1
-  elif [ ${2} -eq 2 ]; then func_CMD PHSC SE MODE:IMT MSN:${1} MNO:436=2
-  elif [ ${2} -eq 3 ]; then func_CMD PHSC SE MODE:IMT MSN:${1} MNO:436=3
-                       else func_CMD PHSC SE MODE:IMT MSN:${1} MNO:436=0
-  fi
-  func_CMD nb
-}
-
-# P1: 0: 不一致 : THSC MNO:366 と異なる値を設定 
-#     1: 一致   : THSC MNO:366 と等しい値を設定 
-PHSC_476()
-{
-  func_CMD "### 端末ロック対象IMEI 設定"
-  if [ ${2} -eq 1 ]; then func_CMD PHSC SE MODE:IMT MSN:${1} MNO:476=${PHSC_476_VAL}
-                     else func_CMD PHSC SE MODE:IMT MSN:${1} MNO:476=35a23899999999
-  fi
-  func_CMD nb
-}
-
-# P2: 0: 未収容    => 0000000000000000
-#     1: 収容      => $PHSC_496_VAL
-#    99:           => 未設定  
-PHSC_496()
-{
-  [ ${2} -eq 99 ] && func_CMD "### 2in1異名義対応用IMUI 未設定" && exit
-  func_CMD "### 2in1異名義対応用IMUI 設定"
-  if [ ${2} -eq 1 ]; then func_CMD PHSC SE MODE:IMT MSN:${1} MNO:496=${PHSC_496_VAL}
-                     else func_CMD PHSC SE MODE:IMT MSN:${1} MNO:496=0000000000000000
-  fi
-  func_CMD nb
-}
-
-# P2: 0: 未契約
-#     1: 契約
-PHSC_509()
-{
-  func_CMD "### LTE契約 設定"
-    if [ ${2} -eq 1 ]; then func_CMD PHSC SE MODE:IMT MSN:${1} MNO:509=1
-                       else func_CMD PHSC SE MODE:IMT MSN:${1} MNO:509=0
-  fi
-  func_CMD nb
-}
-# P2: 0: 未契約
-#     1: 契約
-PHSC_670()
-{
-  func_CMD "### 5G契約 設定"
-  if [ ${2} -eq 1 ]; then func_CMD PHSC SE MODE:IMT MSN:${1} MNO:670=1
-                     else func_CMD PHSC SE MODE:IMT MSN:${1} MNO:670=0
-  fi
-  func_CMD nb
-}
-# P2: 0: 未契約
-#     1: 契約
-PHSC_750()
-{
-  func_CMD "### 5GC契約 設定"
-  if [ ${2} -eq 1 ]; then func_CMD PHSC SE MODE:IMT MSN:${1} MNO:750=1
-                     else func_CMD PHSC SE MODE:IMT MSN:${1} MNO:750=0
-  fi
-  func_CMD nb
-}
 # 0: 活性
 # 1: 非活性
 PHSC_761()
@@ -959,42 +580,6 @@ PHSC_363()
   fi
   func_CMD nb
 }
-# 0: 0_0:変換解除
-# 1: 1_0:おまかせロック
-# 2: 2_0:ケータイお探し
-PHSC_573()
-{
-  func_CMD "### APN変換フラグ(フラグ_制御情報) 設定"
-    if [ ${2} -eq 1 ]; then func_CMD PHSC SE MODE:IMT MSN:${1} MNO:573=1_0
-  elif [ ${2} -eq 2 ]; then func_CMD PHSC SE MODE:IMT MSN:${1} MNO:573=2_0
-                       else func_CMD PHSC SE MODE:IMT MSN:${1} MNO:573=0_0
-  fi
-  func_CMD nb
-}
-
-# P2: そのまま設定  
-PHSC_685()
-{
-  func_CMD "### ロック・ワイプ ノード番号 設定"
-  func_CMD PHSC SE MODE:IMT MSN:${1} MNO:685=${2}
-  func_CMD nb
-}
-
-# P2: そのまま設定  
-PHSC_686()
-{
-  func_CMD "### ロック・ワイプ FEP番号 設定"
-  func_CMD PHSC SE MODE:IMT MSN:${1} MNO:686=${2}
-  func_CMD nb
-}
-
-# P2: そのまま設定  
-PHSC_687()
-{
-  func_CMD "### ロック・ワイプ USP番号 設定"
-  func_CMD PHSC SE MODE:IMT MSN:${1} MNO:687=${2}
-  func_CMD nb
-}
 
 
 #*************************************************************
@@ -1013,89 +598,9 @@ THSC_308()
   func_CMD nb
 }
 
-# P2: 0: MSCナンバー無し 
-#     1: MSCナンバー有り : 何もしない 
-THSC_309()
-{
-  func_CMD "### MSC number 設定"
-    if [ ${2} -eq 0 ]; then func_CMD THSC SE MODE:IMT IMUI:${1} MNO:309=0000000000000000
-                       else func_CMD "### 在圏情報(chg_mprg) 依存"
-  fi
-  func_CMD nb
-}
-
-# P2: 0: SGSN number 無し -> クリア
-#     1: SGSN number 有り -> 何もしない 
-THSC_310()
-{
-  func_CMD "### SGSN number 設定"
-    if [ ${2} -eq 0 ]; then func_CMD THSC SE MODE:IMT IMUI:${1} MNO:310=0000000000000000
-                       else func_CMD "### 在圏情報(chg_mprg) 依存"
-  fi
-  func_CMD nb
-}
-# P2: 0: パージ無し
-#     1: パージ有り
-THSC_321()
-{
-  func_CMD "### 移動機パージフラグ 設定"
-    if [ ${2} -eq 1 ]; then func_CMD THSC SE MODE:IMT IMUI:${1} MNO:321=1
-                       else func_CMD THSC SE MODE:IMT IMUI:${1} MNO:321=0
-  fi
-  func_CMD nb
-}
-
-# P2: 0: パージ無し(MS not purged for GPRS)
-#     1: パージ有り(MS purged for GPRS)
-THSC_322()
-{
-  func_CMD "### GPRS移動機パージフラグ(MS purged for GPRS flag) 設定"
-    if [ ${2} -eq 1 ]; then func_CMD THSC SE MODE:IMT IMUI:${1} MNO:322=1
-                       else func_CMD THSC SE MODE:IMT IMUI:${1} MNO:322=0
-  fi
-  func_CMD nb
-}
-
-# P2: 0: ドコモ網在圏
-#     1: ローミング中
-THSC_325()
-{
-  func_CMD "### ローミング中表示 設定"
-  if [ ${2} -eq 1 ]; then func_CMD THSC SE MODE:IMT IMUI:${1} MNO:325=1
-                     else func_CMD THSC SE MODE:IMT IMUI:${1} MNO:325=0
-  fi
-  func_CMD nb
-}
-# P2: 0: 非ローミング中
-#     1: ローミング中
-THSC_333()
-{
-  func_CMD "### パケットローミング中フラグ 設定"
-  if [ ${2} -eq 1 ]; then func_CMD THSC SE MODE:IMT IMUI:${1} MNO:333=1
-                     else func_CMD THSC SE MODE:IMT IMUI:${1} MNO:333=0
-  fi
-  func_CMD nb
-}
-
-# IMEISV 固定値設定
-THSC_366()
-{
-  func_CMD "### IMEISV 設定"
-  func_CMD THSC SE MODE:IMT IMUI:${1} MNO:366=${THSC_366_VAL}
-  func_CMD nb
-}
-
-# 0: ALL 0 ( chg_mprg 依存 )
-# 1: 0 以外
-#   [2021.10.21] ALL0とは「0」ではないよう。
-THSC_401()
-{
-  func_CMD "### MME Name 設定"
-  if [ ${2} -eq 1 ]; then func_CMD "### 在圏情報(chg_mprg) 依存"
-                     else func_CMD "### DEFAULTのままで設定なし"
-  fi
-  func_CMD nb
-}
+# ...........#
+# ...........#
+# ...........#
 
 # 0: ALL 0 (何もしない)
 # 1: 0 以外 (固定 819a542aaaaaaa11 を設定)
@@ -1110,45 +615,6 @@ THSC_414()
   func_CMD nb
 }
 
-# 0: パージ無し 
-# 1: パージ有り 
-THSC_752()
-{
-  func_CMD "### 5GC移動機パージフラグ 設定"
-  if [ ${2} -eq 1 ]; then func_CMD THSC SE MODE:IMT IMUI:${1} MNO:752=1
-                     else func_CMD THSC SE MODE:IMT IMUI:${1} MNO:752=0
-  fi
-  func_CMD nb
-}
-# 0: ALL 0
-# 1: 0 以外 
-#   [2021.10.18] ALL0とは「0」ではないよう。
-THSC_759()
-{
-  func_CMD "### SMSFアドレス 設定"
-  if [ ${2} -eq 1 ]; then func_CMD THSC SE MODE:IMT IMUI:${1} MNO:759=smsf.3gppnetwork.org
-#                    else func_CMD THSC SE MODE:IMT IMUI:${1} MNO:759=00000000000000000000
-                     else func_CMD "### DEFAULTのままで設定なし"
-  fi
-  func_CMD nb
-}
-
-# P2: 0: ALL 0
-#     1: 0 以外 -> 固定値設定. 
-#   [2021.10.18] ALL0とは「0」ではないよう。
-THSC_763()
-{
-  func_CMD "### DeregCallBackURI(AMF-UECMプロシージャ用) 設定 "
-  if [ ${2} -eq 1 ]; then func_CMD THSC SE MODE:IMT IMUI:${1} MNO:763=${THSC_763_VAL}
-#                    else func_CMD THSC SE MODE:IMT IMUI:${1} MNO:763=000000000000000000000000000000000000000
-                     else func_CMD "### DEFAULTのままで設定なし"
-  fi
-  func_CMD nb
-}
-
-
-
-
 # P1: 0: ロック対応端末   : 0000000000000880 
 #     1: ロック非対応端末 : 0000000000000C80
 smdo_TAC()
@@ -1161,4 +627,327 @@ smdo_TAC()
 }
 
 ```
+
+## GetGscCoreUSP2.sh
+
+下例脚本最主要的思想，就是将旧log拷贝一份，然后一定时间后新的log与之比较，就能得出这段时间新增的log，最后转运压缩取得。
+
+```shell
+# Debug Flag
+#   0: No Debug + Excute Command
+#   1:    Debug + Excute Command
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+DEBUGFLAG=0
+func_DEBUG()
+{
+    [ ${DEBUGFLAG} -eq 1 ] && echo $@
+}
+
+# Save Path
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Fbb=Gsc
+#SAVEPATH=/tmp/${Fbb}
+SAVEPATH=/tmp/${Fbb}/TOOL
+
+# Tool
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TOOLNAME=`basename $0`
+TGZFILE=GscCore.tgz
+
+# Data
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# USP Counter
+USPMAX=1
+# USP NAME
+USPHOST=(usp00
+usp01
+usp02
+usp03
+usp04
+usp05
+)
+
+#-----------------------------------
+# Item
+#-----------------------------------
+#     Msglog
+#     Core -+- FS   -+-  565: 565_Itc
+#           |        +- 1023: 1023_Itc
+#           |        +- 1047: 1047_Itc
+#           +- USP0 -+- 1024: 1024_Gsc
+#                    +-  550: 550_Gsc
+#                    +-  538: 538_Nsm
+#-----------------------------------
+# Get FS Item(FMT: PROCID,FILENAME)
+FSITEM=(565,Itc000
+1023,Itc001
+1047,Itc002
+)
+# Get USP Item(FMT: PROCID,FILENAME)
+USPITEM=(565,Itc000
+1047,Itc002
+538,Nsm000
+550,Gsc
+1024,Gsc100
+)
+
+# Create Diff_File
+func_Diff()
+{
+    local old_=${1}
+    local new_=${2}
+    local diff=${3}
+    func_DEBUG "${LINENO}: func_Diff Old:${old_} New:${new_} DIff:${diff}"
+    diff --unchanged-group-format='' --new-group-format='%>' ${old_} ${new_} >> ${diff}
+}
+
+
+# Get FSCP Name & Set USP Counter
+FSCPNAME=`grep -A 1 "IPSCP;" /ipscp/odm/GEN/uniIPSCP | tail -1 | cut -d = -f2 | cut -d \; -f1`
+case ${FSCPNAME} in
+    R[ABF])     USPMAX=6            ;;
+    GU[KLM])    USPMAX=2            ;;
+    GH[HAI])    USPMAX=2            ;;
+    J)          USPMAX=2            ;;
+esac
+func_DEBUG "${LINENO}: USP Counter: $USPMAX"
+func_DEBUG "${LINENO}: P1 = ${1}"
+
+
+if [ "${1}" == "bef" ]
+then
+#{
+    func_DEBUG "${LINENO}: Delete Old File/Directory"
+    rm -rf ${SAVEPATH}/Msglog*
+    rm -rf ${SAVEPATH}/Core*
+    rm -rf ${SAVEPATH}/${TGZFILE}
+
+    func_DEBUG "${LINENO}: Copy Msglog"
+    befmsg=msg`date +%y%m%d`.log
+    cp -p /SYSTEM/LOG/msglog/${befmsg} ${SAVEPATH}/${befmsg}
+
+    func_DEBUG "${LINENO}: Copy FS CORE"
+    mkdir -p ${SAVEPATH}/Core/FS
+    for item in "${FSITEM[@]}"
+    do
+        func_DEBUG "${LINENO}: Get Item = ${item}"
+        pth=`echo ${item} | sed -e 's/,/\//g'`
+        pid=`echo ${item} | cut -d , -f1`
+        fnm=`echo ${item} | cut -d , -f2`
+        svf=$( printf "%04d" $pid )_${fnm}
+    
+        # If *.old, Copy
+        [ -f /SYSTEM/CORE/core/${pth}.old ] && cp -p /SYSTEM/CORE/core/${pth}.old ${SAVEPATH}/Core/FS/${svf}.old
+        cp -p /SYSTEM/CORE/core/${pth}.log ${SAVEPATH}/Core/FS/${svf}.log
+    done
+
+    func_DEBUG "${LINENO}: Copy USP CORE"
+    for uno in `seq 0 $(( ${USPMAX} - 1 ))`
+    do
+        uspnm=$( printf "USP%02d" $uno )
+        mkdir -p ${SAVEPATH}/Core/${uspnm}
+        func_DEBUG "${LINENO}: Get ${uspnm}"
+        for item in "${USPITEM[@]}"
+        do
+            func_DEBUG "${LINENO}: Get Item = ${item}"
+            pth=`echo ${item} | sed -e 's/,/\//g'`
+            pid=`echo ${item} | cut -d , -f1`
+            fnm=`echo ${item} | cut -d , -f2`
+            svf=$( printf "%04d" $pid )_${fnm}
+ 
+            # If *.old, Copy
+            scp -p ${uspnm}:/SYSTEM/CORE/core/${pth}.old ${SAVEPATH}/Core/${uspnm}/${svf}.old_bef 1>&/dev/null
+            scp -p ${uspnm}:/SYSTEM/CORE/core/${pth}.log ${SAVEPATH}/Core/${uspnm}/${svf}.log_bef
+        done
+    done
+
+    # view
+    find ${SAVEPATH} -type f -name "*log*" | sort
+
+#}
+elif [ "${1}" == "aft" ]
+then
+#{
+    echo "### After"
+  
+    func_DEBUG "${LINENO}: Copy Msglog and Diff"
+    cd ${SAVEPATH}
+    befmsg=`ls msg*.log`
+    aftmsg=msg`date +%y%m%d`.log
+    if [ "${befmsg}" == "${aftmsg}" ]
+    then
+        func_DEBUG "${LINENO}: Today"
+        func_Diff ${befmsg} /SYSTEM/LOG/msglog/${befmsg} ${befmsg}_aft
+    else
+        func_DEBUG "${LINENO}: Yesterday + Today"
+        func_Diff ${befmsg} /SYSTEM/LOG/msglog/${befmsg} ${befmsg}_aft
+        cat /SYSTEM/LOG/msglog/${aftmsg} >> ${befmsg}_aft
+    fi
+    mv ${befmsg}_aft ${befmsg}
+
+    func_DEBUG "${LINENO}: Copy FS CORE and Diff"
+    cd ${SAVEPATH}/Core/FS
+    for item in "${FSITEM[@]}"
+    do
+    #{
+        # Change DDDD,NAME -> DDDD/NAME
+        pth=`echo ${item} | sed -e 's/,/\//g'`
+        pid=`echo ${item} | cut -d , -f1`
+        fnm=`echo ${item} | cut -d , -f2`
+        svf=$( printf "%04d" $pid )_${fnm}
+ 
+        # 保存DIR 配下に .oldがあれば、/SYSTEM/CORE/core/???/*.old と差分があるチェック
+        # ある場合は、.log がローテーションしたと判断  
+        if [ -f /SYSTEM/CORE/core/${pth}.old ]; then
+            func_DEBUG "${LINENO}: Exist /SYSTEM/CORE/core/${pth}.old"
+            # /SYSTEM/CORE/core 配下に .old がある場合は 保存DIR 配下に .old があるかをチェック 
+            if [ -f ${svf}.old ]; then
+                func_DEBUG "${LINENO}: Exist ${SAVEPATH}/Core/FS/${svf}.old"
+                # 保存DIR 配下に .old がある場合
+                if [ `diff -q ${svf}.old /SYSTEM/CORE/core/${pth}.old | wc -l` == 1 ]; then
+                    func_DEBUG "${LINENO}: Different /SYSTEM/CORE/core/${pth}.old ${SAVEPATH}/Core/FS/${svf}.old"
+                    # 差分がある場合は .log がローテーションしたとみなす 
+                    func_Diff ${svf}.log /SYSTEM/CORE/core/${pth}.old ${svf}.log_aft
+                    cat /SYSTEM/CORE/core/${pth}.log >> ${svf}.log_aft
+                else
+                    func_DEBUG "${LINENO}: Equal /SYSTEM/CORE/core/${pth}.old ${SAVEPATH}/Core/FS/${svf}.old"
+                    # 差分がない場合は .log のみ差分を抽出 
+                    func_Diff ${svf}.log /SYSTEM/CORE/core/${pth}.log ${svf}.log_aft
+                fi
+            else
+                func_DEBUG "${LINENO}: No ${SAVEPATH}/Core/FS/${svf}.old"
+                # 保存DIR 配下に .old がない場合は、.log がローテーションしたとみなす 
+                func_Diff ${svf}.log /SYSTEM/CORE/core/${pth}.old ${svf}.log_aft
+                cat /SYSTEM/CORE/core/${pth}.log >> ${svf}.log_aft
+            fi
+        else
+            func_DEBUG "${LINENO}: No /SYSTEM/CORE/core/${pth}.old"
+            # /SYSTEM/CORE/core 配下に .old がない場合は 保存DIR 配下にも .old がないので、
+            # .log を比較するのみ 
+            func_Diff ${svf}.log /SYSTEM/CORE/core/${pth}.log ${svf}.log_aft
+        fi
+ 
+        # 不要ファイル削除 
+        rm -f ${svf}.old ${svf}.log
+        mv ${svf}.log_aft ${svf}.log
+    #}
+    done
+
+    func_DEBUG "${LINENO}: Copy USP CORE and Diff"
+    for uno in `seq 0 $(( ${USPMAX} - 1 ))`
+    do
+    #{
+        uspnm=$( printf "USP%02d" $uno )
+        cd ${SAVEPATH}/Core/${uspnm}
+
+        for item in "${USPITEM[@]}"
+        do
+        #{
+            func_DEBUG "${LINENO}: Get Item = ${item}"
+            pth=`echo ${item} | sed -e 's/,/\//g'`
+            pid=`echo ${item} | cut -d , -f1`
+            fnm=`echo ${item} | cut -d , -f2`
+            svf=$( printf "%04d" $pid )_${fnm}
+
+            # 1) COPY
+            scp -p ${uspnm}:/SYSTEM/CORE/core/${pth}.old ${SAVEPATH}/Core/${uspnm}/${svf}.old_aft 1>&/dev/null
+            scp -p ${uspnm}:/SYSTEM/CORE/core/${pth}.log ${SAVEPATH}/Core/${uspnm}/${svf}.log_aft
+
+            # 2) CHECK & DIFF
+            if [ -f ${svf}.old_aft ]; then
+                if [ -f ${svf}.old_bef ]; then
+                    if [ `diff -q ${svf}.old_bef ${svf}.old_aft | wc -l` -eq 1 ]; then
+                        func_DEBUG "${LINENO}: Different ${svf}.old_bef ${svf}.old_aft"
+                        func_Diff ${svf}.log_bef ${svf}.old_aft ${svf}.log
+                        cat ${svf}.log_aft >> ${svf}.log
+                    else
+                        func_DEBUG "${LINENO}: Equal ${svf}.old_bef ${svf}.old_aft"
+                        func_Diff ${svf}.log_bef ${svf}.log_aft ${svf}.log
+                    fi
+                else
+                    func_DEBUG "${LINENO}: No ${svf}.old_bef"
+                    func_Diff ${svf}.log_bef ${svf}.old_aft ${svf}.log
+                    cat ${svf}.log_aft >> ${svf}.log
+                fi
+            else
+                func_DEBUG "${LINENO}: No ${svf}.old_aft"
+                func_Diff ${svf}.log_bef ${svf}.log_aft ${svf}.log
+            fi
+            # remove
+            rm -f ${svf}.log_* ${svf}.old_*
+        #}
+        done
+    #}
+    done
+
+    # compress
+    cd ${SAVEPATH}
+    #tar czvf ./MSGandCORE.tgz ./msg*.log ./Core 1>/dev/null 2>/dev/null
+    tar czvf ./${TGZFILE} ./msg*.log ./Core 1>/dev/null 2>/dev/null
+    rm -rf ./msg*.log ./Core 1>/dev/null 2>/dev/null
+#}
+else
+#{
+    echo "
+    [Usage] ${TOOLNAME} STEP
+        STEP: 工程.
+                bef: 試験前.
+                aft: 試験後. ${SAVEPATH}/${TGZFILE} を吸い上げること.
+"
+#}
+fi
+
+```
+
+
+
+## 附录：Shell逻辑运算总结
+
+> 1. 关于文件和目录
+> 例如[ -f file ]
+> -f  判断某普通文件是否存在
+> -d  判断某目录是否存在
+> -b  判断某文件是否块设备
+> -c  判断某文件是否字符设备
+> -S  判断某文件是否socket（待修正）
+> -L  判断某文件是否为符号链接（待修正）
+> -e  判断某东西是否存在（待修正）
+> -p  判断某文件是否为pipe 或是 FIFO
+>
+> 2. 关于文件的属性
+> -r  判断文件是否为可读的属性
+> -w  判断文件是否为可以写入的属性
+> -x  判断文件是否为可执行的属性
+> -s  判断文件是否为非空白文件
+> -u  判断文件是否具有SUID的属性
+> -g  判断文件是否具有SGID的属性
+> -k  判断文件是否具有sticky bit的属性
+>
+> 3. 两个文件之间的判断与比较
+> 例如[ test file1 -nt file2 ]
+> -nt  第一个文件比第二个文件新
+> -ot  第一个文件比第二个文件旧
+> -ef  第一个文件与第二个文件为同一个（ link 之类的文件）
+>
+> 4. 逻辑的(and)与(or)
+> &&   逻辑的 AND 的意思, -a 也是这个意思
+> ||  逻辑的 OR 的意思， -o 也是这个意思
+>
+> 5. 运算符相关
+>    运算符号代表意义
+>    =  等于  应用于：整型或字符串比较 如果在[] 中，只能是字符串
+>    !=  不等于 应用于：整型或字符串比较 如果在[] 中，只能是字符串
+>    <  小于 应用于：整型比较 在[] 中，不能使用 表示字符串
+>
+>    大于 应用于：整型比较 在[] 中，不能使用 表示字符串
+>    -eq  等于 应用于：整型比较
+>    -ne  不等于 应用于：整型比较
+>    -lt  小于 应用于：整型比较
+>    -gt  大于 应用于：整型比较
+>    -le  小于或等于 应用于：整型比较
+>    -ge  大于或等于 应用于：整型比较
+>    -a  双方都成立（and） 逻辑表达式 –a 逻辑表达式
+>    -o  单方成立（or） 逻辑表达式 –o 逻辑表达式
+>    -z  空字符串
+>    -n  非空字符串
 
