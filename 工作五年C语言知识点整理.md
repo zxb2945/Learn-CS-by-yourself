@@ -20,6 +20,8 @@ cJson_CreatIntArray( const int * num, int count);
 
 const 在\*右边，比如 int * const p3=&a，指针地址不能变，所以必须初始化，\*p3可以任意赋值。
 
+（记忆方法：\*p是否为整体，若是所代表的值不能被更改；若不是，指针必须初始化，不能另指）
+
 ### 1.3 const修饰返回值
 
 const修饰返回值时，其返回值内容不能被修改，只能复制给加const修饰的同类型指针。
