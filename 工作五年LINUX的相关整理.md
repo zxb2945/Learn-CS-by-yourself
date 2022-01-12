@@ -916,6 +916,8 @@ ssh与telnet的不同点：
 
 2.telnet的默认端口号为23；ssh的默认端口号为22.
 
+此外，scp(Secure Copy Protocol)用于Linux之间复制文件和目录。基于ssh登陆进行安全的远程文件拷贝命令。SSH连接隧道是安全的，因而基于SCP协议的文件传输是安全的。
+
 ### http 和 ftp
 
 http 与ftp的相同点：
