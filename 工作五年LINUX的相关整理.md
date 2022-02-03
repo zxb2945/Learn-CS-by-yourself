@@ -142,6 +142,12 @@ link,s表示软连接，即创建快捷方式。
 
 将当前服务器下某文件传输到另一台服务器上。
 
+如果是文件夹的话
+
+```
+scp -r TOOL emergency@129.76.3.193:/home/emergency/Gsc
+```
+
 
 
 **cat /proc/cpuinfo**
