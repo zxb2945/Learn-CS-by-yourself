@@ -80,6 +80,10 @@ root:root 表示 组：名。
 
 解压用unzip。
 
+```
+tar -xzvf file.tar.gz //解压tar.gz
+```
+
 
 
 **ln -s xx/tmp xx/dir/linktemp**
@@ -200,7 +204,7 @@ scp -r TOOL emergency@129.76.3.193:/home/emergency/Gsc
 
 从root用户切回普通用户则用`su - zxb`. 注意破折号前后有空格。
 
-注意某些用户也可以通过`sudo su`来暂时获得root的权限。前提是该用户被记载在sudoers文件中。
+注意某些用户也可以通过`sudo 执行文件`来暂时获得root的权限。前提是该用户被记载在sudoers文件中。
 
 ## 3 linux执行命令结果输出到文件
 
