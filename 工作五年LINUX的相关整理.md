@@ -926,11 +926,16 @@ ssh与telnet的不同点：
 
 2.telnet的默认端口号为23；ssh的默认端口号为22.
 
+```shell
+//可以向远程终端打入命令
+ssh usp00 /SYSTEM/LM/apl/virtual/cmd/bin/PHSC
+```
+
 此外，scp(Secure Copy Protocol)用于Linux之间复制文件和目录。基于ssh登陆进行安全的远程文件拷贝命令。SSH连接隧道是安全的，因而基于SCP协议的文件传输是安全的。
 
 sftp(Secure File Transfer Protocol)与 ftp 有着几乎一样的语法和功能。是ssh的其中一部分。用法如下：
 
-```
+```shell
 sftp username@ip
 cd 文件存储的位置
 put [本地文件的地址] [服务器上文件存储的位置]
