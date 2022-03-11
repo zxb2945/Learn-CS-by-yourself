@@ -86,3 +86,51 @@ Reject：表明接收到一个不正确的数据包类型或组成部分。
 **PDC** (**Personal Digital Cellular**) 是一种由[日本](https://baike.baidu.com/item/日本)开发及使用的[2G](https://baike.baidu.com/item/2G)[移动电话](https://baike.baidu.com/item/移动电话)通信标准。与[D-AMPS](https://baike.baidu.com/item/D-AMPS)及[GSM](https://baike.baidu.com/item/GSM)相似，PDC采用[TDMA](https://baike.baidu.com/item/TDMA)技术。标准由RCR（其后变成[ARIB](https://baike.baidu.com/item/ARIB)）在1991年4月制定。而[NTT DoCoMo](https://baike.baidu.com/item/NTT DoCoMo)在1993年3月推出其数字MOVA服务。PDC采用25 kHz载波、3个时间格、pi/4-[DQPSK](https://baike.baidu.com/item/DQPSK) 编码及低速率11.2 kbit/s 及 5.6 kbit/s（半速率）话音[编解码器](https://baike.baidu.com/item/编解码器)。
 
 全球移动通信系统(Global System for Mobile Communications) ，缩写为GSM，由[欧洲电信标准组织](https://baike.baidu.com/item/欧洲电信标准组织)[ETSI](https://baike.baidu.com/item/ETSI)制订的一个[数字移动通信](https://baike.baidu.com/item/数字移动通信)标准。它的空中接口采用时分多址技术 [1] 。自90年代中期投入商用以来，被全球超过100个国家采用。GSM标准的无处不在使得在移动电话运营商之间签署"漫游协定"后用户的国际漫游变得很平常。 GSM 较之它以前的标准最大的不同是它的[信令](https://baike.baidu.com/item/信令/99474)和语音[信道](https://baike.baidu.com/item/信道/499862)都是数字式的，因此GSM被看作是第二代 ([2G](https://baike.baidu.com/item/2G/3110701))移动电话系统 [2] 。
+
+
+
+### 1.7 Diameter
+
+Diameter[网络节点](https://baike.baidu.com/item/网络节点)运行在TCP或者SCTP上，能够提供[可靠传输](https://baike.baidu.com/item/可靠传输)和具有[重传机制](https://baike.baidu.com/item/重传机制)，由[传输层](https://baike.baidu.com/item/传输层)来提供可靠性；
+
+Diameter协议被IETF的AAA工作组作为下一代的[AAA协议](https://baike.baidu.com/item/AAA协议)标准。Diameter（为直径，意为着Diameter协议是[RADIUS](https://baike.baidu.com/item/RADIUS)协议的升级版本）协议包括基本协议，NAS（网络接入服务）协议，EAP（可扩展鉴别）协议，MIP（移动IP）协议，CMS（密码消息语法）协议等。
+
+Diameter[协议支持](https://baike.baidu.com/item/协议支持)移动IP、NAS请求和移动代理的认证、授权和计费工作，协议的实现和RADIUS类似，也是采用AVP，属性值对（采用Attribute-Length-Value三元组形式）来实现，但是其中详细规定了错误处理， failover机制，采用TCP协议，支持分布式计费，克服了RADIUS的许多缺点，是最适合未来移动通信系统的AAA协议。
+
+
+
+## 2 MSISDN
+
+### 2.1 MSISDN
+
+MSISDN=CC+NDC+SN  =>存储在HLR和VLR中，在MAP接口上传送
+
+MSISDN是指主叫用户为呼叫GSM PLMN中的一个移动用户所需拨的号码，作用同于固定网PSTN号码；是在公共电话网交换网络编号计划中，唯一能识
+
+CC：Country Code，含义为国家码，因为陆地移动网络遍布全球各地，自然需要对不同国家的移动用户进行区分，中国的国家码为86。
+
+NDC：National Destination Code，表示国内目的地码，也称网络接入号。为保障消费者的利益并允许合理的市场竞争，每个主权国家都可以授权一个或多个网络运营商组建并经营移动网络，例如中国三大移动运营商之中国移动网络接入号为134~139、150~152、188等，中国联通为130~132、185~186等，中国电信为133、153、180、189等。
+
+SN：Subscriber Number，客户号码。
+
+若在以上号码中将国家码CC去除，就成了移动台的国内身份号码，也就是我们日常所说的"**手机号码**"。
+
+
+
+### 2.2 IMSI
+
+MSISDN就是用户的手机号；
+
+IMSI国际移动用户识别码，即 sim 卡的识别码
+
+[国际移动用户识别码](https://baike.sogou.com/lemma/ShowInnerLink.htm?lemmaId=58631&ss_c=ssc.citiao.link)（IMSI：International Mobile Subscriber Identification Number）是区别移动用户的标志，储存在SIM卡中，可用于区别移动用户的有效信息。
+
+IMSI不同于手机设备的标识IMEI（International Mobile Equipment Identity，国际移动设备标识）：IMEI是与手机绑定的。IMSI是与SIM（Subscriber Identity Module，[用户识别模块](https://baike.sogou.com/lemma/ShowInnerLink.htm?lemmaId=30482&ss_c=ssc.citiao.link)）或者USIM（Universal Subscriber Identity Module，全球用户身份模块） 。
+
+IMSI和MSISDN都是[用户标识](https://baike.sogou.com/lemma/ShowInnerLink.htm?lemmaId=148354373&ss_c=ssc.citiao.link)，在不同的接口、不同的流程中需要使用不同的标识。在通信系统中MSISDN（Mobile Station International Subscriber [Directory](https://baike.sogou.com/lemma/ShowInnerLink.htm?lemmaId=154839032&ss_c=ssc.citiao.link) Number，[移动台](https://baike.sogou.com/lemma/ShowInnerLink.htm?lemmaId=64335829&ss_c=ssc.citiao.link)国际用户目录号）又称为手机号码。
+
+
+
+### 2.3 IMEI
+
+**国际移动设备识别码**（**International Mobile Equipment Identity**，**IMEI**），即通常所说的手机“串号”，用于在移动电话网络中识别每一部独立的手机等移动通信设备，相当于[移动电话](https://zh.wikipedia.org/wiki/行動電話)的[身份证](https://zh.wikipedia.org/wiki/身份證)。序列号共有15位数字，前6位（TAC）是型号核准号码，代表手机类型。接着2位（FAC）是最后装配号，代表产地。后6位（SNR）是串号，代表生产顺序号。最后1位（SP）一般为0，是检验码，备用。国际移动设备识别码一般贴于机身背面与外包装上，同时也存在于手机[存储器](https://zh.wikipedia.org/wiki/記憶體)中，通过输入*#06#即可查询。
