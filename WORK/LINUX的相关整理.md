@@ -88,7 +88,7 @@ tar -xzvf file.tar.gz //解压tar.gz
 
 **ln -s xx/tmp xx/dir/linktemp**
 
-link,s表示软连接，即创建快捷方式。
+link,s表示软连接，即创建快捷方式。linktemp为快捷方式。
 
 
 
@@ -293,11 +293,13 @@ gcc main.c -L. -lhello
 
 gcc最基本的用法就是：gcc [options] [filenames] => gcc test.c （简洁不！）。
 
-| [options] |                                   |
-| --------- | --------------------------------- |
-| -o        | 若不给，则生成a.out（可执行文件） |
-| -Wall     | 编译后显示所有警告                |
-|           |                                   |
+| [options] |                                         |
+| --------- | --------------------------------------- |
+| -o        | 若不给，则生成a.out（可执行文件）       |
+| -Wall     | 编译后显示所有警告                      |
+| -g        | 生成可以使用gdb的版本                   |
+| -Dxxx     | 条件编译，例如 -DDBG，相当于#define DBG |
+|           |                                         |
 
 （2019.7.1）
 
