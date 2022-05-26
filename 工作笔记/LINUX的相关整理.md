@@ -206,6 +206,14 @@ scp -r TOOL emergency@129.76.3.193:/home/emergency/Gsc
 
 注意某些用户也可以通过`sudo 执行文件`来暂时获得root的权限。前提是该用户被记载在sudoers文件中。
 
+
+
+**which**
+
+查看可执行文件的位置。比如`which bash`。
+
+
+
 ## 3 linux执行命令结果输出到文件
 
 |                    |                |
