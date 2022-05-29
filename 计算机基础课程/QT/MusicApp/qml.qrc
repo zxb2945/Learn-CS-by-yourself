@@ -1,0 +1,12 @@
+﻿<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>SongList.qml</file>
+        <file>images/Baby Don't Cry.jpg</file>
+        <file>images/BLACKPINK IN YOUR AREA.jpg</file>
+        <file>images/Happy.jpg</file>
+        <file>images/Hero.jpg</file>
+        <file>images/innocent world.jpg</file>
+        <file>images/Sign.jpg</file>
+    </qresource>
+</RCC>
