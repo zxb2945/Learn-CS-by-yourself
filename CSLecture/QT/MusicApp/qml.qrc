@@ -13,5 +13,8 @@
         <file>Test2Window.qml</file>
         <file>Test2Tile.qml</file>
         <file>Test2Content.qml</file>
+        <file>Test2ContentNav.qml</file>
+        <file>Test2ContentNavBtn.qml</file>
+        <file>Test2ContentAlb.qml</file>
     </qresource>
 </RCC>

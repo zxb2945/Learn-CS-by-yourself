@@ -9,12 +9,12 @@ ApplicationWindow {
     height: 480
     title: qsTr("Music Player")
     flags:Qt.FramelessWindowHint | Qt.Window;
+//    flags:Qt.FramelessWindowHint
 
 
-    Test1Window{}
-//    Test2Window{
-//        parentObj: mainwindow
-//    }
-
+//    Test1Window{}
+    Test2Window{
+        parentObj: mainwindow
+    }
 
 }
