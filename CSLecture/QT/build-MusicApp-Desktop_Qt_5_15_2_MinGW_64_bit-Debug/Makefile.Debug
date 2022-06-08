@@ -101,10 +101,10 @@ debug/qrc_qml.cpp: ../MusicApp/qml.qrc \
 		C:/Software/QT/5.15.2/mingw81_64/bin/rcc.exe \
 		../MusicApp/SongList.qml \
 		../MusicApp/main2.qml \
-		../MusicApp/Test2ContentNav.qml \
 		../MusicApp/Test2ContentNavBtn.qml \
 		../MusicApp/Test2Window.qml \
 		../MusicApp/Test2Tile.qml \
+		../MusicApp/Test2ContentAlb.qml \
 		../MusicApp/Test1Window.qml \
 		../MusicApp/main.qml \
 		../MusicApp/Test2Content.qml \

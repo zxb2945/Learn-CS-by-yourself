@@ -4,22 +4,22 @@ import QtQuick.Controls 2.12
 
 Page {
     property QtObject parentObj
-    property color borderColor: "black";
-    property color titleColor:"green";
+//    property color borderColor: "black";
+//    property color titleColor:"green";
 
-    id:root;
+    id:mainwindow;
     anchors.fill: parent;
     background: Rectangle{
         anchors.fill: parent;
         border{
-            color: borderColor;
+            color: "black";
             width: 5
         }
     }
 
     Test2Tile{
         id:test2Tile
-        color: titleColor;
+        color: "green";
         height: 50;
         anchors{
             left: parent.left

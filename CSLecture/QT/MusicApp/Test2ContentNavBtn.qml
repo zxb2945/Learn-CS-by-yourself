@@ -2,6 +2,7 @@ import QtQuick 2.0
 import QtQuick.Controls 2.2
 
 Button{
+//    property QtObject parentObj;
     property color hoveredColor: "grey"
     property color clickedColor: "black"
     property color normalColor: "white"
@@ -13,7 +14,7 @@ Button{
 //    property string type;
 
     id:navBtn;
-    signal btnClicked();
+//    signal btnClicked();
 
     width: parent.width;
     height: 60;
@@ -28,7 +29,7 @@ Button{
     Image {
         id: image1
         anchors.verticalCenter: parent.verticalCenter
-        anchors.left: parent
+        anchors.left: parent.left
         width: 50
         height: 50
         fillMode: Image.PreserveAspectFit
@@ -57,16 +58,20 @@ Button{
     MouseArea{
         anchors.fill: parent
         onClicked: {
-            btnClicked();
+//            btnClicked();
+            root.currentSongName = songText
+            root.currentArtistName = artistText
+            root.currentAlbulmPath = imagePathText
         }
     }
 
 
-    function setCurrentItemState(){
-        currentItem = true;
-    }
+//    function setCurrentItemState(){
+//        currentItem = true;
+//    }
 
-    Component.onCompleted: {
-        navBtn.btnClicked.connect(setCurrentItemState);
-    }
+
+//    Component.onCompleted: {
+//        navBtn.btnClicked.connect(Test2ContentAlb.setCurrentItemState);
+//    }
 }
