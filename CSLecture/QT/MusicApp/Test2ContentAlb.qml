@@ -11,7 +11,7 @@ Rectangle {
         id: text1
         anchors.horizontalCenter: parent.horizontalCenter
         y: 306
-        color: "black"
+        color: "white"
         text: songText
         font.pixelSize: 20
     }
@@ -20,7 +20,7 @@ Rectangle {
         id: text2
         anchors.horizontalCenter: parent.horizontalCenter
         y: 336
-        color: "black"
+        color: "white"
         text: artistText
         font.pixelSize: 20
     }
@@ -35,22 +35,4 @@ Rectangle {
         source: imagePathText
     }
 
-//    function setCurrentItemState(){
-//        console.log("test")
-//    }
-
-
-//    Connections{
-//        target:songListPanel
-//        function onBtnClicked(){
-//        console.log("test")
-//        }
-//    }
-
-//    onBtnClicked: function setCurrentItemState(){
-//        console.log("test")
-//    }
-//    Component.onCompleted: {
-//        navBtn.btnClicked.connect(setCurrentItemState);
-//    }
 }

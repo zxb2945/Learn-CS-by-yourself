@@ -15,5 +15,6 @@
         <file>Test2Content.qml</file>
         <file>Test2ContentNavBtn.qml</file>
         <file>Test2ContentAlb.qml</file>
+        <file>Test2ContentPly.qml</file>
     </qresource>
 </RCC>

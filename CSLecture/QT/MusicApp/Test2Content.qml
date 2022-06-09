@@ -46,7 +46,7 @@ Page{
         imagePathText: currentAlbulmPath
     }
 
-    Rectangle{
+    Test2ContentPly{
         id:playCtl
         anchors.bottom: parent.bottom
     }

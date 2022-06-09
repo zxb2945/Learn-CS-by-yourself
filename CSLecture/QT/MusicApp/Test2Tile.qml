@@ -2,6 +2,7 @@ import QtQuick 2.0
 import QtQuick.Controls 2.15
 
 Rectangle {
+    property QtObject parentObj
 
     MouseArea{
         property real xmouse
@@ -21,7 +22,7 @@ Rectangle {
 
     Image {
         id: titleIcon
-        source: "qrc:/images/Hero.jpg";
+        source: "/images/Hero.jpg";
         width: parent.height-15
         height: parent.height-15
         anchors{
@@ -51,8 +52,11 @@ Rectangle {
         anchors{
             right: parent.right
         }
+        width: 65
+        height: parent.height-15
         anchors.verticalCenter: parent.verticalCenter
         background: Rectangle{
+            radius: 10
             color: {
                 if(closeBtn.pressed && closeBtn.hovered)
                     return "black"
@@ -64,6 +68,7 @@ Rectangle {
         }
 
         contentItem: Label{
+            anchors.centerIn : closeBtn
             text: "QUIT"
             font{
                 family: "Microsoft YaHei"

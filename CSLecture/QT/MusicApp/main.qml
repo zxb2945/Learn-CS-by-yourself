@@ -6,7 +6,7 @@ ApplicationWindow {
     id:startwindow
     visible: true
     width: 640
-    height: 480
+    height: 580
     title: qsTr("Music Player")
 //    flags:Qt.FramelessWindowHint | Qt.Window;
     flags:Qt.FramelessWindowHint

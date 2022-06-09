@@ -29,6 +29,7 @@ Page {
             top:parent.top
             topMargin: 2
         }
+        parentObj: mainwindow.parentObj
     }
 
     Test2Content{

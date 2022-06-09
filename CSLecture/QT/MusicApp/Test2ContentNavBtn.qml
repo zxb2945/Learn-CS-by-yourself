@@ -18,7 +18,6 @@ Button{
 
     width: parent.width;
     height: 60;
-//    ButtonGroup.group: narBarBtngroup
 
     background: Rectangle{
         id:backgroundRect;
@@ -65,13 +64,4 @@ Button{
         }
     }
 
-
-//    function setCurrentItemState(){
-//        currentItem = true;
-//    }
-
-
-//    Component.onCompleted: {
-//        navBtn.btnClicked.connect(Test2ContentAlb.setCurrentItemState);
-//    }
 }
