@@ -18,7 +18,7 @@ Rectangle{
         id:playBtn;
         anchors{
             left: parent.left
-            leftMargin: 100
+            leftMargin: 20
             verticalCenter: parent.verticalCenter
         }
         width: 50
