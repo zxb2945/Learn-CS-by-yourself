@@ -43,8 +43,11 @@ Rectangle{
             color: "black"
         }
 
+
+// maybe we could use libZPlay libary to complete this model
+// like click to invoke a play function
 //        onClicked: {
-//            Qt.quit()
+//
 //        }
     }
 

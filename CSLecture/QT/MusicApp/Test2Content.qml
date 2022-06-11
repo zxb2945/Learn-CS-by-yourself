@@ -23,7 +23,7 @@ Page{
             anchors.top: parent.top
             anchors.bottom: parent.bottom
 
-            model: SongList{}
+            model: SongList{}    //Maybe adding song from database or local device is a better design
             delegate: Test2ContentNavBtn { songText: title; artistText: "安室奈美恵"; imagePathText: "images/"+imagePath; }
 
             flickableDirection: Flickable.AutoFlickDirection
