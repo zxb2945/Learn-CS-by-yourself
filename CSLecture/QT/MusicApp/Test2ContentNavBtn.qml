@@ -2,16 +2,13 @@ import QtQuick 2.0
 import QtQuick.Controls 2.2
 
 Button{
-//    property QtObject parentObj;
     property color hoveredColor: "grey"
     property color clickedColor: "black"
     property color normalColor: "white"
-    property bool currentItem : false;
-//    property string fontfamily;
-    property string songText;
-    property string artistText;
-    property string imagePathText;
-//    property string type;
+    property bool currentItem : false
+    property string songText
+    property string artistText
+    property string imagePathText
 
     id:navBtn;
 //    signal btnClicked();
