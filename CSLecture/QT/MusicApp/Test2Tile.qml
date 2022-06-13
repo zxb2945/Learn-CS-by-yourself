@@ -82,4 +82,6 @@ Rectangle {
         }
     }
 
+    //add buttons to expand and narrow the size of the window.
+
 }
