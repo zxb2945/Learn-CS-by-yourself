@@ -214,6 +214,22 @@ scp -r TOOL emergency@129.76.3.193:/home/emergency/Gsc
 
 
 
+**screen**
+
+screen是一个全屏窗口管理器，它在多个进程（通常是交互式shell）之间多路传输物理终端。
+
+创建：screen -S 屏幕名称
+
+进入：screen -r 屏幕名称
+
+展示屏幕列表：screen -ls
+
+关闭：screen -S 对应ID -X quit
+
+切回主屏幕：ctrl+A+D
+
+
+
 ## 3 linux执行命令结果输出到文件
 
 |                    |                |
