@@ -1,9 +1,9 @@
-import QtQuick 2.0
+import QtQuick 2.7
 import QtQuick.Controls 2.2
 
 Button{
     property color hoveredColor: "grey"
-    property color clickedColor: "black"
+    property color clickedColor: "green"
     property color normalColor: "white"
     property bool currentItem : false
     property string songText
@@ -11,14 +11,28 @@ Button{
     property string imagePathText
 
     id:navBtn;
-//    signal btnClicked();
+    signal btnClicked(string name);
 
     width: parent.width;
     height: 60;
+    ButtonGroup.group: navBtngroup
+
+    function navBtnClicked(name)
+    {
+        var len = navBtngroup.buttons.length;
+        for(var i=0;i<navBtngroup.buttons.length;i++)
+        {
+            if(name!==navBtngroup.buttons[i].songText)
+                navBtngroup.buttons[i].setCurrentItemState(false);
+            else
+                navBtngroup.buttons[i].setCurrentItemState(true);
+        }
+    }
+
 
     background: Rectangle{
         id:backgroundRect;
-        color: hovered?hoveredColor:normalColor
+        color: currentItem ? clickedColor:(hovered?hoveredColor:normalColor)
     }
 
 
@@ -54,11 +68,20 @@ Button{
     MouseArea{
         anchors.fill: parent
         onClicked: {
-//            btnClicked();
+            btnClicked(songText);
             root.currentSongName = songText
             root.currentArtistName = artistText
             root.currentAlbulmPath = imagePathText
         }
+    }
+
+    function setCurrentItemState(ok){
+        currentItem = ok;
+    }
+
+    Component.onCompleted: {
+        navBtn.btnClicked.connect(navBtnClicked);
+        console.log("test1")
     }
 
 }
