@@ -295,6 +295,86 @@ Server Message Block (SMB) 这个文件系统，而就是这套 SMB 软件就能
 Linux 的 NAT 功能主要透过封包过滤的方式， 并使用 iptables 的 nat 表格进行 IP 伪装 (SNAT) ，让客户端自行前往因特网上的任何地方的一种方式。主要的运作行为是在 OSI 七层协议的二、三、四层。由于是透过封包过滤与伪装，因此客户端可以使用的端口口号码 (第四层) 较弹性；
 主要透过 Proxy 的服务程序 (daemon) 提供网络代理的任务，因此 Proxy 能不能进行某些工作，与该服务的程序功能有关。 举例来说，如果你的 Proxy 并没有提供邮件或 FTP 代理，那么你的客户端就是无法透过 Proxy 去取得这些网络资源。 主要运作的行为在 OSI 七层协议的应用层部分
 
+代理服务器的功能主要有：
+ 作为 WWW 的网页资料取得代理人
+ 作为内部区网的单点对外防火墙系统：而且还不需要设定那复杂的 NAT 功能呢！
+由于 Proxy 的这种特性，让他很常被使用于大型的企业内部，因为可以达到杜绝内部人员上班时使用非 WWW 以外的网络服务，而且还可以监测用户的资料要求流向与流量呢！很不错吧！
+
+达成代理服务器功能的软件很多，例如效能不是很好的 Apache 以及我们这个章节要介绍的八爪章鱼 squid 这一套。
+安装好 squid 之后，它主要的提供的配置文件有：...
+
+Proxy 服务放在 NAT 服务器上：通透式代理 (Transparent Proxy)
+从上面的说法来看，我们可以发现 proxy 可以做到类似防火墙的功能 (acl dst, acl dstdomain 再配合 http_access 处理)， 但是，我们也知道浏览器得要设定好proxy 之后，才会真的使用 proxy 嘛！那就不就是在耍宝用的防火墙吗？ 只要你的用户知道不要设定 proxy 就可以躲过你的管控，那这部 proxy 防火墙有啥屁用啊？您说是吧？
+那该如何强制使用者一定要使用你的 proxy 呢？很简单！那就是： (1)在对外的防火墙服务器 (NAT) 上面安装 proxy； (2)在 proxy 上头启动 transparent 功能；(3) NAT 服务器加上一条 port 80 转 port 3128 的规则，如此一来，所有往 port 80 的封包就会被你的 NAT 转向 port 3128 ， 而你的 port 3128 就是 proxy ，那大家就得要用你的 proxy ，而且重点是，浏览器不需要进行任何设定！
+
+
+18
+NAS (Network Attached Storage, 网络附加储存服务器)
+SAN (Storage Area Networks, 储存局域网络)
+ SAN 早期使用光纤信道，由于以太网络的发展，近来使用 iSCSI 协议在 TCP/IP 架构上面实作；
+ iSCSI target 主要使用 scsi-target-utils 软件达成主要利用 tgt-admin 及tgtadm 指令完成：
+
+
+19
+讲到因特网服务器，你第一个会想到的应该就是 WWW 还有 FTP 吧！但其实还有一个更重要的你可能会不知道他的存在， 那就是 DNS ！这才是重点中的重点
+
+用网络主机名取得 IP 的历史渊源:
+单一档案处理上网的年代： /etc/hosts  =>客户端计算机每次都得要重新下载一次档案才能顺利联网
+/etc/hosts 这个档案的用法，基本上该档案内容就是『IP 主机名 主机别名一 主机别名二...』。在里面最重要的就是 localhost 对应到 127.0.0.1 这个咚咚！你千万不能删除该笔记录的。这里也再次强调，在你的私有网域内部，最好将所有的私有 IP 与主机名对应都写入这个档案中啦！
+
+分布式、阶层式主机名管理架构： DNS 系统
+DNS 是一种因特网的通讯协议名称， 至于 Bind 则是提供这个 DNS 服务的软件
+
+在 Internet 当中，任何一部合法的主机都具有独一无二的主机名，这个主机名包含了 hostname 与 domain name ，并称为 Fully Qualified Domain Name (FQDN)；
+
+20
+大约在 90 年代初期由伊利诺大学的国家超级计算机应用中心 开发出服务器 HTTPd (HTTP daemon 之意)。HTTPd 为自由软件，所以很快的领导了 WWW 服务器市场。
+由于 HTTPd 这个服务器一直没有妥善的发展，于是一群社群朋友便发起一个计划，这个计划主要在改善原本的 HTTPd 服务器软件，他们称这个改良过的软件为Apache，取其『一个修修改改的服务器 (A patch server)』的双关语！(这东西就是主要提供 WWW 的服务器平台，后面谈到的 PHP 必须要在这玩意儿上才能运作！)
+虽然 WWW 越来越重要，但相对的来说，客户端如果没有浏览器的话那么他们当然就无法去浏览 WWW 服务器所提供的数据。
+
+ WWW 是依据 HTTP 这个协议而来的，分为服务器端与客户端；
+ Apache 是一个服务器端的软件，主要依据 NCSA 的 HTTPd 服务器发展而来，为自由软件；
+ Mozilla 是一个自由软件的开发计划，其中 firefox 浏览器是相当成功的作品。
+
+URL:<协定>://<主机地址或主机名>[:port]/<目录资源>
+鸟哥的网站 www 数据放置在我主机的 /var/www/html/ 当中，通常首页目录底下会有个特殊的文件名，例如 index.html 
+默认的首页目录在 /var/www/html/，你应该将所有的 WWW 数据都搬到该目录底下才对！
+在整个平台设计上面，目前常见的有两大系统，一个是 Linux 操作系统上面，搭配 Apache + MySQL + PHP 等而达成，这个系统被称为 LAMP。
+
+PHP 是一个工具，他可以被用来建立动态网页，PHP 程序代码可以直接在 HTML 网页当中嵌入， 就像你在编辑 HTML 网页一样的简单。所以说， PHP 是一种『程序语言』，这种程序语言可以直接在网页当中编写， 不需要经过编译即可进行程序的执行。
+我们知道在 Linux 上面要达成网页服务器需要 Apache 这套服务器软件吶！不过 Apache 仅能提供最基本的静态网站数据而已，想要达成动态网站的话，那么最好还是需要 PHP 与 MySQL 的支持才好。
+那么我们的 LAMP 需要哪些东西呢？你必需要知道的是，PHP 是挂在 Apache 底下执行的一个模块， 而我们要用网页的 PHP 程控 MySQL 时，你的 PHP 就得要支持MySQL 的模块才行！所以你至少需要底下几个软件：
+ httpd (提供 Apache 主程序)
+ mysql (MySQL 客户端程序)
+ mysql-server (MySQL 服务器程序)
+ php (PHP 主程序含给 apache 使用的模块)
+ php-devel (PHP 的发展工具，这个与 PHP 外挂的加速软件有关)
+ php-mysql (提供给 PHP 程序读取 MySQL 数据库的模块)
+
+要达成让 apache 支持 https 协议的话，你必须要有 mod_ssl 这个软件才行！
+
+Apache 也自行提供一支 script 可以让我们来简单的使用，那就是apachectl 这支程序啦！这支程序的用法与 /etc/init.d/httpd 几乎完全一模一样喔！
+如果想要知道有没有成功的驱动 PHP 模块...
+
+虽然 PHP 网页程序标榜的是速度快速，不过因为 PHP 毕竟是先将一些可用函数先编译成为模块，然后当网页使用到该 PHP 程序的时候，再由呼叫 PHP 模块来达成程序所需要的行为。由于多了一道手续， 所以他的执行效能还是有别于传统编译的程序语言啰。
+ 那么如果我们可以将 PHP 程序预先转换成为可直接执行的 binary file，不就可以直接读取进而加快速度吗？ 没错！是这样～这东西称为预编器～其中有一套软件称为 eaccelerator，eaccelerator 可以将你的 PHP 程序与 PHP 核心及相关函式库预先编译后暂存下来，以提供未来使用时可以直接执行，加上他可以优化你的 PHP 程序
+  [root@www eaccelerator-0.9.6.1]# make install
+ # 此时这个新编译的模块会被放置到
+/usr/lib64/php/modules/eaccelerator.so 当中！
+
+
+如果你想要 Apache 可以执行 perl 之类的网页程序时(helloworld.pl)， 你就得需要安装一些额外的模块才行。其中 mod_perl 与 mod_python 这两个软件建议你最好安装一下啦！
+
+ 找不到网页时的显示讯息通知:
+事实上 CentOS 所提供的 Apache 已经规范好一些简单的错误资料网页了，你可以到 /var/www/error/ 目录下瞧瞧就晓得。
+
+[root@www ~]# vim /etc/httpd/conf/httpd.conf
+ # 大约在 875 行左右，预设就是批注掉的！
+ # ErrorDocument 403 /error/HTTP_FORBIDDEN.html.var
+ # ErrorDocument 404 /error/HTTP_NOT_FOUND.html.var
+ # ErrorDocument 405 /error/HTTP_METHOD_NOT_ALLOWED.html.var
+ # ErrorDocument 408 /error/HTTP_REQUEST_TIME_OUT.html.var
+
 
 
 
