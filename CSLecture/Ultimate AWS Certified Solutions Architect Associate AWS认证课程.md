@@ -350,3 +350,106 @@ Understanding vCPU:
 这个vCPU指核心级线程吗？这样的话所谓的一个vCPU甚至没法运行一个多线程的进程...这样太弱了吧...
 
 Capacity Reservations: ensure you have EC2 Capacity when need.
+
+## 056 EBS Overview 20220703
+
+An EBS(Elastic Block Store)Volume is a network drive you can attach to your instances while they run.
+
+Think of them as a "network USB srick"
+
+It's locked to an Availability Zone(AZ)
+
+Controls the EBS behaviour when an EC2 instance terminates
+
+1. By default, the root EBS volume is deleted
+2. By default, any other attached EBS volume is not deleted
+
+
+
+## 058 EBS Snapshots Overview
+
+Make a backup(snapshot) of your EBS volume at a point in time
+
+Can copy snapshots across AZ or Region
+
+
+
+Action中Manage Fast Snapshot Restore  干嘛用的？？
+
+## 060 AMI Overview
+
+AMI: Amazon Machine Lmage
+
+AMI are a customization of an EC2 instance
+
+We can create your own AMI
+
+
+
+创建一个AMI，肯定是关联到snapshot的，他人参照你这个AMI时候，它的存储EBS就是从你这个AMI关联的snapshot上创造出来的吧。
+
+## 062 EC2 Instance Store
+
+Compared to EBS, EC2 Instance Store has better I/O performance, and risk to loss data if hardware fails.
+
+## 063 EBS Volume Types
+
+gp(SSD): General purpose SSD
+
+iol(SSD): Highest performance SSD
+
+stl/scl(HDD): Low cost HDD
+
+
+
+Only gp/iol can be used as boot volumes（用于操作系统启动，HDD也可以，大概是AMAZON考虑到顾客体验吧...）
+
+
+
+io1/io2 with Multi-Attach: Attach the same EBS Volume to multiple EC2 instances in the same AZ. Application must manage concurrent write operations. (only io1/io2 can multi-attcach)
+
+## 065 EBS Encryption
+
+这个episode谈论了两种方式，一个未加密的snapshot，先复制为一个加密的snapshot，然后在这个加密的snapshot创造出一个volume，自动继承加密；一个未加密的snapshot，创造出volume时候加密，也成为一个加密的volume...(好无聊...)
+
+## 066 EFS Overview
+
+Managed NFS(network file system) that can be mounted on many EC2
+
+EFS works with EC2 instances in multi-AZ (conpared to EBS)
+
+scalable,expensive(3 x gp2)
+
+Use cases: content management, web serving, data sharing...
+
+Compatible with Linux based AMI(not Windows)
+
+File system scales automatically, pay-per-use, no capacity planning!
+
+Performance mode:
+
+1. General purpoese(default):latency-sensitive use cases(web server...)
+2. Max I/O:higher latency, higher parallel( big data...)
+
+Throughout mode:
+
+1. Bursting(1TB = 50MiB/s + burst of up to 100MiB/s) 与容量成正比
+2. Provisioned: set your throughput regardless of storage size.
+
+Storage Tiers:( Lifecycle management , 30days default)
+
+1. Standard: for frequently accessed files
+2. Infrequent access: cost to retrieve files, lower price to store
+
+
+
+
+
+
+
+
+
+
+
+
+
