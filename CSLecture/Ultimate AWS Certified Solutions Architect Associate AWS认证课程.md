@@ -422,7 +422,7 @@ scalable,expensive(3 x gp2)
 
 Use cases: content management, web serving, data sharing...
 
-Compatible with Linux based AMI(not Windows)
+Compatible with Linux(POSIX) based AMI(not Windows)
 
 File system scales automatically, pay-per-use, no capacity planning!
 
@@ -441,15 +441,117 @@ Storage Tiers:( Lifecycle management , 30days default)
 1. Standard: for frequently accessed files
 2. Infrequent access: cost to retrieve files, lower price to store
 
+## 068 EBS vs EFS - Elastic Block Storage 20220704
+
+To migrate an EBS volume across AZ
+
+1. Take a snapshot
+2. Restore the snapshot to another AZ
+3. EBS backups use IO and you shouldn't run then while your application is handing a lot of traffic.
+
+## 070 High Availability and Scalability
+
+Vertical scalability指单个instance的硬件升级来提高performance
+
+Horizontal  scalability 就运用分布式框架增加instance来提高performance
+
+## 071 Elastic Load Balancing(ELB) Overview
+
+Load Balances are servers that forward traffic to multiple servers downstream.
+
+Health Check are crucial for Load Balancers
+
+Types of load balancers on AWS
+
+1. Classic Load Balancer-2009-CLB, HTTP,HTTPS,TCP,SSL
+2. Application Load Balancer-2016-ALB, HTTP,HTTPS,WebSocket
+3. Network Load Balancer-2017-NLB, TCP,TLS,UDP ->(layer4)
+4. Gateway Load Balancer-2020-GWLB, Operating at layer3(IP)
+
+Overall,it is recommended to use the newer generation load balancers as they provide more features.
+
+## 074 Application Load Balancer(ALB)
+
+Load balancing to multiple HTTP applications across machines
+
+Load balancing to multiple HTTP applications on the same machine
+
+Support redirects(from HTTP to HTTPS for example)=>has a port mapping feature to redirect to a dynamic port in ECS
+
+ALB routing tables to different target groups based on HTTP(layer 7, URL), a great fit for micro sevices & container-based application(example:Docker &Amazon ECS)
+
+The application servers don't see the IP of the client directly, the true IP of the client is inserted in the header X-Forwarded-For
+
+(security group中的source中添加另一个安全组号来控制流量不太懂...security group不是规则的集合吗？难道还能作为主机IP的集合？？它的意思是特定另一个security group出来的流量？)
+
+## 076 Network Load Balancer(NLB)
+
+Network load balances(Layer 4) allow to:
+
+1. Forward TCP&UDP traffic to your instances
+2. Handle milions of request per seconds
+3. Less latency ~100ms (vs 400ms for ALB)
+
+NLB has **one static IP** per AZ, and supprots assigning Elastic IP(helpful for whitelisting specific IP)
+
+## 078 Gateway Load Balancer(GWLB)
+
+Deploy,scale,and manage a fleet of 3rd party network virtual appliances in AWS.
+
+Example:Firewalls,Deeo Packet Inspection Systems...
+
+Operates at Layer 3 (Network Layer)-IP Packets
+
+从网上收集流量，先转发到第三方的3rd Party Secutiry Virtual Appliances分析，OK之后传回GWLB，GWLB再转发到Application. （网关嘛路由转发）
+
+## 079 ELB-Sticky Sessions
+
+Operation order:EC2->Target groups->my-first-target-group->Edit attributes
+
+基于cookie，ELB将固定client转发到固定instances，会有expire时间
+
+## 080 ELB-Cross-Zone Load Balancing
+
+ELB必然也存在于一个特定的AZ，负载均衡时可以无视instance的AZ差异。只是对于ALB，默认开启且不能被关所以免费；对于NLB，默认关闭，启用收费；而CLB虽然默认关闭但启用不收费...
+
+## 081 ELB-SSL Certificates
+
+SSL: Secure Sockets Layer, used to encrypt connections (HTTPS)
+
+TLS: Transport Layer Security, which is a newer version of SSL
 
 
 
+SNL: Server Name Indication
 
+SNI solves the problem of loading mutiple SSL certificates onto one web server(to serve multiple websites), it's a "newer" protocol, supported by ALB and NLB, not supported by CLB
 
+CA: Certificate Authorities, such as Comodo, Symantec, etc...
 
+ELB为不同instances上的instances去申请不同CA的能力
 
+## 082 Connection Draining
 
+在CLB，被称为Connection Draining, 对于ALB&NLB，叫作Deregistration Delay。
 
+Time to complete "in-fight requests" while the instance is de-reistering or unhealthy.
 
+比如下载某个文件这种需要一定时间完成的request，就需要将此设得时间长一些，ELB大概在这段时间里持续向特定的instance去询问吧。
 
+Set to a low value if your requests are short.
+
+## 083 Auto Scaling Group(ASG) Overview
+
+Subnets => 子网
+
+The goal of an Auto Scaling Group is to:
+
+1. Scale out(add EC2 instances) to match an increased load
+2. Scale in(remove EC2 instances) to match an decreased load
+3. Ensure we have a minimum and maximum number of machines running
+4. Automatically Register new instances to a load balancer
+
+Auto Scaling Group in AWS with Load Balancer
+
+Scaling policies can be on CPU,Network,even schedule
 
