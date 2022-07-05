@@ -2,7 +2,9 @@
 
 ## 001 Course Introduction 20220629
 
-site: https://www.bilibili.com/video/BV1wR4y1F7YM?p=11&vd_source=cfea4a81af3552025602bbed3cecda4f
+B站课程地址: https://www.bilibili.com/video/BV1wR4y1F7YM?p=11&vd_source=cfea4a81af3552025602bbed3cecda4f
+
+知乎分享：https://zhuanlan.zhihu.com/p/512791644
 
 ## 011 IAM Introduction 
 
@@ -555,3 +557,243 @@ Auto Scaling Group in AWS with Load Balancer
 
 Scaling policies can be on CPU,Network,even schedule
 
+1. Dynamic scaling policies => target tracking policy(比如CPU利用率)
+2. Predictive scaling policies  => based on machine learning
+3. Scheduled actions
+
+
+
+ASG Default Termination Policy:
+
+1. Find the AZ which has the most number of instances
+2. If there are multiple instances in the AZ to choose from, delete the one with the oldest launch configuration
+
+ASG tries the balance the number of instances across AZ by default.
+
+
+
+Lauch Template vs Launch Configuration:
+
+都能提供AMI去launch EC2 instances, 只是前者更newer，Recommended By AWS
+
+## 088 Amazon RDS Overview 20220705
+
+RDS stands for Relational Database Service
+
+It's managed DB **service** for DB use SQL as a query language.
+
+It allows you to create databases in the cloud that are managed by AWS
+
+​	PostgreSQL,MySQL,MariaDB,Oracle,Microsoft SQL Server,Aurora
+
+But you can't SSH into your instances.
+
+
+
+DB Snapshots compared to Backups:
+
+1. Manually triggered by the user
+2. Retention of backup for as long as you want.
+
+
+
+RDS backups and scales automatically for you.
+
+## 089 RDS Read Replicas vs Multi AZ
+
+RDS Read Replicas for read scalability
+
+​	up to 5 Read Replicas
+
+​	With AZ, Cross AZ or Cross Region
+
+For RDS Read Replicas within the same region, you don't pay that fee.
+
+(RDS 是托管服务)
+
+
+
+RDS Muiti AZ (Disaster Recovery)
+
+​	SYNC replication
+
+​	One DNS name-automatic app failover to standby
+
+​	Not used for scaling
+
+Note: The Read Replicas can be setup as Multi AZ for Disaster Reconvery.
+
+
+
+RDS-From Single-AZ to Muti-AZ:
+
+1. A snapshot is taken
+2. A new DB is restored from the snapshot in a new AZ
+3. Synchronization is established between the two databases.
+
+So just click on "modify" for the database, it's Zero downtime operation.(no need to stop the DB)
+
+RDS的security group还是在EC2上统一管理的。
+
+## 091 RDS Encryption+Security
+
+Encruption has to be defined at launch time.
+
+If the master is not encrypted, the read replicas cannot be encrypted.
+
+SSL certificates to encrypt data to RDS in flight.
+
+
+
+IAM database authentication only works with MySQL and PostgreSQL.
+
+## 092 Aurora Overview
+
+Postgres and MySQL are both supported as Aurora DB(that means your drivers will work as if Aurora was a Postgres or MySQL database)
+
+Aurora is "**AWS cloud optimized**" and claims 5x performance improvement over MySQL on RDS, over 3x the performance of Postgre on RDS.
+
+ 
+
+Aurora High Availability and Read Scaling:
+
+6 copies of your data across 3 AZ
+
+​	4 copies out of 6 needed for writes
+
+​	3 copies out of 6 need for reads
+
+​	self healing with peer-to-peer replication
+
+Auto Expanding
+
+
+
+Between Client and Aurora DB cluster:
+
+Writer Endpoint：Pointing to the master, DNS name don't change even failover
+
+Reader Endpoint: Connection Load Balancing because of Auto Scaling 
+
+这里的Auto Scaling大概是两个层次，其一是单一Aurora，其二是read-only server层面的自动扩容。
+
+## 094 Aurora-Advanced Concepts
+
+Aurora Replicas-Auto Scaling
+
+Custom Endpoints: Define a subset of Aurora Instances as a Custom Endpoint. Example-Run analytical queries on specific replicas. The reader endpoint is generally not used after defining Custom Endpoints.
+
+Aurora Serverless: Automated database instantiation and auto-scaling based on actual usage.
+
+Aurora Multi-Master: Every node does R/W => an immediate failover for writer
+
+Global Aurora: 1 Primary Region(r/w); Up to 5 secondary(read-only) region.
+
+Aurora Machine Learning: Simple ,optimized, and secure intergration between Aurora and AWS ML sevices(Amazon SageMaker, Amazon Conprehend)
+
+## 095 ElastiCache Overview
+
+The same way RDS is to get managed Relational Database...
+
+ElasticCache is to get managed Redis or Mencahced.
+
+Cache are in-memory databases with really high performance,low latency
+
+AWS takes care of OS maintance,configuration,failure recovery...
+
+Using ElatiCache involves heavy application code changes...
+
+
+
+ElasticCache Solution Architecture:
+
+1. DB Cahce: Applications queries ElastiCache(Cache hit),if not(Cache miss),get from RDS and store in ElasticCache.
+2. User Session Store:
+
+
+
+Redis vs Memcached:  High availibity vs No High availibity 
+
+ 
+
+All caches in ElastiCache:
+
+​	Do not support IAM authentication
+
+​	IAM policies on ElastiCache are only used for AWS API-level security
+
+Redis AUTH
+
+​	You can set a password/token when you create a Redis cluster
+
+​	Support SSL in flight encryption
+
+
+
+Memcached: Support SASL-based authentication(advanced)
+
+## 099 What is a DNS
+
+Domain Name System
+
+Domain Register:Amazon Route 53,GoDaddy...
+
+FQDN(Full Qualified Domain Name): Protocol//:Domain Name(api.www.google.com.)=>Sub Domain Name(www.google.com.)=>Second Level Domain(google.com.)=>Top Level Domain(.com.)=>Root(.)
+
+
+
+Web Browser => Local DNS Server => Root DNS Server, TLD DNS Server, SLD DNS server
+
+## 100 Route 53 Overview
+
+Why Route 53? 53 is a reference to the traditional DNS port.
+
+A highly available,scalable,fully managed and Authoritative DNS(the customer you can update the DNS records)
+
+Route 53 is also a Domain Registrar
+
+
+
+Route 53  supports the following DNS record types:
+
+​    A/AAAA/CNAME/NS
+
+A:maps a hostname to IPv4
+
+AAAA:maps a hostname to IPv6
+
+CNAMW:maps a hostname to another hostname
+
+NS:Name Servers for the Hosted Zone => DNS name or address
+
+> | 类型  | **目的**                                                     |
+> | ----- | ------------------------------------------------------------ |
+> | A     | 地址记录，用来指定域名的 IPv4 地址，如果需要将域名指向一个 IP 地址，就需要添加 A 记录。 |
+> | AAAA  | 用来指定主机名(或域名)对应的 IPv6 地址记录。                 |
+> | CNAME | 如果需要将域名指向另一个域名，再由另一个域名提供 ip 地址，就需要添加 CNAME 记录。 |
+> | MX    | 如果需要设置邮箱，让邮箱能够收到邮件，需要添加 MX 记录。     |
+> | NS    | 域名服务器记录，如果需要把子域名交给其他 DNS 服务器解析，就需要添加 NS 记录。 |
+> | SOA   | SOA 这种记录是所有区域性文件中的强制性记录。它必须是一个文件中的第一个记录。 |
+> | TXT   | 可以写任何东西，长度限制为 255。绝大多数的 TXT记录是用来做 SPF 记录(反垃圾邮件)。 |
+
+Hosted Zone: A container for records that define how to route traffic to a domain and its subdomains.
+
+Public Hosted Zone / Private Hosted Zone
+
+你可以独占一个Route 53.
+
+## 104 Route 53 - TTL
+
+Time to Live
+
+是时间，不是次数...
+
+client will cache the result for the TTL of the record
+
+## 105 Route 53 CNAME vs Alias
+
+CNAME是一般DNS服务器通用性质，而Alias是AWS特有的，an extension to DNS functionality.
+
+Alias Record: Maps a hostname tp an AWS resource. Unlike CNAME,it can be used for the top node of a DNS namespace(Zone Apex). But you can't set TTL.
+
+Alias Records Targets: ELB, S3 Websites...but You can't set it for an EC2 DNS name
