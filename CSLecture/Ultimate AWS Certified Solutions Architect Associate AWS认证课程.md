@@ -776,7 +776,7 @@ NS:Name Servers for the Hosted Zone => DNS name or address
 > | SOA   | SOA 这种记录是所有区域性文件中的强制性记录。它必须是一个文件中的第一个记录。 |
 > | TXT   | 可以写任何东西，长度限制为 255。绝大多数的 TXT记录是用来做 SPF 记录(反垃圾邮件)。 |
 
-Hosted Zone: A container for records that define how to route traffic to a domain and its subdomains.
+Hosted Zone: A container for records that define how to route traffic to a domain and its subdomains. (可以理解为你专属DNS服务器的一个分机)
 
 Public Hosted Zone / Private Hosted Zone
 
@@ -797,3 +797,130 @@ CNAME是一般DNS服务器通用性质，而Alias是AWS特有的，an extension 
 Alias Record: Maps a hostname tp an AWS resource. Unlike CNAME,it can be used for the top node of a DNS namespace(Zone Apex). But you can't set TTL.
 
 Alias Records Targets: ELB, S3 Websites...but You can't set it for an EC2 DNS name
+
+## 106 Routing Policy 20220706
+
+Difine how Route 53 responds to DNS queries.(Don't confused by the word "routing", DNS does not route any traffic, it only responds to the DNS queries)
+
+Route 53 Supports the following Routing Policies（一个DNS name,多个IP前提下）:
+
+### Simple
+
+Can specify multiple values in the same record
+
+If multiple values, are retured, a random one is chosen by the client.
+
+### Weighted
+
+Control the % of the requests that go to each specific resource
+
+DNS records must have the same name and type
+
+对于同一个名字，如douban.com, 它对应多个IP，加权比重概率返回其中一个IP.
+
+### Latency-based
+
+ Redirect to the resource that has he least latency close to us.
+
+Latency is based on the traffic between users and AWS Regiones
+
+### Failover
+
+对一个DNS name, 两个IP的情况，将两个IP分为Primary和Secondary，前者的
+
+Health Check是mandatory, 后者optional，前者失败failover到后者。
+
+### Geolocation
+
+Diffrent from Latency-based!
+
+This routing is based on user location(这个并不是说靠近原则，而是需要手动指定某个区域去某个DNS服务器)
+
+Should create a "Default" record(in case there's no match no location)
+
+### Geoproximity
+
+Route traffic to your resources based on the geographic location of users and resources
+
+Ability to shift more traffic to resources based on the defined bias.
+
+当bias=0, 基本可以等同于就近原则，当你想更广范围的users到这个服务器上来访问时，就增加这个服务器的bias.
+
+### Multivalue Answer
+
+Use when routing traffic to multiple resources
+
+Can be associated with Health Checks(return only values for healthy resources)
+
+这个相对Simple，就是可以运用Health Checks? 其他就是形式上，Simple只是一条record，只是value写多个地址，而Multivalue则是多条records.
+
+## 109 Route 53 - Health Checks
+
+可以理解为在因特网上AWS专属？的定期检查端点通信状况的HTTP协议服务。
+
+不适用于Simple Routing Policy.
+
+Health checks that monitor CloudWatch Alarms(helpful for private resources)
+
+不仅是Route 53, 也可以放到ELB上。
+
+
+
+Tips for the whole lecture: if you see connection timeout, you should check firewall first.
+
+## 114 Route 53 - Traffic flow
+
+Simplify the process of creating and maintaining records in large and complex configurations
+
+Visual editor to manage complex routing decision trees
+
+可视化组合各种Routing Policy，Geoproximity尤其对此依赖。
+
+## 116 3rd Party Domains & Route 53
+
+Domain Registrar != DNS service
+
+But every Domain Registrar usually comes with some DNS features
+
+
+
+If  you buy your domain on a 3rd party registrar, you can still use Route 53 as the DNS Service provider.
+
+所以Route 53首先是一个可以买卖域名的Domain Registrar，然后它通过Hosted Zone的形式提供DNS Service. 我们所谓的独占其实也是这个Hosted Zone.
+
+## 119 WhatsTheTime.com
+
+Elastic IP vs Route 53 vs Load Balancers
+
+Maintaining EC2 instances manually vs Auto Scaling Groups
+
+Multi AZ to survive disasters
+
+这里需要注意的是，Multi AZ 是在ELB而不是Auto Scaling处设置的。??抑或是两处要协调设置...
+
+ We're considering 5 pollars for a well architected application:
+
+​	costs,performance,reliability,security,operational excellence
+
+## 120 MyClothes.com
+
+活用ELB Stickiness避免用户访问其他instances丢失存储于EC2上的购物信息. 
+
+但可以另外换一个思路，将用户购物信息存储于浏览器的Cookies上，就不需要Stickiness. 这样的的框架有一下性质：
+
+Stateless(指EC2不需要存储购物信息)
+
+Http requests are heavier => Cookie must be less than 4KB
+
+Security risk(cookies can be altered) => Cookie must be validated
+
+进一步，我们加上一个ElsaticCache存储购物信息，而Cookies只放上session_id信息，在ElastiCache 中 Store/retrive session data, 性能也很好，又安全
+
+再进一步，加上RDS，在ElastiCache miss的情况下访问RDS，然后设置write master, read scaling.
+
+最后，在ELB，EC2，RDS等设置Multi-AZ，Security Group来提高安全性
+
+## 121 MyWordPress.com
+
+这里两个EC2各自连接EBS肯定不行，但是更换成一个EFS后，与两个EC2之间为什么要加ENI, 我觉得不是必需的吧...
+
