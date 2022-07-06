@@ -924,3 +924,86 @@ Security risk(cookies can be altered) => Cookie must be validated
 
 这里两个EC2各自连接EBS肯定不行，但是更换成一个EFS后，与两个EC2之间为什么要加ENI, 我觉得不是必需的吧...
 
+## 123 Elastic Beanstalk
+
+Elastic Beanstalk is a developer centric view of deploying an application on AWS.
+
+Managed service:
+
+1. Automatically handles capacity provisioning, load balancing, scaling, application health monitoring, instance configuration...
+2. Just the application code is the responsibility of the developer.
+
+We still have full control over the configuration.
+
+## 126 S3 Buckets and Objects
+
+Amazon S3 allows people to store objects(file) in "buckets"(directories)
+
+Buckets must have a globally unique name
+
+Name convention:
+
+1. No uppercase
+2. No underscore
+3. 3-63 characters long
+4. Not an IP
+5. Must start with lowercase letter or number
+
+
+
+Obejects(files) have a key, The key is the FULL path.
+
+s3://my-bucket/my_file.txt
+
+## 128 S3 Versioning
+
+You can version your files in Amazon S3
+
+Easy roll back to previous version
+
+Notes:
+
+1. Any file that is not versioned prior to enabling versioning will have version "null"
+2. Suspending versioning does not delete the previous versions
+
+## 130 S3 Encryption
+
+There are 4 methods of encrypting objects in S3:
+
+1. SSE-S3
+2. SSE-KMS
+3. SSE-C: S3 does not store the encryption key you provide,HTTPS is mandatory for SSE-C.
+4. Client Side Encryption
+
+前三者都是 server-side encryption, 只是前两者的key由S3提供。
+
+## 132 S3 Security & Bucket policies
+
+User based: 
+
+1. IAM policies=>which API calls should be allowed for a specific user from IAM console
+
+Resource Based: 
+
+1. Bucket policies=>bucket wide rules from the s3 console-allows cross account
+2. ACL(Access Control List)
+
+
+
+Bucket Policies: JSON based policies
+
+Bucket settings for Block Public Access
+
+These settings were created to prevent company data leaks
+
+## 134 S3 Websites
+
+S3 can host static websites and have them accessible on the WWW.
+
+Operation:Properties=>Static website hosting
+
+接下来做两步对public开放：
+
+1. Block public access Edit
+2. Bucker policy Edit => permit to get any objects
+
