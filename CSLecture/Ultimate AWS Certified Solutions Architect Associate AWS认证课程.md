@@ -1007,3 +1007,235 @@ Operation:Properties=>Static website hosting
 1. Block public access Edit
 2. Bucker policy Edit => permit to get any objects
 
+## 135 S3 CORS 20220707
+
+CORS: CORS means Cross-Origin Resource Sharing
+
+Origin: a protocol + host domian + port(http://www.google.com)
+
+谷歌网站上不同文件路径就是same origin,谷歌跟百度就是different origin.
+
+不同bucket就是different origin, (Enabled as a website前提)
+
+The requests won't be fulfilled unless the other origin allows for the requests, using CORS Headers(ex: Access-Control-Allow-Origin)
+
+Web Browser based mechanism to allow requests to other ogrigins while visting the main origin.
+
+浏览器会去被引用的网站问一下是否允许被引用，no的话浏览器就拒绝加载
+
+## 138 IAM Roles and Policies
+
+IAM中一个Role可以有很条Policies，这些policies允许你去各个服务如S3增删改查，policy可以自定义
+
+测试这个性质可以用一个在线工具：AWS Policy Simulator
+
+## 140 AWS EC2 Instance Metdadata
+
+```
+curl http://169.254.169.254/latest/meta-data/
+```
+
+上述IP基本上是AWS内部网点，它只作用于用你的EC2去访问，查询EC2的关联信息。（类似于EC2作为此内部网点的用户？）
+
+It allows AWS EC2 instances to "learn about themselves" without using an IAM Role for that purpose.
+
+## 142 S3 MFA Delete
+
+字面是理解是要完全删除某个版本需要MFA的功能。
+
+启用这个功能目前不能通过UI，而是客户端来操作，十分繁琐
+
+然后演示中，它也没出现输入MFA的界面...只是开启关闭这个功能来寻求不同...
+
+## 144 S3 Default Encryption
+
+One way to force encryption is to use a bucket policy and refuse any API call to PUT an S3 object without encryption headers;
+
+Another way is to use the default encryption iption in S3
+
+这两个内容昨天不是讲了吗？总结？
+
+## 145 S3 Access Logs
+
+Any request made to S3, from any account, authorized or denied, will be logged into **another** S3 bucket.
+
+Warning:
+
+Do not set your loggin bucket to be the monitored bucket
+
+It will create a logging loop, and your bucket will grow in size exponentially.
+
+## 147 S3 Replication(CRR&SRR)
+
+Must enable versioning in source and destination
+
+CRR:Cross Region Repilication
+
+SRR:Same Region Replication
+
+Buckets can be in different accouts
+
+
+
+Notes；
+
+After activatin, only new objects are replicated
+
+There is no "chaining" of replication(不会连续复制，1自动复制到2，2不会将此自动复制到3，所以2不将复制过来的文件视为写入。)
+
+For Delete oprations: can replicate delete markers from source to target(optional setting)
+
+## 149 S3 Pre-sgined URLs
+
+Can generate pre-signed URLs using SDK or CLI
+
+Valid for a default of 3600 seconds, can change timeout with expires.(generating URLs dynamically)
+
+Users given a pre-signed URL inherit the permissions of the person who generated the URL for GET/PUT
+
+注意到console中bucket中文件显示的地址没法打开，而下载键后打开网页其实是一个新的URL，这个就是pre-signed URL.
+
+## 151 S3 Storage Classes & Glacier
+
+Standard: High durabiliry(99.999999%)
+
+Standard-Infrequent Access(IA):useCases=>backup
+
+One Zone-infrequent Access:Low cost compared to IA
+
+Intelligent Tiering: Automatically moves objects between two access tiers based on changing access patterns(Standard <=> IA)
+
+Glacier: very low cost, 取用时需要额外的唤醒时间(1-12hours)
+
+Glacier Deep Archive: for super long storage, even cheaper, more retrieval time(12-48hours) 
+
+## 153 S3 Lifecycle Rules
+
+You can transition objects between storage classes
+
+Moving objects can be automated using a lifecycle configuration
+
+Lifecycle Rules:
+
+1. transition actions
+2. expiration actions
+
+相当于移动不要的文件到低成本存储的自动化脚本
+
+## 155 S3 Analytics
+
+Storage Class Analysis
+
+You can setup S3 Analytics to help determine when to trasition objects from Standard to Standard_IA
+
+## 156 S3 Performance
+
+Baseline Performance: Amazon S3 automatically scales to high request rates,latency 100-200 ms.
+
+If you use SSE-KMS, you may be impacted by the KMS limits
+
+recommended Muti-Part upload for files >100MB
+
+讨论上传下载性能的限制与优化
+
+## 157 S3 Select & Glacier Select
+
+Retrieve less data using SQL by performing server side filtering
+
+Can filter by rows & colums(simple SQL statements)
+
+Less network transfer, less CPU cost client-side.
+
+大概是S3侧开启Server-side filtering功能...没有hands on, 具体不知...
+
+## 158 S3 Event Notifications
+
+Types: SNS, SQS, Lambda Function
+
+## 160 S3 Requester pays
+
+In general ,bucket owners pay for all Amazon S3 storage and data transfer costs associated with their bucket
+
+With Requester Pays buckets, the requester instead of the bucket owner pays the cost of the request and the data download from the bucket.
+
+Helpful when you wang to share large datasets with other accounts
+
+## 161 Athena Overview
+
+Serverless query service to perform analytics against S3 objects
+
+Uses standard SQL language to query the files
+
+Support CSV,JSON...(built on Presto)
+
+相当于一个可以分析S3各种行为的独立的服务器。
+
+```
+create database sa_access_logs_db
+
+CREATE EXTERNAL TABLE `sa_access_logs_db.mybucket_logs`(
+  `bucketowner` STRING,
+  `bucket_name` STRING,
+  `requestdatetime` STRING,
+  `remoteip` STRING,
+  `requester` STRING,
+  `requestid` STRING,
+  `operation` STRING,
+  `key` STRING,
+  `request_uri` STRING,
+  `httpstatus` STRING,
+  `errorcode` STRING,
+  `bytessent` BIGINT,
+  `objectsize` BIGINT,
+  `totaltime` STRING,
+  `turnaroundtime` STRING,
+  `referrer` STRING,
+  `useragent` STRING,
+  `versionid` STRING,
+  `hostid` STRING,
+  `sigv` STRING,
+  `ciphersuite` STRING,
+  `authtype` STRING,
+  `endpoint` STRING,
+  `tlsversion` STRING)
+ROW FORMAT SERDE
+  'org.apache.hadoop.hive.serde2.RegexSerDe'
+WITH SERDEPROPERTIES (
+  'input.regex'='([^ ]*) ([^ ]*) \\[(.*?)\\] ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) (\"[^\"]*\"|-) (-|[0-9]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) (\"[^\"]*\"|-) ([^ ]*)(?: ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*))?.*$')
+STORED AS INPUTFORMAT
+  'org.apache.hadoop.mapred.TextInputFormat'
+OUTPUTFORMAT
+  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+LOCATION
+  's3://mysqlzxb/WorkNote/'
+  
+  SELECT * FROM sa_access_logs_db.mybucket_logs WHERE
+key = 'images/picture.jpg' AND operation like '%DELETE%';
+```
+
+source: https://aws.amazon.com/cn/premiumsupport/knowledge-center/analyze-logs-athena/
+
+=>如何使用 Athena 分析我的 Amazon S3 服务器访问日志？
+
+前提是 “s3://mysqlzxb/WorkNote/” 作为S3 Access Logs.
+
+## 163 S3 Lock Policies & Glacier Vault Lock
+
+Glacier Vault Lock:
+
+Adopt a WORM(Write Once Read Many) model
+
+Lock the policy for future edits(can no longer be changed)
+
+S3 Objects Lock(versioning must be enabled):
+
+Adopt a WORM(Write Once Read Many) model
+
+Block an object version deletion for a specified amount of time
+
+没有hands on, 没有印象...
+
+
+
+
+
