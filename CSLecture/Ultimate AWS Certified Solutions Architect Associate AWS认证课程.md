@@ -1093,7 +1093,7 @@ Valid for a default of 3600 seconds, can change timeout with expires.(generating
 
 Users given a pre-signed URL inherit the permissions of the person who generated the URL for GET/PUT
 
-注意到console中bucket中文件显示的地址没法打开，而下载键后打开网页其实是一个新的URL，这个就是pre-signed URL.
+注意到console中bucket中文件显示的地址没法打开(S3 变公开就可以打开)，而下载键后打开网页其实是一个新的URL，这个就是pre-signed URL.
 
 ## 151 S3 Storage Classes & Glacier
 
@@ -1235,7 +1235,45 @@ Block an object version deletion for a specified amount of time
 
 没有hands on, 没有印象...
 
+## 164 CloudFront Overview 20220709
+
+Content Delivery Network(CDN)
+
+Improve read performance, content is cahced at the edge
 
 
 
+CloudFront - Origins =》 S3 Bucket:
 
+1. For distributing files and caching them at the edge
+2. Enhanced security with CloudFront Origin Access Identity(OAI)
+
+CloudFront - Origins =》 Custom Origin(HTTP): ALB,EC2,S3 website,Any HTTP backend you want
+
+
+
+Client<=> Edge Location <=> Origin:S3 or HTTP(Globally) 
+
+你在美国去澳大利亚读取内容，次数多了，澳大利亚的内容就被缓存到美国边缘节点，与S3 Cross Region Replication 比多为static content而不是dynamic content.
+
+## 166 CloudFront Signed URL/Cookies
+
+You want to distribute paid shared content to premium users over the world.
+
+Signed URL = access to individual files( one signed URL per file)
+
+Signed Cookies = access to multiple files( one signed cookie for many files)
+
+CloudFront Signed URL vs S3 Pre-Signed URl, 差不多，非要说就是是否直连S3 bucket，前者CloudFront与S3之间还有个OAI.
+
+## 167 CloudFront Advanced Concepts
+
+CloudFront Edge  locations are all around the world
+
+The cost of data out per edge location varies
+
+Multi-Origin
+
+Origin Groups: High availibilty
+
+Field Level Encryption: Sensitive information encrypted at the edge close to user
