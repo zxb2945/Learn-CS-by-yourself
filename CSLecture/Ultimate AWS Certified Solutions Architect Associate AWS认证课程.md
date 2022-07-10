@@ -1277,3 +1277,127 @@ Multi-Origin
 Origin Groups: High availibilty
 
 Field Level Encryption: Sensitive information encrypted at the edge close to user
+
+## 168 AWS Global Accelerator Overview 20220710
+
+Unicast IP: one server holds one IP address
+
+Anycast IP: all servers hold the same IP address and the client is routed to the nearest one
+
+后者是怎么实现的呢？就是不同IP的服务器通过同一台Proxy向全球各地users提供服务，而这台Proxy就是所谓的Accelerator
+
+AWS Global Acceleraot vs CloudFront:
+
+They both use the AWS global network and its edge locations around the world
+
+Both services integrate with AWS Shield for DDos protection.
+
+## 170 AWS Snow Family Overview
+
+Highly-secure, portable **devices** to collect and process data at the edge, and migrate data into and out of AWS.
+
+Amazon将一些硬件邮寄给你，你可以用来比网络速度更快的硬件数据迁移，然后寄回去，直接插到网络服务中...下面从小到大共有三种，最小的Snowcone可以放到无人机上，最大的Snowmobile居然是辆大卡车...
+
+1. Snowcone
+2. Snowball Edge
+3. Snowmobile
+
+除了Data migration外，上述前两者还可以做Edge computing，就是暂时不能联网的地方，比如海船上做机器学习产生了大量数据，所以要求除了硬盘，还要CPU.
+
+不是所有地区都提供...
+
+Snowball cannnot import to Glacier directly, you must use Amzon S3 first, in combination with an S3 lifecycle policy.
+
+## 173 Storage Gateway Overview
+
+所谓的Hybrid Cloud for Storage，就是一部分infrastructure在云上，一部分在本地...问题是怎样将S3（Unlike EFS/NFS）延伸到本地呢？
+
+AWS Storage Cloud Native Options:
+
+1. Block: Amazon EBS, EC2 instance Store
+2. File: Amazon EFS, Amazon FSx
+3. Object: Amazon S3, Amazon Glacier
+
+
+
+AWS Storage Gateway: Bridge between on -premises data(本地？) and cloud data in S3.
+
+3 types of Storage Gateway:
+
+1. File gateway: Store files as objects in S3, with a local cache for low-latency access to your most recently used data.
+2. Volume gateway: Block storage in S3 with point-in-time backups as EBS snapshots.
+3. Tape gateway: Backup your data to S3 and archive in Glacier using your existing tape-based processes.
+
+这个gateway应该在你本地网络虚拟化，如果没有，也可以向Amazon买Hardware appliance. Tape gateway是本地磁盘化然后存到S3去？File gateway似乎可以用NFS相关协议...而后两者用iSCSI interface来连接Application Server和Gateway，Volume gateway可以整个cache到本地，定期向云端backup？所介绍的功能越来越边缘且无趣...
+
+## 175 Amazon FSx Overview
+
+EFS is a shared POSIX system for Linux systems
+
+
+
+FSx for Windows is a fully managed Windows file system share drive
+
+Support SMB protocol & Windows NTFS
+
+
+
+FSx for Lustre: a type  of parallel distributed file system, for large-scale computing. The name Lustre is derived from "Linux" and "cluster" => Machine Learning, High Performance Computing(HPC), Seamless integration with S3...
+
+
+
+> **Amazon FSx for NetApp ONTAP**
+>
+> Amazon FSx for NetApp ONTAP 提供功能丰富、高性能且高度可靠的存储，这些存储基于 NetApp 流行的 ONTAP 文件系统构建，完全由 AWS 托管。
+>
+> - 可通过各种 Linux、Windows 和 macOS 计算实例和容器访问(在 AWS 上或本地部署运行)，支持行业标准的 NFS、SMB 和 iSCSI 协议。
+> - 提供流行的 ONTAP 数据管理功能，例如快照、SnapMirror (用于数据复制)、FlexClone (用于数据克隆)和数据压缩/重复数据删除。
+> - 提供几十万个 IOPS 以及一致的亚毫秒级延迟，以及高达 3 GB/s 的吞吐量。
+> - 提供高度可用且高度持久的多可用区 SSD 存储，支持跨区域复制并内置完全托管式备份功能。
+> - 自动将不频繁访问的数据分层到容量池存储，容量池存储是一个完全弹性的存储层，可以扩展到 PB 级，并为不频繁访问数据优化了成本。
+> - 与 Microsoft Active Directory (AD)集成以支持基于 Windows 的环境和企业。
+
+
+
+> **Amazon FSx for OpenZFS**
+>
+> Amazon FSx for OpenZFS 提供基于 OpenZFS 文件系统和 AWS Graviton 处理器构建的简单、经济高效、高性能文件存储，可通过行业标准 NFS 协议访问此存储。
+>
+> - 可从各种 Linux、Windows 和 macOS 计算实例和容器(在 AWS 上或本地部署运行)通过行业标准的 NFS 协议(v3、v4.0、v4.1 和 v4.2)访问。
+> - 提供强大的 OpenZFS 数据管理功能，包括 Z-Standard 压缩、即时时间点快照和数据克隆。
+> - 提供高达 100 万 IOPS 和仅仅数百微秒的延迟，同时吞吐量高达 12.5 GB/s。
+> - 提供高度可用且高度持久的单可用区 SSD 存储，以及内置的完全托管备份。
+> - 通过每个文件系统的多个卷、精简资源预置和用户/组配额，跨多个用户和应用程序实现成本高效的共享文件系统。
+
+## 177 AWS Transfer Family
+
+A  fully-managed service for file transfers into and out of Amazon S3 or EFS using FTP protocol.
+
+Support Protocols: FTP, FTPS(FTP over SSL), SFTP(Secure FTP)
+
+Users<=>Route 53(optional)<=>AWS Transfer For FTP<=>S3/EFS
+
+## 180 SQS-Standard Queues Overview
+
+Oldest offering(over 10 years old), Fully managed service, used t decouple applications
+
+
+
+Produced to SQS using the SDK (SendMessage API)
+
+The message is persisted in SQS until a consumer deletes it
+
+Message retention: default 4 days, up to 14 days
+
+
+
+SQS with Auto Scaling Group(ASG) => common in exam
+
+Security=>In -flight encryption using HTTPS API => 它是个服务器？
+
+
+
+
+
+
+
