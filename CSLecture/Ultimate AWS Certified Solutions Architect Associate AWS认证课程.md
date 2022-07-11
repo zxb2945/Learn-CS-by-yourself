@@ -1395,9 +1395,98 @@ SQS with Auto Scaling Group(ASG) => common in exam
 
 Security=>In -flight encryption using HTTPS API => 它是个服务器？
 
+## 182 SQS Queue Access Policy 20220711
 
+Cross Accout Access
 
+Publish S3 Event Notifications TO SQS Queue
 
+```
+{
+    "Version": "2012-10-17",
+    "Id": "example-ID",
+    "Statement": [
+        {
+            "Sid": "example-statement-ID",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "s3.amazonaws.com"
+            },
+            "Action": [
+                "SQS:SendMessage"
+            ],
+            "Resource": "arn:aws:sqs:ap-northeast-1:280043394707:EventFromS3",
+            "Condition": {
+                "ArnLike": {
+                    "aws:SourceArn": "arn:aws:s3:::zhouxingbobucket"
+                },
+                "StringEquals": {
+                    "aws:SourceAccount": "2800-4339-4707"
+                }
+            }
+        }
+    ]
+}
+# failure... Please check again
+```
 
+## 183 SQS - Message Visibility Timeout
 
+After a message is polled by consumer, it becomes invisible to other consumers
+
+By default, the message visibility timeout is 30 seconds
+
+That means the message has 30 seconds to be processed
+
+After the message visibility timeout is over, the message is visible in SQS (Not return, 即如果没被删掉的话)
+
+If a mesage is not processed within the visibility timeout, it will be processed twice
+
+A consumer could call the ChangeMessageVisibility API to get more time(demo 没有展示，大概是关于编程层面了)
+
+## 184 SQS - Dead Letter Queue
+
+If a cosumer fails to process a message within the Visibility Timeout...the message goes back to the queue!
+
+We can set a threshold of how many times a message can go back to the queue
+
+After the MaximumRecieves threshold is exceeded, the message goes into a dead letter queue(DLQ)
+
+Make sure to process the message in the DLQ before they expire(Useful for debugging)
+
+相当于一个自动定期清理的垃圾箱
+
+这个DLQ基于普通的Queue，设定一个retention of period, 然后就可以作为其他Queue的DLQ.
+
+## 185 SQS - Request-Response Systems
+
+通过Correlation ID来标记
+
+## 186 SQS - Delay Queues
+
+Delay a message(consumers don't see it immediately) up to 15 minutes
+
+Default is 0 seconds.
+
+## 187 SQS - FIFO Queues
+
+FIFO = First in first out(odering of messaes in the queue)
+
+Exactly-once send capability(by removing duplicates)
+
+Messages are processed in order by consumer
+
+## 188 SQS + Auto Scaling Group
+
+SQS Queue => Auto Scaling Group => CloudWatch Custom Metric: Queue Lenth/Number of Instances => CloudWatch Alarm => Auto Scaling Group 
+
+## 189 Amazon SNS - Overview
+
+The event producer only sends message to one SNS topic
+
+As many event reciever(subcriptions) as we want to listen to the SNS topic nififications
+
+Each subscriber to the topic will get all the messages
+
+Subscribers can be: SQS, HTTP, Lambda, Emails, SMS messages, Mobile Notifications
 
