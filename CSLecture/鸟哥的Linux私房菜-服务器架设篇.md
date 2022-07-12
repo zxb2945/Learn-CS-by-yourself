@@ -405,12 +405,27 @@ Proxy 服务放在 NAT 服务器上：通透式代理 (Transparent Proxy)
 那该如何强制使用者一定要使用你的 proxy 呢？很简单！那就是： (1)在对外的防火墙服务器 (NAT) 上面安装 proxy； (2)在 proxy 上头启动 transparent 功能；(3) NAT 服务器加上一条 port 80 转 port 3128 的规则，如此一来，所有往 port 80 的封包就会被你的 NAT 转向 port 3128 ， 而你的 port 3128 就是 proxy ，那大家就得要用你的 proxy ，而且重点是，浏览器不需要进行任何设定！
 
 ### 18.网络驱动器装置：iSCSI服务器
+做为服务器的系统通常是需要储存设备的，而储存设备除了可以使用系统内建的磁盘之外，如果内建的磁盘容量不够大， 而且也没有额外的磁盘插槽 (SATA 或 IDE) 可用时，那么常见解决的方案就是增加 NAS (网络附加储存服务器) 或外接式储存设备。再高档一点的系统，可能就会用到 SAN (储存局域网络) 这个高贵的玩意儿
 
 NAS (Network Attached Storage, 网络附加储存服务器)
-SAN (Storage Area Networks, 储存局域网络)
- SAN 早期使用光纤信道，由于以太网络的发展，近来使用 iSCSI 协议在 TCP/IP 架构上面实作；
- iSCSI target 主要使用 scsi-target-utils 软件达成主要利用 tgt-admin 及tgtadm 指令完成：
+基本上，NAS 其实就是一部客制化好的主机了，只要将 NAS 连接上网络，那么在网络上面的其他主机就能够存取 NAS 上头的数据了。简单的说，NAS 就是一部 file server 啰
+NAS 也通常支持 TCP/IP ，并会提供 NFS, SAMBA, FTP 等常见的通讯协议来提供客户端取得文件系统。
+那为什么不要直接使用个人计算机安装 Linux 再搭配相关的服务，即可提供 NAS 预计要提供的大容量空间啦！干嘛需要 NAS 呢？ 因为，通常 NAS 还会包括很多组态的接口，通常是利用 Web 接口来控制磁盘阵列的设定状况、提供 IP 或其他相关网络设定， 以及是否提供某些特定的服务等等。因为具有较为亲和的操作与控制接口，对于非 IT 的人员来说，控管较为容易啦。 这也是 NAS 存在的目的。
 
+SAN (Storage Area Networks, 储存局域网络)
+最简单的看法，就是将 SAN 视为一个外接式的储存设备。只是单纯的外接式储存设备仅能透过某些接口 (如 SCSI 或 eSATA) 提供单一部主机使用，而 SAN 却可以透过某些特殊的接口或信道来提供局域网络内的所有机器进行磁盘存取。要注意喔，SAN 是提供『磁盘 (block device)』给主机用，而不是像 NAS 提供的是『网络协议的文件系统 (NFS, SMB...)』！因此，挂载使用 SAN 的主机会多出一个大磁盘，并可针对 SAN 提供的磁盘进行分割与格式化等动作。想想看，你能对 NAS 提供的文件系统格式化吗？不行吧！这样了解差异否？
+ SAN 早期使用光纤信道，由于以太网络的发展，近来使用 iSCSI 协议在 TCP/IP 架构上面实作；
+ 有厂商将 SAN 的连接方式改为利用 IP 技术来处理。然后再透过一些标准的订定，最后就得到 Internet SCSI (iSCSI) 这玩意的产生啦！
+ iSCSI 是在 TCP/IP 上面所开发出来的一套应用，所以得要有网络才行啊！
+ 
+ iSCSI 这个架构主要将储存装置与使用的主机分为两个部分，分别是：
+ iSCSI target：就是储存设备端，存放磁盘或 RAID 的设备，目前也能够将Linux 主机仿真成 iSCSI target 了！目的在提供其他主机使用的『磁盘』；
+ iSCSI initiator：就是能够使用 target 的客户端，通常是服务器。 也就是说，想要连接到 iSCSI target 的服务器，也必须要安装 iSCSI initiator 的相关功能后才能够使用 iSCSI target 提供的磁盘就是了。
+ 
+ iSCSI target 主要使用 scsi-target-utils 软件达成主要利用 tgt-admin 及tgtadm 指令完成：
+  
+ 
+ 
 ## 第四部分：常见因特网服务器架设
 
 ### 19.主机名控制者：DNS服务器
