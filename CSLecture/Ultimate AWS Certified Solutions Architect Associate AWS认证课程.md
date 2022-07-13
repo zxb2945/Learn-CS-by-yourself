@@ -1490,3 +1490,58 @@ Each subscriber to the topic will get all the messages
 
 Subscribers can be: SQS, HTTP, Lambda, Emails, SMS messages, Mobile Notifications
 
+## 190 SNS and SQS - Fan Out Pattern 20220713
+
+Push onece in SNS, receive in all SQS queues that are subscribers
+
+SNS - FIFO Topic
+
+SNS - Message Filtering
+
+所以原则是SNS发所有消息去所有SQS，但相应SQS可以配套filtering，从而各个SQS得到不同的消息。
+
+## 192 Kinesis Overview
+
+Make it easy to collect, process, and analyze streaming data in real-time
+
+1. Kinesis Data Streams: capture, process, and store data streams
+2. Kinesis Data Firehose: load data streams into AWS data stores=> S3,Amazon Redshift(copy through S3), Amazon ElasticSearch or Custom HTTP Destinations
+3. Kinesis Data Analytics: analyze data streams with SQL or Apache Flink
+4. Kinesis Video Streams: capture, process, and store video streams
+
+用Kinesis Data Streams收集data，再利用Kinesis Data Firehose转运到S3去，注意Kinesis Data Firehose会有一个缓存，缓存未满一定时间后才发送到S3. 
+
+## 194 Kinesis vs SQS ordering
+
+Kinesis 可以有许多shards 来hash各种数据的种类，而SQS只有一个接收端口，必须要指定Group ID 来给consumer分组...(视频里虽说有很大不同，但据我理解感觉一样...)
+
+## 195 Kinesis vs SNS vs SQS
+
+## 196 Amazon MQ
+
+SQS,SNS are cloud-native services, and they're using prorietary protocols from AWS
+
+Traditional applications running from on-premise may use open protocos such as:MQTT, STOMP...
+
+When migrating to the cloud, instead of re-engineering the application to use SQS and SNS, we can use Amazon MQ.
+
+## 197 Docker Introduction
+
+Docker is a software development platform to deploy apps
+
+Apps are packaged in containers that can be run on any OS
+
+Apps run the same, regardless of where ther're run
+
+
+
+EC2实际上就是虚拟机
+
+Docker vs Virtual Machines:
+
+Docker is sort of a virtualization technology, but not exactly
+
+Resources are shared with the host => many containers on one server
+
+
+
