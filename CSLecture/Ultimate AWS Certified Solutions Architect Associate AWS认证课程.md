@@ -1543,5 +1543,93 @@ Docker is sort of a virtualization technology, but not exactly
 
 Resources are shared with the host => many containers on one server
 
+## 198 ECS Overview 20220714
+
+ECS = Elastic Container Service
+
+Launch Docker containers on AWS
+
+Has integrations with ALB
 
 
+
+Fargate: You do not provision the infrastructure(no EC2 instances to manage) -simpler!   That's why it's called serverless offering.(所谓的serverless是指无服务器的服务？)
+
+AWS just runs containers for you based on the CPU/RAM you need.(再分配一个ENI，确保足够的IP分配)
+
+所以Fatgeta是ECS的一种启动类型？: Fargete Launch Type for ECS; EC2 Launch Type for ECS
+
+
+
+ECS Task Role: Allow each task to have a specific role. Use different roles for the different ECS Servie you run.  简而言之，由ECS启动的container访问特定服务如S3所使用的IAM Roles.
+
+EC2 Instance Profile: EC2 Launch Type for ECS时，作为 EC2 instance上的ECS Agent.
+
+
+
+共享资源用EFS去mount.
+
+## 199 ECS Service & Tasks, Load Balancing
+
+理解以下层次：
+
+Container definition -> Task definition -> Service -> Cluster
+
+然后介绍了ALB对于两种方式的ECS的不同点，EC2 Launch Type就是如何找right port，Fargete Launch Type的话，Each task has a unique IP, 如何找IP了.
+
+最后讲了一个 ECS tasks invoked by Event Bridge的例子.
+
+## 201 ECS Scaling
+
+也是配合 CloudWatch Metric(ECS seivice CPU Usage)监视CPU Usage来trigger CloudWatch Alarm, 然后去scale
+
+对于EC2 Launch Type for ECS，当没有足够EC2来启动Contaner时候也会在更高层次上（Scale ECS Capacity Providers）去scale EC2 instances，所以这里有两个层次的扩展: Auto scaling, Auto scaling Group
+
+
+
+除了监视CPU Usage，另一种方式 SQS+ASG.(之前也反复提到)也可以来用到这里.
+
+## 202 ECS Rolling Updates
+
+When updating from v1 to v2, we can control how many tasks can be started and stopped , and in which order.
+
+比如四个tasks：4->2->2+2->2->2+2, 这样的顺序可以把所有task都更新一遍的同时，保证始终有一个最小Minmun的task在运行.
+
+## 203 ECR Overview
+
+Elastic Container Registry
+
+Store, manage and deploy containers in AWS
+
+Fully integrated with ECS&IAM for security, backed by Amzon S3
+
+## 204 EKS Overview
+
+Amazon Elastic Kubernetes Service
+
+It is a way to launch managed Kubernetes clusters on AWS
+
+Kubernetes is an open-source system for automatic deployment, scaling and management of containerized(usually Docker) application
+
+It's an altenative to ECS, similar goal but different API
+
+Use case: if your company is already using Kubernetes on-premises or in another cloud, and wants to migrate to AWS using Kubernetes.
+
+## 206 Serverless Introduction
+
+Serveless is a new paradigm in which the developers don't have to manage servers anymore... They just deploy functions!
+
+Initially...Serverless was pioneered by AWS Lambda but now also includes anything that's managed: "databases, messaging, storage, etc."
+
+**Serverless does not mean there are no servers... it means you just don't manage/provision/see them.**
+
+## 207 Lambda Overview
+
+| Amazon EC2                                | Amazon Lambda                          |
+| ----------------------------------------- | -------------------------------------- |
+| Virtual Servers in the Cloud              | Virtual functions-no servers to manage |
+| Limited by RAM and CPU                    | Limited by time-short executions       |
+| Continously running                       | Run on-demand                          |
+| Scaling means intervention to add servers | Scaling is automated!                  |
+
+感觉Lambda像一个多语言支持的编译平台。
