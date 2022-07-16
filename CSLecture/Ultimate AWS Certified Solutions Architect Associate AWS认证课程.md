@@ -1633,3 +1633,98 @@ Initially...Serverless was pioneered by AWS Lambda but now also includes anythin
 | Scaling means intervention to add servers | Scaling is automated!                  |
 
 感觉Lambda像一个多语言支持的编译平台。
+
+## 209 Lambda Limits 20220716
+
+Execution:
+
+1. Memeory allocation: 128MB-10GB
+2. Maximum execution time: 15min
+3. Environment Variables: 4KB
+4. Disk capacity in the function container(in /tmp): 512MB
+5. Concurrency executions: 1000
+6. Lambda function deployment size(compressed .zip): 50MB, 250MB(uncompressed)
+
+## 210 Lambda@Edge
+
+You have deployed a CDN using CloudFront
+
+What if you wanted to run a global AWS Lambda alongside?
+
+Or how to implement request filtering before reaching your application?
+
+=>For this, you can use Lambada@Edge
+
+You can use Lambda to change CloudFront requests and responses
+
+You can also generate responses to viewers without ever sending the request to the origin.
+
+(Runs code in each CloudFront Edge, globally)
+
+## 211 DynamoDB Overview
+
+NoSQL database - not a relational database
+
+Scales to massive workloads, distributed database
+
+Intergrated with IAM for security, authorization and administration
+
+
+
+Read/Write Capacity Modes:
+
+1. Provisioned Mode(default)
+2. On-Demand Mode => more expensive, great for unpredictable workloads.
+
+## 213 DynamoDB Advanced Fratures
+
+**DynamoDB Accelerator(DAX)**: Help solve read congestion by caching.
+
+DAX vs ElatiCache: 前者适应于DynamoDB的Query & Scan cache, 而后者比如Application的计算结果的缓存？？..
+
+**DynamoDB Streams**: Ordered stream of item-level modifications(crate/update/delete) in a table.
+
+就是修改日志数据流可以发送到Kinesis或者Lambda等去分析。
+
+**DynamoDB Global Tables**: Application an read/write to the table in any region
+
+并不是一张table，而是各个区域的table通过DynamoDB Streams来同步
+
+**TTL**: Automatically delete items after an expiry timestamp
+
+## 214 API Gateway Overview
+
+```python
+import json
+
+def lambda_handler(event, context):
+    print(event)
+    body = "Hello from Lambda!"
+    statusCode = 200
+    return{
+        "statusCode": statusCode,
+        "body": json.dumps(body),
+        "headers":{
+            "Content-Type": "application/json"
+        }
+    }
+```
+
+AWS Lambda + API Gateway: NO infrastructure to manage
+
+Support for the WebSocket Protocol
+
+
+
+API Gateway can invoke Lambda function, easy way to expose REST API backed by AWS Lambda
+
+所以你用一个定位到该API的URL就可以触发相应Lambda，为什么不把Lambda直接暴露给client呢，有IAM上的考虑，API Gateway 也有其它功能：rate limit, caching, authenticatins...
+
+## 216 API Gateway Security
+
+IAM Permissions
+
+Custome Authorizers
+
+Cognito User Pools
+
