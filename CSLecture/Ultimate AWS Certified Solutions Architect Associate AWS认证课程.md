@@ -732,6 +732,8 @@ Redis AUTH
 
 Memcached: Support SASL-based authentication(advanced)
 
+cannot use SQL
+
 ## 099 What is a DNS
 
 Domain Name System
@@ -1727,4 +1729,84 @@ IAM Permissions
 Custome Authorizers
 
 Cognito User Pools
+
+## 217 AWS Cognito Overview 20220720
+
+We want to give our users an identify so that they can interact with our application.
+
+**Cognito User Pools**: Integrate with API Gateway. 
+
+Create a serveless database of user for your mobile apps
+
+Can enable Federated Identities(Facebook, Google...) 用脸书账号登录,作为Identity Provider
+
+Send back a Json Wen Tokens
+
+本质上，Cognito User Pools(CUP)是和Google，Facebook一样的Identity Provider.
+
+**Cognito Identity Pools(Federated Identity)**: Integrate with Cognito User Poos as an identity provider
+
+Example: provide(temporary access to write to S3 bucket using Facebook Login)
+
+
+
+以上两者的区别还是不清不楚..是后者可以第三方进行验证，直接访问AWS资源？？前者跟Google，Facebook一个性质，后者把他们对接了？前者可以用Google来代替，与后者配合...
+
+关键是Coginoto可以提供一个临时凭证给远端手机用户去访问S3...
+
+## 218 AWS SAM
+
+SAM = Serverless Application Model
+
+Framework for developing and deploying serverless applications
+
+一个管理Lambda, DynamoDB, API Gateway, CUP这些serverless的框架
+
+## 219 Mobile Application-MyTodoList
+
+Moble client <-> API Gateway ->Lambda <- DAX Caching layer-> DynamoDB
+
+Mobile client <->Cognito <->API Gateway
+
+首先这是一个serverless框架，所以不用考虑EC2这类的，至于read/write性能优化，主要有DynamoDB中DAX Caching layer缓存实现，另外API Gateway中也 Caching the REST requests. Cognito 跟API Gateway搭配起来.
+
+## 220 Serverless Website-MyBlog.com
+
+Client->CloudFront Global distribution->S3->Lambda/SQS/SNS: trigger thumnail->S3
+
+Moble client <-> API Gateway ->Lambda <- DAX Caching layer-> DynamoDB Global Table->DynamoDB Stream->Lambda->Amazon Simple Email Service(SES)
+
+要做到全球分发，就要想到CloudFront，边缘缓存，S3可以调用Lambda去做缩略图存储. 另外，注册新用户发邮件的架构可利用Lambda去处理DynamoDB Stream.
+
+（P2 明显难起来是因为我缺乏Web服务器搭建经验）
+
+## 221 Micro Services architecture
+
+We want to switch to a micro service architecture
+
+Many services interact with each other directly using a REST API
+
+## 222 Distributing Paid Content
+
+a fully serverless solution:
+
+CloudFront can only be used using Signed URLs to prevent unauthorized users.
+
+## 223 Software updating distribution
+
+放在EC2上的软件更新补丁，短时间大量用户来更新补丁requests，Auto scaling产生大量费用，此时往架构添加CloudFront，放个静态缓存：Easy way to make an existing application more scalable and cheaper
+
+## 224 Big Data Ingestion Pileline
+
+S3也是severless...
+
+## 225 Choosing the right database
+
+### RDS
+
+### Aurora
+
+### ElastiCache
+
+
 
