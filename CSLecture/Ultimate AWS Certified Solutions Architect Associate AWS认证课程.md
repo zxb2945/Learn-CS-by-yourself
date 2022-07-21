@@ -1800,13 +1800,87 @@ CloudFront can only be used using Signed URLs to prevent unauthorized users.
 
 S3也是severless...
 
-## 225 Choosing the right database
+## 225 Choosing the right database 20220721
 
 ### RDS
 
 ### Aurora
 
 ### ElastiCache
+
+### DynamoDB
+
+NoSQL, Serverless
+
+### S3
+
+Great for big objects.
+
+Serverless
+
+### Athena
+
+Fully Serverless database with SQL capabilities.
+
+可以将其视为S3之上的SQL层。
+
+### Redshift
+
+Reshift is based on PostgreSQL, but it's not used for OLTP
+
+It's OLAP- online analytical processing
+
+Data is loaded from S3, DynamoDB, other DBs...
+
+可以通过Kinesis Data Firehose从S3 Loding data，也可以直接用copy command.
+
+### Glue
+
+Managed extract, transform, and load (ETL) service
+
+Useful to prepare and transform data for analytics
+
+Fully serverless service
+
+S3/RDS -> Glue ETL -> Redshift
+
+### Neptune
+
+Fully managed **graph** database
+
+比如说Wikipedia，一个页面有各种其它链接，形成一个Graphs
+
+### ElasticSearch
+
+Example: In DynamoDB, you can only find by primary key or indexes.
+
+With ElasticSearch, you can search any field, even partially matches.
+
+正则表达式？
+
+It's common to use ElasticSearch as a complement to another database.
+
+## 238 AWS CloudWatch Metrics
+
+CloudWatch provides merics for every service in AWS
+
+Metric is a variable to monitor( CPU utilization,erc...)
+
+## 239 CloudWatch Custom Metrics
+
+Possibility to define and send your own custom metrics to CloudWatch
+
+Example: memory(RAM) usage...
+
+Use API call Put MetricData
+
+## 240 AWS CloudWatch Dashboards
+
+自定义Dashboards布局
+
+## 241 AWS CloudWatch Logs
+
+Application can send logs to CloudWatch using the SDK
 
 
 
