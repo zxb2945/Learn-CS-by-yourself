@@ -1882,5 +1882,78 @@ Use API call Put MetricData
 
 Application can send logs to CloudWatch using the SDK
 
+## 242 CloudWatch Agent 20220722
 
+By default, no logs from your EC2 machine will go to CloudWatch.
+
+You need to run a CloudWatch agent on EC2 to push the log files you want.
+
+1. CloudWatch Logs Agent
+2. CloudQatch Unified Agent
+
+后者更新，除了log，还可以发送system-level metrics such as RAM,processes...
+
+
+
+想想有道理，之前均是像S3这样的serverless的服务可以无agent就发送log至CloudWatch.
+
+## 243 AWS CloudWatch Alarms
+
+Alarms are used to trigger notifications for any metric
+
+Targets:
+
+1. Stop,Terminate,Reboot,or recover an EC2 instance
+2. Trigger Auto Scaling Action
+3. Send notification to SNS
+
+Alarms can be created based on CloudWatch Logs Metrics Filters
+
+## 245 EC2 Instance Recovery with CloudWatch
+
+Recover: Same Private,Public,Elastic IP, metadata, placement group
+
+就是配置文件会恢复，EC2上面存储的数据会丢失，除非配个EBS
+
+## 246 AWS CloudWatch Events
+
+Intercept events from AWS services
+
+比如，检测到EC2 Pending, 然后就创建一个事件：发送邮件。类似于Alarms，但Event本质上是可以触发调用许多API（包括SNS），而Alarms可触发的选择范围较小。
+
+
+
+> **CloudWatch Events 现在名为 EventBridge**
+>
+> Amazon EventBridge 在 CloudWatch Events 上构建并对其进行扩展。它使用相同的服务 API 和终端节点，以及相同的底层服务基础设施。对于现有 CloudWatch Events 客户，什么都没改变 - 您可以继续使用相同的 API 以及 CloudFormation 模板。所有现有的 CloudWatch Events API 和开发工具包继续以与 EventBridge 相同的方式工作。现有的默认事件总线、规则和事件还可以在 Amazon EventBridge 控制台中访问。
+
+## 247 Amazon EventBridge
+
+EventBridge is the next evolution of CloudWatch Events
+
+Default event bus是来自CloudWatch的events, 但是现在增加了第三方Saas平台(如Salesforce)而来的events，还有自定义应用的events，为这些events创建rules（similar to CloudWatch Events）
+
+EventBridge can analyze the events in your bus and infer the schema=>Schema Registry
+
+这个性质不是很理解，提前推断出总线中的数据结构，有什么用？
+
+> schema 用于定义在 Amazon EventBridge 中通过事件总线传递的事件的结构和内容。您可以浏览或搜索 EventBridge 上所有 AWS 服务的 schema。您可以自动为事件总线上的事件生成 schema，创建或上传自定义 schema，并在自定义注册表中组织自定义 schema。
+
+## 249 CloudTrail Overview
+
+> 持续记录您的 AWS 账户活动
+>
+> 使用 CloudTrail 满足您 AWS 账户的治理、合规性和审计需求。
+
+CloudTrail is enabled by default
+
+Get an history of events /API calls made within your AWS Accout by Console,CLI...
+
+Can put logs from CloudTrail into CloudWatch Logs or S3
+
+ 
+
+CloudTrail Insights:to detect unusual activity in your accout.
+
+Retention:Events are stored for 90 days in CloudTrail, to keep events beyong this period, log them to S3 and use Athena
 
