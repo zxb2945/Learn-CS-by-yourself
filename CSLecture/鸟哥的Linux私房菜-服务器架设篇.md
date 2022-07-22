@@ -346,10 +346,17 @@ dhcpd 使用的埠口是 port 67
 
 ### 13.文件服务器之一：NFS服务器
 
-NFS 为 Network FileSystem 的简称，它的目的就是想让不同的机器、不同的操作系统可以彼此分享个别的档案啦！
+NFS 为 Network FileSystem 的简称，它的目的就是想让不同的机器、不同的操作系统可以彼此分享个别的档案啦！基本上， Unix Like 主机连接到另一部 Unix Like 主机来分享彼此的档案时，使用 NFS 要比 SAMBA 这个服务器快速且方便的多了！
 因为预设 NFS 用来传输的埠口是随机选择小于 1024 以下的埠口来使用的。咦！那客户端怎么知道你服务器端使用那个埠口啊？此时就得要 远程过程调用(Remote Procedure Call, RPC) 的协议来辅助啦！
+RPC 最主要的功能就是在指定每个 NFS 功能所对应的 port number ，并且回报给客户端，让客户端可以连结到正确的埠口上去。 那 RPC 又是如何知道每个 NFS 的埠口呢？这是因为当服务器在启动NFS 时会随机取用数个埠口，并主动的向 RPC 注册，因此 RPC 可以知道每个端口口对应的 NFS 功能，然后 RPC 又是固定使用 port 111 来监听客户端的需求并回报客户端正确的埠口， 所以当然可以让 NFS 的启动更为轻松愉快了！
+也就是说，NFS 必须要有 RPC 存在时才能成功的提供服务，因此我们称 NFS 为 RPC server 的一种。事实上，有很多这样的服务器都是向 RPC 注册的，举例来说，NIS (Network Information Service) 也是 RPC server 的一种呢。
+NFS 通常需要与NIS (十四章) 这一个可以确认客户端与服务器端身份一致的服务搭配使用，以避免身份的错乱啊！
+NFS 主程序：nfs-utils :就是提供 rpc.nfsd 及 rpc.mountd 这两个 NFS daemons 与其他相关documents 与说明文件、执行文件等的软件！这个就是 NFS 服务所需要的主要软件啦！一定要有喔！
+
 entOS 或者是其他版本的 Linux ，预设核心通常是支持 NFS 功能的，所以你只要确认你的核心版本是目前新的 2.6.x 版，并且使用你的 distribution 所提供的核心，那应该就不会有问题啦！
 我们知道开机就挂载的挂载点与相关参数是写入 /etc/fstab 中的，那 NFS 能不能写入 /etc/fstab 当中呢？非常可惜的是， 不可以呢！为啥呢？分析一下开机的流程，我们可以发现网络的启动是在本机挂载之后，因此当你利用 /etc/fstab 尝试挂载NFS 时，系统由于尚未启动网络，所以肯定是无法挂载成功的啦！
+
+一般来说， NFS 的服务仅会对内部网域开放，不会对因特网开放的。
 
 ### 14.账号管控：NIS服务器
 
@@ -423,7 +430,7 @@ SAN (Storage Area Networks, 储存局域网络)
  iSCSI initiator：就是能够使用 target 的客户端，通常是服务器。 也就是说，想要连接到 iSCSI target 的服务器，也必须要安装 iSCSI initiator 的相关功能后才能够使用 iSCSI target 提供的磁盘就是了。
  
  iSCSI target 主要使用 scsi-target-utils 软件达成主要利用 tgt-admin 及tgtadm 指令完成：
-  
+ iSCSI 就是透过一个网络接口，将既有的磁盘给分享出去就是了。 
  
  
 ## 第四部分：常见因特网服务器架设
