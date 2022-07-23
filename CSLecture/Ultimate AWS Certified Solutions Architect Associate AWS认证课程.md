@@ -1919,7 +1919,7 @@ Recover: Same Private,Public,Elastic IP, metadata, placement group
 
 Intercept events from AWS services
 
-比如，检测到EC2 Pending, 然后就创建一个事件：发送邮件。类似于Alarms，但Event本质上是可以触发调用许多API（包括SNS），而Alarms可触发的选择范围较小。
+比如，检测到EC2 Pending, 然后就创建一个事件：发送邮件。类似于Alarms，但Event本质上是可以触发调用许多API（包括SNS，SQS，Lambda），而Alarms可触发的选择范围较小。
 
 
 
@@ -1956,4 +1956,36 @@ Can put logs from CloudTrail into CloudWatch Logs or S3
 CloudTrail Insights:to detect unusual activity in your accout.
 
 Retention:Events are stored for 90 days in CloudTrail, to keep events beyong this period, log them to S3 and use Athena
+
+## 251 AWS Config Overview 20220723
+
+> AWS Config 提供了与您的 AWS 账户关联的资源的详细视图，包括它们的配置方式、彼此关联的方式以及配置及其关系是如何随着时间变化的。
+
+Helps woth auditing and recording compliance of your AWS resources
+
+Questions that can be solved by AWS Config: Is there unrestricted SSH access to my security groups?...
+
+AWS Config Rule does not prevent actions from happening(no deny)
+
+你虽然不能阻止不合规变化发生，但你可以在Config中进行Remediations 补救。
+
+## 253 CloudTrail vs CloudWatch vs Config
+
+For example, for an ELB
+
+CloudTrail: Track who made any changes to the ELB with API calls
+
+Cloudwatch: Monitor metric and make a dashboard to get an idea of performance
+
+Config:Track security group rules and configuration changes for ELB
+
+三者互补
+
+## 254 AWS STS Overview
+
+AWS STS: Security Token Service
+
+Allows to grant limited and temporary access to AWS resources.
+
+AssumeRole, Cross Accout Access
 
