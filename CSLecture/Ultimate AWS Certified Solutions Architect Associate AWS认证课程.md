@@ -1744,7 +1744,7 @@ Send back a Json Wen Tokens
 
 本质上，Cognito User Pools(CUP)是和Google，Facebook一样的Identity Provider.
 
-**Cognito Identity Pools(Federated Identity)**: Integrate with Cognito User Poos as an identity provider
+**Cognito Identity Pools(Federated Identity)**: Integrate with Cognito User Pools as an identity provider
 
 Example: provide(temporary access to write to S3 bucket using Facebook Login)
 
@@ -1752,7 +1752,13 @@ Example: provide(temporary access to write to S3 bucket using Facebook Login)
 
 以上两者的区别还是不清不楚..是后者可以第三方进行验证，直接访问AWS资源？？前者跟Google，Facebook一个性质，后者把他们对接了？前者可以用Google来代替，与后者配合...
 
-关键是Coginoto可以提供一个临时凭证给远端手机用户去访问S3...
+关键是Coginito可以提供一个临时凭证给远端手机用户去访问S3...
+
+> Amazon Cognito 提供用户池和身份池。用户池是为您的应用程序提供注册和登录选项的用户目录。身份池提供 AWS 凭证以向用户授予对其他 AWS 服务的访问权限。
+
+CUP可以提供Token去登陆Facebook，而CIP是来验证Facebook的Token来访问S3一类的东西。
+
+
 
 ## 218 AWS SAM
 
@@ -1988,4 +1994,106 @@ AWS STS: Security Token Service
 Allows to grant limited and temporary access to AWS resources.
 
 AssumeRole, Cross Accout Access
+
+## 255 Identity Federation & Cognito 20220724
+
+Federation lets users outside of AWS to assume temporary role for accessing AWS resources.
+
+比如你用你的facebook账号来登录amazon
+
+STS相当于amazon内部提供credential的第三方，但推荐用Cognito？<=错...
+
+> ADFS的全称是Active Directory Federation Services.
+>
+> 在ADFS中, 身份的联合(identity federation )是通过在两个组织的安全边界间建立信任关系来实现的. 在一端(account side)的federation server 负责通过在Active Directory domain services中的标准方式认证一个用户, 然后生成一个包含一系列包含有关这个用户的claims的token, 包括federation server的实体本身. 另一端(resource side), 另一个federation server会校验这个token, 然后生成另一个token供本地服务器接受claimd identify所用. 这允许系统为它的资源提对另外一个安全边界的某用户供可控制的访问权限, 而不需要让这个用户直接登录系统, 也不需要两个系统共享用户的identify和密码.
+>
+> ADFS与Active Directory Domain Services进行了集成, 使用Domain Services作为identify provicer. ADFS可以与其他的符合WS-* 和 SAML 2.0的federation services兼容.
+
+Cognito由CUP和Federated Identity组成的一个服务，APP从Google取个Token过来问Federated Identity来验证，OK的话，Federated Identity再产生一个临时的Token交给APP去访问S3，那这个临时的Token就要去找STS(Security Token Service) 要了。
+
+## 256 Directory Services Overview
+
+What is Microsoft Active Directory(AD)?
+
+> 活动目录，Active Directory，简称为”AD“
+>
+> 活动目录是负责管理一定区域「1」内Windows网络中各类资源的Windows Server组件之一。
+>
+> 「1」:可以是一台计算机，一个小型局域网（LAN）或多个广域网(WAN）的结合。
+>
+> 在由windows系统组成的网络中，存在着各种资源，如服务器、客户机、用户账户、打印机、各种文件等，这些资源都分布于各台计算机上。没有使用“活动目录”之前，需要在每台计算机上单独管理这些资源 。
+>
+> 使用“AD”的主要作用是：
+>
+> 为了集中管理windows网络的各类资源，“活动目录”就像是一个数据库，存储着windows网络中的所有资源。
+> Active Directory域内的directory database（目录数据库）用来存储用户账户、计算机账户、打印机与共享文件夹等对象，而提供目录服务的组件是Active Directory Domain Services，AD DS（活动目录域服务），它负责目录数据库的存储、新建、删除、修改与查询等工作[1]。
+> 普通用户通过“活动目录”可以很容易找到并使用网络中的各种资源。
+> 管理员也可以通过活动目录，对网络上的所有资源进行集中管理，以控制不同用户在不同计算机上对不同资源的访问。
+> ————————————————
+> 版权声明：本文为CSDN博主「NOWSHUT」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+> 原文链接：https://blog.csdn.net/NOWSHUT/article/details/107851255
+
+Centralized security management, create accout, assign permission.
+
+类似 Network Information Services (NIS server) 这个服务器吧？=>还是很不一样
+
+> Directory Service：帮助您存储信息和管理对资源的访问。
+>
+> 基于您的需求选择目录类型。依赖 Microsoft Active Directory (AD)域服务的客户提供了三个选项来帮助您将依赖于 Active Directory 的应用程序迁移到 AWS Cloud。利用这些解决方案，用户还可以使用其 Active Directory 凭证登录 AWS 应用程序，例如 Amazon WorkSpaces 和 Amazon QuickSight。不需要 Active Directory 的开发人员可使用 Amazon Cloud Directory 创建云规模目录，从而组织和管理分层信息，例如组织图表、课程目录和设备注册表。Amazon Cognito 用户池向移动和 Web 应用程序开发人员提供了 Internet 规模的用户目录与集成的注册和登录功能。
+>
+> 适用于 Microsoft Active Directory 的 Directory Service 解决方案：
+>
+> AWS Managed Microsoft AD:
+>
+> Create your own AD in AWS, manage users locally, support MFA
+>
+> AWS Directory Service for Microsoft Active Directory (标准版或企业版)是 AWS 云中的实际 Microsoft Active Directory。您可以使用它来支持 Active Directory 可识别的工作负载；适用于 Microsoft SQL Server 的 Amazon Relational Database Service；AWS Managed Services，例如 Amazon WorkSpaces 和 Amazon QuickSight；或需要 LDAP 目录的 Linux 应用程序。您的最终用户可从 Windows 集成的单一登录体验中受益，无论您是在 AWS 云中将它用作单独目录，还是使用 Active Directory 信任将现有 Active Directory 基础架构扩展到 AWS Cloud 中。
+>
+> AD Connector:
+>
+> Directory Gateway(Proxy) to redirect to on-premise AD
+>
+> AD Connector 是一种代理，它允许您将现有的自托管 Microsoft Active Directory (AD)中的身份用于兼容的 AWS 应用程序。您还可以使用 AD Connector 将 Amazon EC2 实例连接到您的 AD 域，并使用现有的组策略对象管理这些实例。这样一来，您可以更轻松地在这些 Amazon EC2 实例上部署 AD 感知应用程序，并使用您的自托管 AD 进行用户和组授权。
+>
+> Simple AD:
+>
+> AD-compatible managed directory on AWS
+>
+> Simple AD 是一种兼容基础 Active Directory 的小规模的低成本目录。您可以在 AWS Cloud 中将它用作独立目录以支持 AWS 应用程序和服务、Samba 4 兼容的应用程序以及需要 LDAP 目录的 Linux 应用程序。
+
+总而言之就是Amazon提供的兼容Microsoft AD的方案。
+
+## 257 Organizations Overview
+
+Global service 
+
+Allows to manage multiple AWS accouts
+
+The main account is the master accout
+
+Consolidated Billing across all accouts- single payment method
+
+Organizational Units = OU: OU是高于Account的level
+
+Service Control Policies(SCP): Whitelist or blacklist IAM actions
+
+## 259 IAM Adavanced
+
+IAM Conditions : 比如基于IP，区域等对访问进行限制，强制使用MFA
+
+IAM for S3
+
+IAM Roles vs Resource Based Policies
+
+比如账户A要访问账户B中的S3，B可以为A创建一个Role，或者为S3做一个访问策略。
+
+## 260 IAM Policy Evaluation Logic
+
+IAM Permission Boundaries : Advanced feature to use a managed policy to set the maximum permissions an IAM entity can get.
+
+## 261 Resource Access Manager(RAM)
+
+Share AWS resources that you own with other AWS accounts
+
+比如, 账户1创建一个VPC，Private subnet，它可以将这个subnet分享给账户2，但是这两个账号各自管理在这个subnet上的资源，所分享的仅仅是网络层配置。
 
