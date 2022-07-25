@@ -2097,3 +2097,156 @@ Share AWS resources that you own with other AWS accounts
 
 比如, 账户1创建一个VPC，Private subnet，它可以将这个subnet分享给账户2，但是这两个账号各自管理在这个subnet上的资源，所分享的仅仅是网络层配置。
 
+## 262 AWS Sinle Sign On(SSO) Overview 20220725
+
+Centrally manage Single Sign-On to access multiple accounts and 3rd-party business applications.
+
+Intergrated with AWS Organizations
+
+> 提到SAML (Security Assertion Markup Language), 很多人都会联想到单点登录SSO。那么Saml到底是什么，它跟sso到底有什么联系？
+>
+> 安全声明标记语言（SAML）是一种开放标准，允许身份提供商（IDP）将授权凭证传递给服务提供商（SP）。 这个术语的含义是您可以使用一组凭据登录许多不同的网站。 管理每个用户仅需一次登录比管理电子邮件、客户关系管理（CRM）软件、Active Directory等公司业务系统都需要单独登录要简单得多。
+>
+> SAML使用可扩展标记语言（XML）进行身份提供商和服务提供商之间的标准化通信。 SAML是用户身份验证和使用服务授权之间的链接。
+
+## 265 Encryption
+
+1. Encryption in flight(SSL) => HTTPS
+2. Server side encryption at rest: 服务器收到数据加密存储，发送前解密，防止服务器被劫持。
+3. Client side  encryption: 客户端加密，服务器不解密，只是存储
+
+## 266 KMS Overview
+
+AWS KMS: Key Management Service
+
+Anytime you hear "encryption" for an AWS service, it's most likely KMS.
+
+Fully integrated with IAM for authorization
+
+
+
+KMS-Customer Master Key(CMK) Types:
+
+1. Symmetric(AES-256 keys) : 对称key，AWS大多时候采用的，可以调用KMS API
+2. Asymmetric(RSA & ECC key paris) : 非对称key，有公钥私钥，不能访问KMS API
+
+
+
+Coping Snapshots across regions: key跟region对应，跨区要重新加密
+
+
+
+AWS managed keys or Custom managed keys : 即便是后者也是调用KMS API来创建的。
+
+## 268 KMS Key Rotation
+
+Only for Customer-managed CMK, if enable: automatic key rotation happens every 1 year.
+
+## 269 SSM Parameter Store Overview
+
+> 集中存储和管理您的密钥和配置数据，例如密码、数据库字符串和许可证代码。您可以将值加密，或存储为纯文本，还能实现每个级别的安全访问。
+
+Serverless
+
+可以连接AWS KMS来加密Parameter
+
+不仅可以用CLI来取用Parameter，还可以通过Lambda来取，记得为Lambda的IAM Role添加允许访问SSM，KMS的IAM Policy.
+
+## 272 AWS Secrets Manager
+
+Newer service, meant for storing secrets
+
+Capability to force rotation of scerets every X days
+
+Secrets are encypted using KMS
+
+> 使用 Secrets Manager 来存储、转动、监控和控制对数据库凭证、API 密钥和 OAuth 令牌等密钥的访问。使用内置集成对 Amazon RDS 上的 MySQL、PostgreSQL 和 Amazon Aurora 启用密钥转动。您还可以使用 AWS Lambda 函数启用其他密钥的转动。要检索密钥，您只需通过调用 Secrets Manager API 来更换应用程序中的硬编码密钥，无需暴露明文密钥。
+
+## 274 CloudHSM
+
+Dedicated Hardware(HSM = Hardware Security hardware)
+
+You manage your own encryption keys entirely
+
+Supports both symmetric ans asymmetric encryption(SSL/TLS keys)
+
+有相应的客户端软件
+
+可以比较一下CloudHSM和KMS的区别
+
+## 275 Shield - DDos Protection
+
+DDos
+
+> 1、中文名称：分布式拒绝服务，英文全称：distributed denial-of-service 。
+>
+> 2、具体含义
+>
+> 通过大规模互联网流量淹没目标服务器或其周边基础设施，以破坏目标服务器、服务或网络正常流量的恶意行为。
+>
+> 更加形象的比喻：
+>
+> 如果把互联网上的网站或服务器看作一个个商店（比如淘宝、京东、微信等等），每个访问网站的网民看作是商店里的顾客。DDoS 就相当于一堆小混混装成正常顾客涌入商店，逛来逛去赖着不走让正常的顾客进不来，或者跟售卖员有一搭没一搭地说话，占用他们的时间，让他们无法正常服务客户。
+
+1. AWS Shield Standard:
+
+Provides protection from layer 3/4 attacks
+
+应用层攻击的话，就不保护了？主要是免费自带
+
+2. AWS Shield Advanced：
+
+3000 doller每个月...
+
+## 276 Web Application Firewall(WAF)
+
+Protects your web application from common web exploits(Layer 7)
+
+Deploy only on **ALB, API Gateway, CloudFront** => Shield 基本部署于每台服务器
+
+Difine Web ACL：IP, HTTP headers, or URL...
+
+ 还可以设定特定国家区域的请求通不通过
+
+Rate-based rules - for DDos protection
+
+不是免费的
+
+
+
+AWS Firewall Manager: Manage rules in all accounts of an AWS Organization
+
+Common set of security rules:
+
+1. WAF rules
+2. AWS Shield Advanced
+3. Security Groups for EC2 and ENI resources in VPC
+
+## 278 Amazon GuardDuty
+
+Inteligent Threat discover to protect AWS Accout
+
+Uses Machine Learning algorithms to analyze logs
+
+Can protect against CryptoCurrency attacks
+
+
+
+CloudTrail Logs, DNS logs => GuardDuty => CloudWatch Event => SNS, Lambda
+
+## 279 Amazon Inspector
+
+Only for EC2 instances
+
+Analyze the running OS against known vulnerabilities
+
+AWS Inspector Agent must be installed on OS in EC2 instances
+
+之后才能跟Inspector Service交互
+
+## 280 Amazon Macie
+
+用机器学习来分析搜索在S3中的敏感数据，such as personally identifiable information(PII)
+
+S3 => Macie => CloudWatch Events EventBridge => SNS, Lambda
+
