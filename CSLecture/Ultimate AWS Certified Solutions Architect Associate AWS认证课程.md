@@ -2250,3 +2250,7 @@ AWS Inspector Agent must be installed on OS in EC2 instances
 
 S3 => Macie => CloudWatch Events EventBridge => SNS, Lambda
 
+## 284 Default VPC Overview 20220726
+
+All new AWS accounts have a default VPC
+
