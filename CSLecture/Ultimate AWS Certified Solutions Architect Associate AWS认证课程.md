@@ -2250,7 +2250,73 @@ AWS Inspector Agent must be installed on OS in EC2 instances
 
 S3 => Macie => CloudWatch Events EventBridge => SNS, Lambda
 
-## 284 Default VPC Overview 20220726
+## 285 VPC Overview 20220726
 
 All new AWS accounts have a default VPC
+
+VPC = Virtual Private Cloud
+
+Because VPC is private, only the Private IPv4 ranges are allowed:
+
+10.0.0.0-10.255.255.255
+
+172.16.0.0-172.31.255.255
+
+192.168.0.0-192.168.255.255
+
+## 287 Subnet Overview
+
+AWS reserves 5 IP address(first 4 & last 1) in each subnet.
+
+These 5 IP address are not available for use and can't be assigned to an EC2 instance.
+
+Example: if CIDR block 10.0.0.0/24, then reserved IP addresses are:
+
+10.0.0.0- Network Address
+
+10.0.0.1- reserved by AWS for the VPC router
+
+10.0.0.2- reserved by AWS for mapping to Amazon-provided DNS
+
+10.0.0.3- reserved by AWS for future use
+
+10.0.0.255- Network Broadcast Address, AWS does not support broadcast in a VPC,
+
+therefore the address is reserved.
+
+## 289 Internet Gateway & Route Tables
+
+Internet Gateway(IGW): Allows resources in a VPC connect to the Internet
+
+Must be created separetely from a VPC
+
+Route table must also be edited!
+
+创建一个VPC，划分出数个子网，创建路由表指向本地部分子网，最后创建网关，编辑路由表指向此互联网网关，最终该子网上的EC2就可以使用Public IP了。
+
+## 291 Bastion Hosts
+
+We can use a Bastion Host(EC2 instance) to SSH into our private EC2 instances
+
+The bastion is in the public subnet which is then connected to all other private subnets.
+
+基本就是在EC2 界面操作，创建私网EC2时创建安全组，将安全组source设置为公网EC2的安全组名称，然后就可以通过公网内的EC2登录私网EC2了，此时这个公网EC2就被称为Bastion Host.
+
+Windows可以用Powershell来登录EC2，就是公网EC2公钥这块出现了下面的问题导致没法成功登录私网...按下不表，也不知道passphrase是什么...
+
+```
+Enter passphrase for key 'Key.pem':
+```
+
+上记问题，重新制作密钥，解决...
+
+## 293 NAT Instances
+
+NAT = Network Address Translation (outdated, but still at the exam)
+
+NAT Allow EC2 instances in private subnets to connect to the Internet
+
+NAT Must be lauched in a public subnet
+
+NAT实际上也是一个EC2，因为需要改写IP头，所以Source/destination Check Must be disabled.
 
