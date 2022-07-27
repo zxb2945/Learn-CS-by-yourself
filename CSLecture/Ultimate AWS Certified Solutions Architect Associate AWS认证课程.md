@@ -2318,5 +2318,85 @@ NAT Allow EC2 instances in private subnets to connect to the Internet
 
 NAT Must be lauched in a public subnet
 
-NAT实际上也是一个EC2，因为需要改写IP头，所以Source/destination Check Must be disabled.
+NAT实际上也是一个EC2(can be used as Bastion Host)，因为需要改写IP头，所以Source/destination Check Must be disabled.
+
+## 295 NAT Gateways 20220727
+
+AWS-managed NAT, higher bandwidth, high availability, no administration
+
+Requirea an IGW (Private Subnet => NATGW => IGW)
+
+Can't be used by EC2 instance in the same subnet(only from other subnets)?
+
+操作很简单，直接创建，然后编辑私网中EC2的路由器指向这个NAT Gatways就行，大概IGW需要提前创建，然后会自动连接？
+
+## 297 DNS Resolution Options & Route 53 Praivate zones
+
+DNS Resolution 可以利用Amazon提供的 Route 53，也可以Custome DNS Server.
+
+If you use costom DNS domain names in a Private Hosted Zone in Route 53, you must set both these attributes(enableDnsSupport & enableDnsHostname) to true.
+
+比如，你想为你的EC2访问谷歌时使用别名，你就需要启动这两个特性。
+
+enableDnsSupport 默认启动，就是使用Route 53 而不是自定义。
+
+enableDnsHostname默认的VPC是启动的，自建的VPC关闭，它赋予你在公网中的EC2一个DNS domain name.
+
+## 299 NACL & Security Groups
+
+NACL和SG都可以编辑出入规则，组合使用。区别在于前者是Stateless =>(return traffic must be explicitly allowed by rules, think of ephemeral ports)，就是不管你的信息是发送还是回复，一律检查；而后者是Stateful => (return traffic is automatically allowed, regardless of any rules)，回复的消息就直接通过。
+
+NACL = Network Access Control List
+
+NACL are like a firewall which control traffic on a subnet level. (SG operates at the instance level)
+
+客户端回信时，会选择一个临时端口，Ephemeral Ports, 所以NACL设置rule时对于回信是设置一个端口范围的。
+
+```
+#安装web服务器
+sudo yum install -y httpd
+sudo systemctl enable httpd
+sudo systemctl start httpd
+sudo su
+echo "hello wrold" > /var/www/html/index.html
+```
+
+在NACL中，Rule number很重要，它会据此自从排序，越小的数字越靠前执行，优先度越高。默认NACL的number是100，它允许所有流量通过。
+
+## 301 VPC Reachability Analyzer
+
+It builds a model of the network configuration, then checks the reachablity based on these  confugrations( it doesn't send packets)
+
+## 303 VPC Peering
+
+Privately connect two VPCs using AWS's network
+
+Make them behave as if they were in the same network
+
+Must not have overlapping CIDRs
+
+VPC Peering connection is Not transitive(Must be established for each VPC that need to communicate with one another)
+
+=>比如A与B通过一个VPC Peering连接，B与C通过另一个VPC Peering连接，不表示A与C能够通信。
+
+Must update route tables in each VPC's subnets
+
+## 305 VPC Endpoints
+
+比如说Amazon DynamoDB因为是Public Serves, EC2可以通过Internet Gateway去访问。但CloudWatch， S3这些服务应当有不经过公网的更好的访问形式-VPCEndpoints
+
+VPC Endpoints(AWS PrivateLink):
+
+Every AWS service is publicly exposed(public URL)
+
+VPC Endpoints(powered by AWS PrivateLink) allows you to connect to AWS services using a private network instead of using the public internet.
+
+举例说访问SNS，如果使用internet，首先网络状况没有私网好，另外NAT Gateway等配置也要费用
+
+Types of Endpoints:
+
+1. Interface Endpoints: 配置一个ENI，所以要设置SG，support most AWS Service
+2. Gateway Endpoints:must be used as a target in a route table, only support S3 and DynamoDB
+
+
 
