@@ -2398,5 +2398,98 @@ Types of Endpoints:
 1. Interface Endpoints: 配置一个ENI，所以要设置SG，support most AWS Service
 2. Gateway Endpoints:must be used as a target in a route table, only support S3 and DynamoDB
 
+## 307 VPC Flow Logs 20220728
+
+Capture information about IP trafiic going into your interfaces
+
+Helps to monitor connectivity issues
+
+收发IP端口以及是否被Firewall通过拒绝等信息，是在VPC层面上的，类似于tcpdump?
+
+Query VPC logs using Athena on S3 or CloudWatch Logs Insights.
 
 
+
+Athena如何去操作S3呢？Athena在某个S3路径下对其log进行表创建，以及之后的SQL Query操作。
+
+## 309 Site to Site VPN Connections
+
+Virtual Praivate Gateway (VGW): VPN concentrator on the AWS side of the VPN connection
+
+Customer Gateway(CGW): Software application or physical device on customer side of the VPN connection
+
+AWS VON CloudHub: Provide sevure communication between multiple sites, if you have multiple VPN connections.
+
+就是多个CGW跟这个VGW通信的话，这些CGW之间也可以通过这个VPN交流，此时VGW就相当于一个CloudHub了。
+
+It's a VPN connection so it goes over the public internet.
+
+主义的是CGW实体虽然在对端，但AWS侧你还是要设置CGW IP等信息的。
+
+## 311 Direct Connect(DX)
+
+Provides a dedicated private connection from a remote network to your VPC
+
+相对于之前VPN通过公网通信，这可以通过私网通信，所以网络状况更好？
+
+You need to setup a Virtual Private Gateway on your VPC
+
+Access public resources S3 and private(EC2) on sanme connection
+
+总的而言，似乎是Customer Network与VPC之间建立一个AWS Direct Connect location（其中有AWS Direct Connect Endpoint, Customer router等节点），然后通过Private virtual interface 去连接VPG. 而S3等可以用AWS Direct Connect Endpoint用Public virtual interface去连接.
+
+Direct Connect Gateway: If you want to setup a Direct Connect to one or more VPC in many different regions(same account), you must use a Direct Connect Gateway
+
+这个Direct Connect Gateway就在AWS Direct Connect location和多个VPC的VPG之间。
+
+## 312 AWS PrivateLink - VPC Endpoint Service
+
+背景：Exposing services in your VPC to other VPC. 你可以通过Public Internet，不怎么安全，也可以通过VPC peering，但需要将VPC全部expose.
+
+ Service VPC需要设置一个Network Load Balancer, Customer VPC需要设置ENI，然后两者组成了AWS Private Link.
+
+注意305p所讲的VPC endpoint是指内部私网EC2 如何去访问S3, 这里是另一个VPC通过endpoint去访问，当然其构架基础肯定有共通之处。
+
+## 314 AWS ClassicLink
+
+Has been deprecated
+
+## 315 Transit Gateway
+
+背景：如果有很多VPC各自Peering Connection，与Customer Gateway进行VPN Connetion等，网络拓扑图十分复杂，全部接到Transit Gateway就清晰明了了。
+
+For having transitive peering between thousands of VPC and on-premises, hub-and-spoke connection
+
+除此之外，Transit Gateway有以下功能：
+
+Site to site VPN ECMP: Equal-cost multi-path routing
+
+> ECMP(Equal-cost multi-path)
+>
+> ECMP是一个逐跳的基于流的负载均衡策略，当路由器发现同一目的地址出现多个最优路径时，会更新路由表，为此目的地址添加多条规则，对应于多个下一跳。可同时利用这些路径转发数据，增加带宽。ECMP算法被多种路由协议支持，例如：OSPF、ISIS、EIGRP、BGP等。在数据中心架构VL2中也提到使用ECMP作为负载均衡算法。
+>
+> **特别是基于数据流的转发，对某一个结点运用ECMP时的前提是，这些数据流的目标地址相同，源地址不同。比如来自源地址A的数据流和来自源地址B的数据流都要经过R到达目标地址D，而R到D有两条路径，那么R可能会把来自A的数据流转发到路径1上，把来自B的数据流转发到路径2上。**
+>
+> **感觉ECMP是用在MPLS网络上。**
+
+这个功能也要收钱，过分...
+
+Share Direct Connect between multiple accouts
+
+## 316 VPC Traffic Mirroring
+
+Allows you to capture and inspect network traffic in your VPC
+
+简而言之，复制一份到某个EC2的流浪route到一个分析架构上
+
+## 317 IPv6 for VPC
+
+IPv4 cannot be disabled for your VPC and subnets.
+
+所以一个instance可以同时拥有IPv4和IPv6，出现没法lauch基本上都是前者耗尽的问题。
+
+## 319 Egress-only Internet Gateway
+
+similar to a NAT Gateway but for IPv6
+
+中文名：**仅出口互联网网关**
