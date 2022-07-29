@@ -527,6 +527,18 @@ ErrorDocument 408 /error/HTTP_REQUEST_TIME_OUT.html.var
 ```
 
 ### 21.文件服务器之三：FTP服务器
+FTP (File transfer protocol) 是相当古老的传输协议之一，他最主要的功能是在服务器与客户端之间进行档案的传输。
+利用上述的说明来整理一下 FTP 服务器端会使用到的埠号主要有：命令通道的 ftp (默认为 port 21) 与数据传输的 ftp-data (默认为 port 20)。
+再强调一次，这两个埠口的工作是不一样的，而且，重要的是两者的联机发起端是不一样的！首先 port 21 主要接受来自客户端的主动联机，至于 port 20 则为 FTP 服务器主动联机至客户端呢！
+拜 SSH 所赐，目前我们已经有较为安全的 FTP 了，那就是 ssh 提供的 sftp 这个 server 啊！这个 sftp-server 最大的优点就是：『在上面传输的数据是经过加密的』！
+
+FTP 的服务器软件非常多，例如 Wu FTP, Proftpd, vsftpd 等等，各种 FTP 服务器软件的发展理念并不相同， 所以选择时请依照你的需求来决定所需的软件；
+
+vsftpd 的全名是『Very Secure FTP Daemon 』的意思， 换句话说，vsftpd 最初发展的理念就是在建构一个以安全为重的FTP 服务器呢！
+vsftpd 这个服务的启动者身份为一般用户，所以对于 Linux 系统的权限较低，对于 Linux 系统的危害就相对的减低了。此外， vsftpd 亦利用chroot() 这个函式进行改换根目录的动作，使得系统工具不会被 vsftpd 这支服务所误用；
+
+浏览器所支持的协议，其中一个就是ftp 这个协议啰！这个协议的处理方式可以在网址列的地方这样输入的：ftp://username@your_ip
+
 
 ### 22.邮件服务器：Postfix
 
