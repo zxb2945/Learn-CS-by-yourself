@@ -2493,3 +2493,64 @@ IPv4 cannot be disabled for your VPC and subnets.
 similar to a NAT Gateway but for IPv6
 
 中文名：**仅出口互联网网关**
+
+## 323 Networking Costs in AWS 20220731
+
+Use Private IP instead of public IP for good savings and better network performance
+
+Use same AZ for maximum savings
+
+Try to keep as much internet traffic within AWS to minimize costs
+
+## 324 Disaster Recovery in AWS
+
+RPO-Recovery Ponit Objective: 过去的备份时间点，Data loss
+
+RTO-Recovery Time Objective: 将来的恢复时间点，Down time
+
+
+
+Backup and Restore
+
+Pilot Light
+
+Warm Standby
+
+Multi Site/Hot Site Approach
+
+All AWS Multi Region
+
+## 325 DMS-Database Migration Service
+
+Quickly and securely migrate databases to AWS, resilient, self healing
+
+You must create an EC2 instance to perform the replication tasks
+
+AWS Schema Conversion Tool(SCT): 两个不同的database enginner之间迁移时所需要
+
+## 327 On-Premise strategy with AWS
+
+Ability to download Amazon Linux 2 AMI as a VM(.iso format) => VMWare
+
+说明EC2是个虚拟机
+
+VM Import/Export: Migrate existing applications into EC2; Can export back the VMs from EC2 to on-premise
+
+## 328 DataSync Overview
+
+Move large amount of data from on-premise to AWS
+
+在本地设置一个AWS DataSync Agent，与AWS DataSync 用TLS连接，进行本地与云数据同步
+
+另一个用例- EFS to EFS: 在一个region的VPC搞一个EC2 instance with DataSync Agent与EFS相连，然后另一个region的VPC中搞一个AWS DataSync Service endpoint与EFS相连。
+
+## 330 AWS Backup Overview
+
+Fully managed service
+
+No need to create custom scripts and manual processes
+
+可以将EC2，EBS，RDS...各种Resources Automatacally backed up to Amazon S3
+
+所以备份目的地除S3无它
+
