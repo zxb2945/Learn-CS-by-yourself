@@ -2554,3 +2554,73 @@ No need to create custom scripts and manual processes
 
 所以备份目的地除S3无它
 
+## 332 Event Processing in AWS 20220801
+
+SQS=>Lambda, ANA=>Lambda
+
+SNS => Multi SQS    <= Fan Out Pattern: deliver to multiple SQS
+
+S3 Events => SNS, SQS, Lambda Function
+
+## 333 Caching Strategies in AWS
+
+Client=>CloudFront=>API Gateway=>App logic(EC2/Lambda)=> Redis Memcached DAX, Database
+
+上述，CloudFront, API Gateway, Redis Memcached DAX有缓存功能
+
+## 334 Blocking an IP Address in AWS
+
+NACL，Security group(虽然没有deny rule，但allow rule反过来就是deny)，Optional Firewall Software in EC2
+
+如果EC2和Client之间有ALB，那么ALB上也有Security Group，此时EC2的SG就source向ALB SG，就像委托一样。
+
+注意：NLB跟ALB不同，没有SG，它对Client来的流量是透传，既不像ALB收到后，然后以ALB的IP重新包装给EC2的步骤
+
+如果ALB与Cient存在CloudFront，后者可以用Geo Restriction屏蔽一个特定国家IP，另外也可以装WAF功能，指定复杂的IP address filtering的规则屏蔽特定IP，WAF也可以加在ALB，作为补充。
+
+## 335 High Performance Computing(HPC) on AWS
+
+Data Management & Transfer: AWS Direct Connect, Snowball & Snowmobile, AWS DataSync
+
+Computing and Networking: EC2, EC2 Placement Group， EC2 Enhanced Networking=>ENA(Elatic Network Adapter), Elastic Fabric Adapter(EFA)=>only for Linux,
+
+Storage: EBS, S3, EFS, FSx,
+
+Automation and Orchestration: AWS Batch, AWS ParallelCluster
+
+亚马逊鼓励作为一个云上大型计算机给客户提供HPC服务。
+
+## 336 EC2 Instance High Availability
+
+Public EC2 => CloudWatch Evnet => Lambda => Standby EC2 
+
+Auto Scaling Gruop: 1min, 1max, 1desired, >= 2 AZ
+
+前者用Lambda来连接Elastic IP Address，后者用EC2上的启动脚本
+
+ASG + EBS：最初想，那EC2去attach旧的EBS不就完事，但大概因为不同AZ，所以还是要通过EBS Snapshot
+
+## 337 Bastion Host High Availability
+
+反复说要用NLB而不是ALB去连接Bastion Host, 因为ALB是第七层的HTTP，而登录Bastion Host用的是SSH，不搭嘎
+
+## 339 CICD Introduction
+
+Continuous Intergration:  => build server
+
+Developer push the code to a code repository often
+
+The developer gets feedback about the tests and checks that have passed/failed
+
+Continuous Delivery:  => Deployment Server
+
+Ensure that the software can be released reliably whenever needed
+
+Ensure deployment happen often an are quick
+
+Code: AWS Codecommit, like Github
+
+Build,test: AWS CodeBuild
+
+Deploy,Provision: AWS Elastic Beanstalk / AWS CodeDeploy+CloudFormation
+
