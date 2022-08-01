@@ -599,6 +599,22 @@ DB Snapshots compared to Backups:
 
 RDS backups and scales automatically for you.
 
+
+
+> Amazon RDS 提供三个存储类型：通用型 SSD（也称为 gp2）、预置 IOPS SSD（也称为 io1）和磁性存储（也称为标准）。它们的性能特性和价格不同，这意味着您可以根据数据库工作负载需求定制存储性能和成本。您可以创建最多具有 64 TiB 存储的 MySQL、MariaDB、Oracle 和 PostgreSQL RDS 数据库实例。您可以创建最多具有 16 TiB 存储的 SQL Server RDS 数据库实例。对于此存储量，请使用预配置 IOPS SSD 和通用型 (SSD) 存储类型。
+>
+> 下面的列表简要介绍这三个存储类型：
+>
+> - **通用型 SSD** – 通用型 SSD 卷提供了适用于各种工作负载的经济高效的存储。这些卷可以提供几毫秒的延迟，能够突增至 3000 IOPS 并维持一段较长的时间。这些卷的基准性能是由卷的大小决定的。
+>
+>   有关通用型 SSD 存储的更多信息（包括存储大小范围）。
+>
+> - **预配置 IOPS** – 预配置 IOPS 存储符合 I/O 密集型工作负载（尤其是数据库工作负载）的需求，此类工作负载需要低 I/O 延迟和一致的 I/O 吞吐量。
+>
+>   有关预配置 (IOPS) 存储的更多信息 (包括存储大小范围)。
+>
+> - **磁性** – Amazon RDS 还支持磁性存储以实现向后兼容。我们建议您采用通用型 SSD 或预配置 IOPS 来满足所有新存储需求。磁性存储上的数据库实例允许的最大存储量少于其他存储类型的这种量。
+
 ## 089 RDS Read Replicas vs Multi AZ
 
 RDS Read Replicas for read scalability
@@ -996,7 +1012,7 @@ Bucket Policies: JSON based policies
 
 Bucket settings for Block Public Access
 
-These settings were created to prevent company data leaks
+**These settings were created to prevent company data leaks**
 
 ## 134 S3 Websites
 
@@ -1237,6 +1253,10 @@ Block an object version deletion for a specified amount of time
 
 没有hands on, 没有印象...
 
+> 借助 S3 对象锁定，您可以使用*一次写入，多次读取* (WORM) 模式存储对象。对象锁定可帮助防止在固定的时间段内或无限期地删除或覆盖对象。可以使用对象锁定来帮助您满足需要 WORM 存储的法规要求，或只是添加另一个保护层来防止对象被更改和删除。
+>
+> 对象锁定仅适用于受版本控制的存储桶，保留期限和依法保留则适用于单个对象版本。当您锁定某一对象版本时，Amazon S3 会将锁定信息存储在该对象版本的元数据中。对对象实施保留期限或依法保留仅保护在请求中指定的版本。它不阻止创建该对象的新版本。
+
 ## 164 CloudFront Overview 20220709
 
 Content Delivery Network(CDN)
@@ -1282,17 +1302,21 @@ Field Level Encryption: Sensitive information encrypted at the edge close to use
 
 ## 168 AWS Global Accelerator Overview 20220710
 
+背景：一个美国Client访问位于印度的Server，如果Public network需要跳太多路由器，所以先去访问位于美国的Edge Location，然后通过AWS私网直接去访问印度的Server，来减少延迟。中间运用所谓的Anycast IP，不细究...
+
 Unicast IP: one server holds one IP address
 
 Anycast IP: all servers hold the same IP address and the client is routed to the nearest one
 
-后者是怎么实现的呢？就是不同IP的服务器通过同一台Proxy向全球各地users提供服务，而这台Proxy就是所谓的Accelerator
+后者是怎么实现的呢？就是不同IP的服务器通过~~同一台~~Proxy向全球各地users提供服务，而这台Proxy就是所谓的Accelerator
 
-AWS Global Acceleraot vs CloudFront:
+AWS Global Acceleraor vs CloudFront:
 
-They both use the AWS global network and its edge locations around the world
+**They both use the AWS global network and its edge locations around the world**
 
 Both services integrate with AWS Shield for DDos protection.
+
+因为AWS Global Acceleraor更多是Proxy，而不是缓存，所以我觉得更安全
 
 ## 170 AWS Snow Family Overview
 
@@ -1518,6 +1542,8 @@ Make it easy to collect, process, and analyze streaming data in real-time
 Kinesis 可以有许多shards 来hash各种数据的种类，而SQS只有一个接收端口，必须要指定Group ID 来给consumer分组...(视频里虽说有很大不同，但据我理解感觉一样...)
 
 ## 195 Kinesis vs SNS vs SQS
+
+SNS: Data is not persisted(lost if not delivered)
 
 ## 196 Amazon MQ
 
@@ -2204,6 +2230,13 @@ Protects your web application from common web exploits(Layer 7)
 
 Deploy only on **ALB, API Gateway, CloudFront** => Shield 基本部署于每台服务器
 
+Protects from common attack-SQL injection and Cross-Site Scripting(XSS)
+
+> 百度百科的解释: XSS又叫CSS  (Cross Site Script) ，跨站脚本攻击。它指的是恶意攻击者往Web页面里插入恶意html代码，当用户浏览该页之时，嵌入其中Web里面的html代码会被执行，从而达到恶意用户的特殊目的。
+>
+>
+> 它与SQL注入攻击类似，SQL注入攻击中以SQL语句作为用户输入，从而达到查询/修改/删除数据的目的，而在xss攻击中，通过插入恶意脚本，实现对用户游览器的控制，获取用户的一些信息。
+
 Difine Web ACL：IP, HTTP headers, or URL...
 
  还可以设定特定国家区域的请求通不通过
@@ -2422,6 +2455,10 @@ AWS VON CloudHub: Provide sevure communication between multiple sites, if you ha
 
 就是多个CGW跟这个VGW通信的话，这些CGW之间也可以通过这个VPN交流，此时VGW就相当于一个CloudHub了。
 
+> 您一次能将一个VGW连接到 VPC。要将同一 Site-to-Site VPN 连接连接到多个 VPC，我们建议您改为探索使用中转网关。
+
+> 要避免因您的CGW不可用而造成连接中断，您可使用CGW来为您的 VPC 和虚拟私有网关设置第二个站点到站点 VPN 连接。通过使用冗余站点到站点 VPN 连接和CGW，您可以在对其中一个设备进行维护时保证流量可以继续流经第二个CGW站点到站点 VPN 连接。
+
 It's a VPN connection so it goes over the public internet.
 
 主义的是CGW实体虽然在对端，但AWS侧你还是要设置CGW IP等信息的。
@@ -2434,7 +2471,7 @@ Provides a dedicated private connection from a remote network to your VPC
 
 You need to setup a Virtual Private Gateway on your VPC
 
-Access public resources S3 and private(EC2) on sanme connection
+Access public resources S3 and private(EC2) on same connection
 
 总的而言，似乎是Customer Network与VPC之间建立一个AWS Direct Connect location（其中有AWS Direct Connect Endpoint, Customer router等节点），然后通过Private virtual interface 去连接VPG. 而S3等可以用AWS Direct Connect Endpoint用Public virtual interface去连接.
 
