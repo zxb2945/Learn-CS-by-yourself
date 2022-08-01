@@ -2661,3 +2661,59 @@ Build,test: AWS CodeBuild
 
 Deploy,Provision: AWS Elastic Beanstalk / AWS CodeDeploy+CloudFormation
 
+## 340 CloudFormation Intro 20220802
+
+ 理念：Infrastructure as Code  
+
+CloudFromation is a declarative way of outlining your AWS Infrastructure for any resources
+
+类似于配置脚本？写个CloudFormation template，然后自动启动这些服务器...
+
+然后所配置的服务设施也可以在Cloudformation中全部一次性删除
+
+StackSets: Create,update,or delete stacks across multople accounts and regions with a single operation
+
+## 343 Step Functions & SWF
+
+Build serverless visual workflow to orchestrate your Lambda functions
+
+Represent flow as a JSON **state machine**
+
+用JSON组织Lambda？可以表示为流程图
+
+AWS SWF - Simple Workflow Service: 感觉像Step Function还不是serverless的老版本，即将被淘汰
+
+## 344 Amazon EMR
+
+EMR stands for "Elastic MapReduce" =>Big Data
+
+The clusters can be made of hundreds of EC2 instances
+
+Hadoop
+
+> Hadoop起源：hadoop的创始者是Doug Cutting，起源于Nutch项目，该项目是作者尝试构建的一个开源的Web搜索引擎。起初该项目遇到了阻碍，因为始终无法将计算分配给多台计算机。谷歌发表的关于GFS和MapReduce相关的论文给了作者启发，最终让Nutch可以在多台计算机上稳定的运行;后来雅虎对这项技术产生了很大的兴趣，并组建了团队开发，从Nutch中剥离出分布式计算模块命名为“Hadoop”。最终Hadoop在雅虎的帮助下能够真正的处理海量的Web数据。
+>
+> ​    Hadoop集群是一种分布式的计算平台，用来处理海量数据，它的两大核心组件分别是HDSF文件系统和分布式计算处理框架mapreduce。HDFS是分布式存储系统，其下的两个子项目分别是namenode和datanode;namenode管理着文件系统的命名空间包括元数据和datanode上数据块的位置，datanode在本地保存着真实的数据。它们都分别运行在独立的节点上。Mapreduce的两大子项目分别是jobtracker和tasktracker，jobtracker负责管理资源和分配任务，tasktracker负责执行来自jobtracker的任务。
+
+## 345 AWS Opsworks
+
+Chef & Puppet help you perform server configuration automatically, or repetitive actions    => configuration as code
+
+They work great with EC2 & On premise VM
+
+AWS Opsworks = Managed Chef & Puppet
+
+Chef & Puppet have similarities with SSM/Beabstalk/Cloudformation, but ther're open-source tools that work cross-cloud
+
+## 346 AWS WorkSpaces
+
+Managed,Secure Cloud Desktop
+
+Great to eliminate management of on-premise VDI(Virtual Desktop Infrastructure)
+
+On demand, pay per by usage
+
+Integrated with Microsoft Active Directory
+
+User => Virtual Desktop => Corporate data center/ AWS Cloud
+
