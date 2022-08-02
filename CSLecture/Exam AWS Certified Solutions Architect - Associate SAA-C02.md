@@ -540,10 +540,157 @@ Which approach will result in an increase in website performance?
 > **Option B is wrong as ElastiCache would only help for caching data from same queries.**
 
 
+### Question #31 20220802
+Currently, a company's legacy application relies on an unencrypted Amazon RDS MySQL database with a single instance. All current and new data in this database must be encrypted to comply with new compliance standards.
+
+How is this to be achieved?
+
+A. Create an Amazon S3 bucket with server-side encryption enabled. Move all the data to Amazon S3. Delete the RDS instance.
+B. Enable RDS Multi-AZ mode with encryption at rest enabled. Perform a failover to the standby instance to delete the original instance.
+C. Take a Snapshot of the RDS instance. Create an encrypted copy of the snapshot. Restore the RDS instance from the encrypted snapshot.
+D. Create an RDS read replica with encryption at rest enabled. Promote the read replica to master and switch the application over to the new master. Delete the old RDS instance.
+
+C for sure.
+You can only enable encryption for an Amazon RDS DB instance when you create it, not after the DB instance is created.
+However, because you can encrypt a copy of an unencrypted snapshot, you can effectively add encryption to an unencrypted DB instance. That is, you can create a snapshot of your DB instance, and then create an encrypted copy of that snapshot. You can then restore a DB instance from the encrypted snapshot, and thus you have an encrypted copy of your original DB instance.
+https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Overview.Encryption.html
+
+### Question #32
+A marketing firm uses an Amazon S3 bucket to store CSV data for statistical research. Permission is required for an application running on an Amazon EC2 instance to properly handle the CSV data stored in the S3 bucket.
+
+Which step will provide the MOST SECURE access to the S3 bucket for the EC2 instance?
+
+A. Attach a resource-based policy to the S3 bucket.
+B. Create an IAM user for the application with specific permissions to the S3 bucket.
+C. Associate an IAM role with least privilege permissions to the EC2 instance profile.
+D. Store AWS credentials directly on the EC2 instance for applications on the instance to use for API calls.
+
+It should be IAM Role
+
+### Question #33
+On a cluster of Amazon Linux EC2 instances, a business runs an application. The organization is required to store all application log files for seven years for compliance purposes.
+The log files will be evaluated by a reporting program, which will need concurrent access to all files.
+
+Which storage system best satisfies these criteria in terms of cost-effectiveness?
+
+A. Amazon Elastic Block Store (Amazon EBS)
+B. Amazon Elastic File System (Amazon EFS)
+C. Amazon EC2 instance store
+D. Amazon S3
+
+Correct Answer: D
+Using the AWS Simple Cost Calculator (Jan 2022), the cost of storage for 1TB a month is $81.92. However, 1TB in S3 Standard is $23.44.
+Since S3 does, in fact, support concurrency (https://aws.amazon.com/blogs/big-data/optimizing-amazon-s3-for-high-concurrency-in-distributed-workloads/), for cost-effectiveness and concurrency selecting S3 (Answer D) is the better answer.
+Here's another link that might be helpful. https://aws.amazon.com/about-aws/whats-new/2018/07/amazon-s3-announces-increased-request-rate-performance/
+
+### Question #34
+On a fleet of Amazon EC2 instances, a business provides a training site. The business predicts that when its new course, which includes hundreds of training videos on the web, is available in one week, it will be tremendously popular.
+
+What should a solutions architect do to ensure that the predicted server load is kept to a minimum?
+
+A. Store the videos in Amazon ElastiCache for Redis. Update the web servers to serve the videos using the ElastiCache API.
+B. Store the videos in Amazon Elastic File System (Amazon EFS). Create a user data script for the web servers to mount the EFS volume.
+C. Store the videos in an Amazon S3 bucket. Create an Amazon CloudFront distribution with an origin access identity (OAI) of that S3 bucket. Restrict Amazon S3 access to the OAI.
+D. Store the videos in an Amazon S3 bucket. Create an AWS Storage Gateway file gateway to access the S3 bucket. Create a user data script for the web servers to mount the file gateway.
+
+answer is C
+keyword: Load is kept is a minimum (using cloudfront)
+A. We would have to store the videos on an RDS, not sure if that would be suitable.....
+B. How does this help minimize the anticipated server load?
+C. Sounds about right, the best option probably.
+D. We're not running anything on premise.
+
+### Question #35
+A business chooses to transition from on-premises to the AWS Cloud its three-tier web application. The new database must be able to scale storage capacity dynamically and conduct table joins.
+
+Which AWS service satisfies these criteria?
+
+A. Amazon Aurora
+B. Amazon RDS for SqlServer
+C. Amazon DynamoDB Streams
+D. Amazon DynamoDB on-demand
+
+A...Table joins indicate Relational DB or SQL... so DynamoDB ruled out coz NoSQL.. so Aurora is completely server less and scalable in storage.
 
 
+### Question #36
+On a fleet of Amazon EC2 instances, a business runs a production application. The program takes data from an Amazon SQS queue and concurrently processes the messages. The message volume is variable, and traffic is often interrupted. This program should handle messages continuously and without interruption.
+
+Which option best fits these criteria in terms of cost-effectiveness?
+
+A. Use Spot Instances exclusively to handle the maximum capacity required.
+B. Use Reserved Instances exclusively to handle the maximum capacity required.
+C. Use Reserved Instances for the baseline capacity and use Spot Instances to handle additional capacity.
+D. Use Reserved Instances for the baseline capacity and use On-Demand Instances to handle additional capacity.
+
+I was going with D but now realise that SQS requires consumers to manually delete the message from queue post processing.
+Fact that instance(spot) got abruptly terminated means no deletion from queue,hence no loss of message.
+Going back to C.
+
+### Question #37
+A startup has developed an application that gathers data from Internet of Things (IoT) sensors installed on autos. Through Amazon Kinesis Data Firehose, the data is transmitted to and stored in Amazon S3. Each year, data generates billions of S3 objects. Each morning, the business retrains a set of machine learning (ML) models using data from the preceding 30 days.
+Four times a year, the corporation analyzes and trains other machine learning models using data from the preceding 12 months. The data must be accessible with a minimum of delay for a period of up to one year. Data must be preserved for archive reasons after one year.
+
+Which storage system best satisfies these criteria in terms of cost-effectiveness?
+
+A. Use the S3 Intelligent-Tiering storage class. Create an S3 Lifecycle policy to transition objects to S3 Glacier Deep Archive after 1 year.
+B. Use the S3 Intelligent-Tiering storage class. Configure S3 Intelligent-Tiering to automativally move objects to S3 Glacier Deep Archive after 1 year.
+C. Use the S3 Standard-Infrequent Access (S3 Standard-IA) storage class. Create an S3 Lifecycle policy to transition objects to S3 Glacier Deep Archive after 1 year.
+D. Use the S3 Standard storage class. Create an S3 Lifecycle policy to transition objects to S3 Standard-Infrequent Access (S3 Standard-IA) after 30 days, and then to S3 Glacier Deep Archive after 1 year.
+
+D because:
+- First 30 days- data access every morning ( predictable and frequently) – S3 standard
+- After 30 days, accessed 4 times a year – S3 infrequently access
+- Data preserved- S3 Gllacier Deep Archive
+Not B because S3 Intelligent-Tiering is suitable when access patterns change - https://aws.amazon.com/s3/storage-classes/intelligent-tiering/
+
+### Question #38
+A business requires data storage on Amazon S3. A compliance requirement stipulates that when objects are modified, their original state must be retained. Additionally, data older than five years should be kept for auditing purposes.
+
+What SHOULD A SOLUTIONS ARCHITECT RECOMMEND AS THE MOST EFFORTABLE?
+
+A. Enable object-level versioning and S3 Object Lock in governance mode
+B. Enable object-level versioning and S3 Object Lock in compliance mode
+C. Enable object-level versioning. Enable a lifecycle policy to move data older than 5 years to S3 Glacier Deep Archive
+D. Enable object-level versioning. Enable a lifecycle policy to move data older than 5 years to S3 Standard-Infrequent Access (S3 Standard-IA)
+
+This question appeared in the exam with a tweak. I passed the exam yesterday. Thanks examtopics and those who contributed! Question had two choices. I don't remember the exact wordings but, it also ask to delete objects after five years.
+With Governance Mode it is possible to delete the object with special permissions
+I chose A & C
+
+### Question #39
+Multiple Amazon EC2 instances are used to host an application. The program reads messages from an Amazon SQS queue, writes them to an Amazon RDS database, and then removes them from the queue. The RDS table sometimes contains duplicate entries. There are no duplicate messages in the SQS queue.
+
+How can a solutions architect guarantee that messages are handled just once?
+
+A. Use the CreateQueue API call to create a new queue.
+B. Use the AddPermission API call to add appropriate permissions.
+C. Use the ReceiveMessage API call to set an appropriate wait time.
+D. Use the ChangeMessageVisibility API call to increase the visibility timeout.
 
 
+D -
+The visibility timeout begins when Amazon SQS returns a message. During this time, the consumer processes and deletes the message. However, if the consumer fails before deleting the message and your system doesn't call the DeleteMessage action for that message before the visibility timeout expires, the message becomes visible to other consumers and the message is received again. If a message must be received only once, your consumer should delete it within the duration of the visibility timeout.
+
+https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html
+
+### Question #40
+A corporation just announced the worldwide launch of their retail website. The website is hosted on numerous Amazon EC2 instances, which are routed via an Elastic Load Balancer. The instances are distributed across several Availability Zones in an Auto Scaling group.
+The firm want to give its clients with customized material depending on the device from which they view the website.
+
+Which steps should a solutions architect perform in combination to satisfy these requirements? (Select two.)
+
+A. Configure Amazon CloudFront to cache multiple versions of the content.
+B. Configure a host header in a Network Load Balancer to forward traffic to different instances.
+C. Configure a Lambda@Edge function to send specific objects to users based on the User-Agent header.
+D. Configure AWS Global Accelerator. Forward requests to a Network Load Balancer (NLB). Configure the NLB to set up host-based routing to different EC2 instances.
+E. Configure AWS Global Accelerator. Forward requests to a Network Load Balancer (NLB). Configure the NLB to set up path-based routing to different EC2 instances.
+
+A and C.
+- B is wrong - NLBs do not understand HTTP (Layer 7 / Application layer) headers, this is what ALBs do. Moreover, a host header is information of the DESTINATION server, not the SOURCE client\
+- D and E are wrong - Global Accelerator helps to SPEED UP requests. Doesn't help with CONTENT CUSTOMIZATION
+
+I know D and E are wrong because only ALB can do any path or host based routing. B also is wrong cos HTTP headers cannot be sent by a NLB. NLB operates on layer 3, HTTP is a Layer 7 protocol, hence only an ALB too. By order of elimination, A and C are the answers.
 
 
 
