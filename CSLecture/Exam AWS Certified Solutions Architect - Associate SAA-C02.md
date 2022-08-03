@@ -2,7 +2,9 @@
 
 https://www.examtopics.com/exams/amazon/aws-certified-solutions-architect-associate-saa-c02/view/
 
-### **Question #1** 20220801
+### 20220731
+
+### **Question #1** 
 
 A company is preparing to deploy a new serverless workload. A solutions architect needs to configure permissions for invoking an AWS Lambda function. The function will be triggered by an Amazon EventBridge (Amazon CloudWatch Events) rule. Permissions should be configured using the principle of least privilege.
 
@@ -172,7 +174,9 @@ Which solution satisfies these criteria?
 
 
 
-### **Question #11** 20220802
+###  20220801
+
+### **Question #11** 
 
 On Amazon EC2 instances, a business is developing an application that creates transitory transactional data. Access to data storage that can deliver adjustable and consistent IOPS is required by the application.
 
@@ -540,7 +544,11 @@ Which approach will result in an increase in website performance?
 > **Option B is wrong as ElastiCache would only help for caching data from same queries.**
 
 
-### Question #31 20220802
+
+### 20220802 
+
+### Question #31 
+
 Currently, a company's legacy application relies on an unencrypted Amazon RDS MySQL database with a single instance. All current and new data in this database must be encrypted to comply with new compliance standards.
 
 How is this to be achieved?
@@ -550,10 +558,14 @@ B. Enable RDS Multi-AZ mode with encryption at rest enabled. Perform a failover 
 C. Take a Snapshot of the RDS instance. Create an encrypted copy of the snapshot. Restore the RDS instance from the encrypted snapshot.
 D. Create an RDS read replica with encryption at rest enabled. Promote the read replica to master and switch the application over to the new master. Delete the old RDS instance.
 
-C for sure.
-You can only enable encryption for an Amazon RDS DB instance when you create it, not after the DB instance is created.
-However, because you can encrypt a copy of an unencrypted snapshot, you can effectively add encryption to an unencrypted DB instance. That is, you can create a snapshot of your DB instance, and then create an encrypted copy of that snapshot. You can then restore a DB instance from the encrypted snapshot, and thus you have an encrypted copy of your original DB instance.
-https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Overview.Encryption.html
+
+
+> C for sure.
+> You can only enable encryption for an Amazon RDS DB instance when you create it, not after the DB instance is created.
+> However, because you can encrypt a copy of an unencrypted snapshot, you can effectively add encryption to an unencrypted DB instance. That is, you can create a snapshot of your DB instance, and then create an encrypted copy of that snapshot. You can then restore a DB instance from the encrypted snapshot, and thus you have an encrypted copy of your original DB instance.
+> https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Overview.Encryption.html
+
+
 
 ### Question #32
 A marketing firm uses an Amazon S3 bucket to store CSV data for statistical research. Permission is required for an application running on an Amazon EC2 instance to properly handle the CSV data stored in the S3 bucket.
@@ -565,9 +577,13 @@ B. Create an IAM user for the application with specific permissions to the S3 bu
 C. Associate an IAM role with least privilege permissions to the EC2 instance profile.
 D. Store AWS credentials directly on the EC2 instance for applications on the instance to use for API calls.
 
-It should be IAM Role
+> It should be IAM Role
+>
+
+
 
 ### Question #33
+
 On a cluster of Amazon Linux EC2 instances, a business runs an application. The organization is required to store all application log files for seven years for compliance purposes.
 The log files will be evaluated by a reporting program, which will need concurrent access to all files.
 
@@ -578,10 +594,14 @@ B. Amazon Elastic File System (Amazon EFS)
 C. Amazon EC2 instance store
 D. Amazon S3
 
-Correct Answer: D
-Using the AWS Simple Cost Calculator (Jan 2022), the cost of storage for 1TB a month is $81.92. However, 1TB in S3 Standard is $23.44.
-Since S3 does, in fact, support concurrency (https://aws.amazon.com/blogs/big-data/optimizing-amazon-s3-for-high-concurrency-in-distributed-workloads/), for cost-effectiveness and concurrency selecting S3 (Answer D) is the better answer.
-Here's another link that might be helpful. https://aws.amazon.com/about-aws/whats-new/2018/07/amazon-s3-announces-increased-request-rate-performance/
+
+
+> Correct Answer: D
+> Using the AWS Simple Cost Calculator (Jan 2022), the cost of storage for 1TB a month is $81.92. However, 1TB in S3 Standard is $23.44.
+> Since S3 does, in fact, support concurrency (https://aws.amazon.com/blogs/big-data/optimizing-amazon-s3-for-high-concurrency-in-distributed-workloads/), for cost-effectiveness and concurrency selecting S3 (Answer D) is the better answer.
+> Here's another link that might be helpful. https://aws.amazon.com/about-aws/whats-new/2018/07/amazon-s3-announces-increased-request-rate-performance/
+
+
 
 ### Question #34
 On a fleet of Amazon EC2 instances, a business provides a training site. The business predicts that when its new course, which includes hundreds of training videos on the web, is available in one week, it will be tremendously popular.
@@ -593,12 +613,16 @@ B. Store the videos in Amazon Elastic File System (Amazon EFS). Create a user da
 C. Store the videos in an Amazon S3 bucket. Create an Amazon CloudFront distribution with an origin access identity (OAI) of that S3 bucket. Restrict Amazon S3 access to the OAI.
 D. Store the videos in an Amazon S3 bucket. Create an AWS Storage Gateway file gateway to access the S3 bucket. Create a user data script for the web servers to mount the file gateway.
 
-answer is C
-keyword: Load is kept is a minimum (using cloudfront)
-A. We would have to store the videos on an RDS, not sure if that would be suitable.....
-B. How does this help minimize the anticipated server load?
-C. Sounds about right, the best option probably.
-D. We're not running anything on premise.
+
+
+> answer is C
+> keyword: Load is kept is a minimum (using cloudfront)
+> A. We would have to store the videos on an RDS, not sure if that would be suitable.....
+> B. How does this help minimize the anticipated server load?
+> C. Sounds about right, the best option probably.
+> D. We're not running anything on premise.
+
+
 
 ### Question #35
 A business chooses to transition from on-premises to the AWS Cloud its three-tier web application. The new database must be able to scale storage capacity dynamically and conduct table joins.
@@ -610,7 +634,11 @@ B. Amazon RDS for SqlServer
 C. Amazon DynamoDB Streams
 D. Amazon DynamoDB on-demand
 
-A...Table joins indicate Relational DB or SQL... so DynamoDB ruled out coz NoSQL.. so Aurora is completely server less and scalable in storage.
+
+
+> A...Table joins indicate Relational DB or SQL... so DynamoDB ruled out coz NoSQL.. so Aurora is completely server less and scalable in storage.
+
+
 
 
 ### Question #36
@@ -623,9 +651,13 @@ B. Use Reserved Instances exclusively to handle the maximum capacity required.
 C. Use Reserved Instances for the baseline capacity and use Spot Instances to handle additional capacity.
 D. Use Reserved Instances for the baseline capacity and use On-Demand Instances to handle additional capacity.
 
-I was going with D but now realise that SQS requires consumers to manually delete the message from queue post processing.
-Fact that instance(spot) got abruptly terminated means no deletion from queue,hence no loss of message.
-Going back to C.
+
+
+> I was going with D but now realise that SQS requires consumers to manually delete the message from queue post processing.
+> Fact that instance(spot) got abruptly terminated means no deletion from queue,hence no loss of message.
+> Going back to C.
+
+
 
 ### Question #37
 A startup has developed an application that gathers data from Internet of Things (IoT) sensors installed on autos. Through Amazon Kinesis Data Firehose, the data is transmitted to and stored in Amazon S3. Each year, data generates billions of S3 objects. Each morning, the business retrains a set of machine learning (ML) models using data from the preceding 30 days.
@@ -638,11 +670,16 @@ B. Use the S3 Intelligent-Tiering storage class. Configure S3 Intelligent-Tierin
 C. Use the S3 Standard-Infrequent Access (S3 Standard-IA) storage class. Create an S3 Lifecycle policy to transition objects to S3 Glacier Deep Archive after 1 year.
 D. Use the S3 Standard storage class. Create an S3 Lifecycle policy to transition objects to S3 Standard-Infrequent Access (S3 Standard-IA) after 30 days, and then to S3 Glacier Deep Archive after 1 year.
 
-D because:
-- First 30 days- data access every morning ( predictable and frequently) – S3 standard
-- After 30 days, accessed 4 times a year – S3 infrequently access
-- Data preserved- S3 Gllacier Deep Archive
-Not B because S3 Intelligent-Tiering is suitable when access patterns change - https://aws.amazon.com/s3/storage-classes/intelligent-tiering/
+
+
+> D because:
+>
+> - First 30 days- data access every morning ( predictable and frequently) – S3 standard
+> - After 30 days, accessed 4 times a year – S3 infrequently access
+> - Data preserved- S3 Gllacier Deep Archive
+>   Not B because S3 Intelligent-Tiering is suitable when access patterns change - https://aws.amazon.com/s3/storage-classes/intelligent-tiering/
+
+
 
 ### Question #38
 A business requires data storage on Amazon S3. A compliance requirement stipulates that when objects are modified, their original state must be retained. Additionally, data older than five years should be kept for auditing purposes.
@@ -654,9 +691,13 @@ B. Enable object-level versioning and S3 Object Lock in compliance mode
 C. Enable object-level versioning. Enable a lifecycle policy to move data older than 5 years to S3 Glacier Deep Archive
 D. Enable object-level versioning. Enable a lifecycle policy to move data older than 5 years to S3 Standard-Infrequent Access (S3 Standard-IA)
 
-This question appeared in the exam with a tweak. I passed the exam yesterday. Thanks examtopics and those who contributed! Question had two choices. I don't remember the exact wordings but, it also ask to delete objects after five years.
-With Governance Mode it is possible to delete the object with special permissions
-I chose A & C
+
+
+> This question appeared in the exam with a tweak. I passed the exam yesterday. Thanks examtopics and those who contributed! Question had two choices. I don't remember the exact wordings but, it also ask to delete objects after five years.
+> With Governance Mode it is possible to delete the object with special permissions
+> I chose A & C
+
+
 
 ### Question #39
 Multiple Amazon EC2 instances are used to host an application. The program reads messages from an Amazon SQS queue, writes them to an Amazon RDS database, and then removes them from the queue. The RDS table sometimes contains duplicate entries. There are no duplicate messages in the SQS queue.
@@ -669,10 +710,13 @@ C. Use the ReceiveMessage API call to set an appropriate wait time.
 D. Use the ChangeMessageVisibility API call to increase the visibility timeout.
 
 
-D -
-The visibility timeout begins when Amazon SQS returns a message. During this time, the consumer processes and deletes the message. However, if the consumer fails before deleting the message and your system doesn't call the DeleteMessage action for that message before the visibility timeout expires, the message becomes visible to other consumers and the message is received again. If a message must be received only once, your consumer should delete it within the duration of the visibility timeout.
 
-https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html
+> D -
+> The visibility timeout begins when Amazon SQS returns a message. During this time, the consumer processes and deletes the message. However, if the consumer fails before deleting the message and your system doesn't call the DeleteMessage action for that message before the visibility timeout expires, the message becomes visible to other consumers and the message is received again. If a message must be received only once, your consumer should delete it within the duration of the visibility timeout.
+>
+> https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html
+
+
 
 ### Question #40
 A corporation just announced the worldwide launch of their retail website. The website is hosted on numerous Amazon EC2 instances, which are routed via an Elastic Load Balancer. The instances are distributed across several Availability Zones in an Auto Scaling group.
@@ -686,11 +730,199 @@ C. Configure a Lambda@Edge function to send specific objects to users based on t
 D. Configure AWS Global Accelerator. Forward requests to a Network Load Balancer (NLB). Configure the NLB to set up host-based routing to different EC2 instances.
 E. Configure AWS Global Accelerator. Forward requests to a Network Load Balancer (NLB). Configure the NLB to set up path-based routing to different EC2 instances.
 
-A and C.
-- B is wrong - NLBs do not understand HTTP (Layer 7 / Application layer) headers, this is what ALBs do. Moreover, a host header is information of the DESTINATION server, not the SOURCE client\
-- D and E are wrong - Global Accelerator helps to SPEED UP requests. Doesn't help with CONTENT CUSTOMIZATION
 
-I know D and E are wrong because only ALB can do any path or host based routing. B also is wrong cos HTTP headers cannot be sent by a NLB. NLB operates on layer 3, HTTP is a Layer 7 protocol, hence only an ALB too. By order of elimination, A and C are the answers.
+
+> A and C.
+> - B is wrong - NLBs do not understand HTTP (Layer 7 / Application layer) headers, this is what ALBs do. Moreover, a host header is information of the DESTINATION server, not the SOURCE client\
+> - D and E are wrong - Global Accelerator helps to SPEED UP requests. Doesn't help with CONTENT CUSTOMIZATION
+>
+> I know D and E are wrong because only ALB can do any path or host based routing. B also is wrong cos HTTP headers cannot be sent by a NLB. NLB operates on layer 3, HTTP is a Layer 7 protocol, hence only an ALB too. By order of elimination, A and C are the answers.
+>
+
+
+
+### 20220803
+
+### Question #41
+
+To facilitate experimentation and agility, a business enables developers to link current IAM policies to existing IAM roles. The security operations team, on the other hand, is worried that the developers may attach the current administrator policy, allowing them to bypass any other security rules.
+
+What approach should a solutions architect use in dealing with this issue?
+
+- A. Create an Amazon SNS topic to send an alert every time a developer creates a new policy.
+- B. Use service control policies to disable IAM activity across all account in the organizational unit.
+- C. Prevent the developers from attaching any policies and assign all IAM duties to the security operations team.
+- D. Set an IAM permissions boundary on the developer IAM role that explicitly denies attaching the administrator policy.
+
+
+
+> Permission boundaries are for this use case. Be aware that you can assign boundaries only to users and roles, not groups
+
+
+
+### Question #42
+
+A newly formed company developed a three-tiered web application. The front end is comprised entirely of static information. Microservices form the application layer. User data is kept in the form of JSON documents that must be accessible with a minimum of delay. The firm anticipates minimal regular traffic in the first year, with monthly traffic spikes. The startup team's operational overhead expenditures must be kept to a minimum.
+
+What should a solutions architect suggest as a means of achieving this?
+
+- A. Use Amazon S3 static website hosting to store and serve the front end. Use AWS Elastic Beanstalk for the application layer. Use Amazon DynamoDB to store user data.
+- B. Use Amazon S3 static website hosting to store and serve the front end. Use Amazon Elastic KubernetesService (Amazon EKS) for the application layer. Use Amazon DynamoDB to store user data.
+- C. Use Amazon S3 static website hosting to store and serve the front end. Use Amazon API Gateway and AWS Lambda functions for the application layer. Use Amazon DynamoDB to store user data.
+- D. Use Amazon S3 static website hosting to store and serve the front end. Use Amazon API Gateway and AWS Lambda functions for the application layer. Use Amazon RDS with read replicas to store user data.
+
+
+
+> Answer is C. Microservice does not always means "container". It can be realized by several methods one of which is API gateway + Lambda.
+>
+> https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway-blueprint.html
+
+
+
+### Question #43
+
+Amazon Elastic Container Service (Amazon ECS) container instances are used to install an ecommerce website's web application behind an Application Load Balancer (ALB). The website slows down and availability is decreased during moments of heavy usage. A solutions architect utilizes Amazon CloudWatch alarms to be notified when an availability problem occurs, allowing them to scale out resources. The management of the business want a system that automatically reacts to such circumstances.
+
+Which solution satisfies these criteria?
+
+- A. Set up AWS Auto Scaling to scale out the ECS service when there are timeouts on the ALB. Set up AWS Auto Scaling to scale out the ECS cluster when the CPU or memory reservation is too high.
+- B. Set up AWS Auto Scaling to scale out the ECS service when the ALB CPU utilization is too high. Setup AWS Auto Scaling to scale out the ECS cluster when the CPU or memory reservation is too high.
+- C. Set up AWS Auto Scaling to scale out the ECS service when the service's CPU utilization is too high. Set up AWS Auto Scaling to scale out the ECS cluster when the CPU or memory reservation is too high.
+- D. Set up AWS Auto Scaling to scale out the ECS service when the ALB target group CPU utilization is too high. Set up AWS Auto Scaling to scale out the ECS cluster when the CPU or memory reservation is too high.
+
+
+
+> https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-configure-auto-scaling.html To configure target tracking scaling policies for your service For Scaling policy type, choose Target tracking. For Policy name, enter a descriptive name for your policy. For ECS service metric, choose the metric to track. The following metrics are available: ECSServiceAverageCPUUtilization—Average CPU utilization of the service. ECSServiceAverageMemoryUtilization—Average memory utilization of the service. ALBRequestCountPerTarget—Number of requests completed per target in an Application Load Balancer target group.
+
+
+
+### Question #44
+
+A business uses Site-to-Site VPN connections to provide safe access to AWS Cloud services from on-premises. Users are experiencing slower VPN connectivity as a result of increased traffic through the VPN connections to the Amazon EC2 instances.
+
+Which approach will result in an increase in VPN throughput?
+
+- A. Implement multiple customer gateways for the same network to scale the throughput.
+- B. Use a transit gateway with equal cost multipath routing and add additional VPN tunnels.
+- C. Configure a virtual private gateway with equal cost multipath routing and multiple channels.
+- D. Increase the number of tunnels in the VPN configuration to scale the throughput beyond the default limit.
+
+
+
+> Answer is B. https://aws.amazon.com/blogs/networking-and-content-delivery/scaling-vpn-throughput-using-aws-transit-gateway/ With AWS Transit Gateway, you can simplify the connectivity between multiple VPCs and also connect to any VPC attached to AWS Transit Gateway with a single VPN connection. AWS Transit Gateway also enables you to scale the IPsec VPN throughput with equal cost multi-path (ECMP) routing support over multiple VPN tunnels. A single VPN tunnel still has a maximum throughput of 1.25 Gbps. If you establish multiple VPN tunnels to an ECMP-enabled transit gateway, it can scale beyond the default limit of 1.25 Gbps.
+
+
+
+### Question #45
+
+On Amazon EC2 Linux instances, a business hosts a website. Several of the examples are malfunctioning. The troubleshooting indicates that the unsuccessful instances lack swap space. The operations team's lead need a monitoring solution for this.
+
+What recommendations should a solutions architect make?
+
+- A. Configure an Amazon CloudWatch SwapUsage metric dimension. Monitor the SwapUsage dimension in the EC2 metrics in CloudWatch.
+- B. Use EC2 metadata to collect information, then publish it to Amazon CloudWatch custom metrics. Monitor SwapUsage metrics in CloudWatch.
+- C. Install an Amazon CloudWatch agent on the instances. Run an appropriate script on a set schedule. Monitor SwapUtilization metrics in CloudWatch.
+- D. Enable detailed monitoring in the EC2 console. Create an Amazon CloudWatch SwapUtilization custom metric. Monitor SwapUtilization metrics in CloudWatch.
+
+
+
+> c is correct. https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/mon-scripts.html
+>
+> As per the latest docs this is deprecated. This is now handled via cloudwatch itself without the need to addition mon-scripts https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/metrics-collected-by-CloudWatch-agent.html
+
+
+
+### Question #46
+
+AWS is used by a business to perform an online transaction processing (OLTP) burden. This workload is deployed in a Multi-AZ environment using an unencrypted Amazon RDS database instance. This instance's database is backed up daily.
+
+What should a solutions architect do going forward to guarantee that the database and snapshots are constantly encrypted?
+
+- A. Encrypt a copy of the latest DB snapshot. Replace existing DB instance by restoring the encrypted snapshot.
+- B. Create a new encrypted Amazon Elastic Block Store (Amazon EBS) volume and copy the snapshots to it. Enable encryption on the DB instance.
+- C. Copy the snapshots and enable encryption using AWS Key Management Service (AWS KMS). Restore encrypted snapshot to an existing DB instance.
+- D. Copy the snapshots to an Amazon S3 bucket that is encrypted using server-side encryption with AWS Key Management Service (AWS KMS) managed keys (SSE-KMS).
+
+
+
+> You can't restore from a DB snapshot to an existing DB instance; a new DB instance is created when you restore. https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_RestoreFromSnapshot.html#USER_RestoreFromSnapshot.CON So answer A is right
+
+
+
+### Question #47
+
+A business operates an application that collects data from its consumers through various Amazon EC2 instances. After processing, the data is uploaded to Amazon S3 for long-term storage. A study of the application reveals that the EC2 instances were inactive for extended periods of time. A solutions architect must provide a system that maximizes usage while minimizing expenditures.
+
+Which solution satisfies these criteria?
+
+- A. Use Amazon EC2 in an Auto Scaling group with On-Demand instances.
+- B. Build the application to use Amazon Lightsail with On-Demand Instances.
+- C. Create an Amazon CloudWatch cron job to automatically stop the EC2 instances when there is no activity.
+- D. Redesign the application to use an event-driven design with Amazon Simple Queue Service (Amazon SQS) and AWS Lambda.
+
+
+
+> Answer is D. Lamda and SQS are cheapest. With AWS Lambda, you pay only for what you use. You are charged based on the number of requests for your functions and the duration, the time it takes for your code to execute. For SQS, First 1 Million Requests/Month Free Free
+>
+> "a business operates" I think that's indicates that you can't redesign the application, in that case the answer is A.
+
+
+
+### Question #48
+
+A business wishes to migrate from many independent Amazon Web Services accounts to a consolidated, multi-account design. The organization intends to generate a large number of new AWS accounts for its business divisions. The organization must use a single corporate directory service to authenticate access to these AWS accounts.
+
+Which steps should a solutions architect advocate in order to satisfy these requirements? (Select two.)
+
+- A. Create a new organization in AWS Organizations with all features turned on. Create the new AWS accounts in the organization.
+- B. Set up an Amazon Cognito identity pool. Configure AWS Single Sign-On to accept Amazon Cognito authentication.
+- C. Configure a service control policy (SCP) to manage the AWS accounts. Add AWS Single Sign-On to AWS Directory Service.
+- D. Create a new organization in AWS Organizations. Configure the organization's authentication mechanism to use AWS Directory Service directly.
+- E. Set up AWS Single Sign-On (AWS SSO) in the organization. Configure AWS SSO, and integrate it with the company's corporate directory service.
+
+
+
+> D does not "generate a large number of new AWS accounts for its business divisions". Correct answers should be A and E.
+>
+> https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html
+
+
+
+### Question #49
+
+A solutions architect is developing a daily data processing task that will take up to two hours to finish. If the task is stopped, it must be restarted from scratch.
+
+What is the MOST cost-effective way for the solutions architect to solve this issue?
+
+- A. Create a script that runs locally on an Amazon EC2 Reserved Instance that is triggered by a cron job.
+- B. Create an AWS Lambda function triggered by an Amazon EventBridge (Amazon CloudWatch Events) scheduled event.
+- C. Use an Amazon Elastic Container Service (Amazon ECS) Fargate task triggered by an Amazon EventBridge (Amazon CloudWatch Events) scheduled event.
+- D. Use an Amazon Elastic Container Service (Amazon ECS) task running on Amazon EC2 triggered by an Amazon EventBridge (Amazon CloudWatch Events) scheduled event.
+
+
+
+> Answer is C A is wrong; "EC2 Reserved Instance" not cost effective compared to serverless 
+>
+> B is wrong; Lambda runs for 15 minutes max
+>
+>  D is wrong; "running on Amazon EC2" not cost effective
+
+
+
+### Question #50
+
+A business intends to use AWS to host a survey website. The firm anticipated a high volume of traffic. As a consequence of this traffic, the database is updated asynchronously. The organization want to avoid dropping writes to the database housed on AWS.
+
+How should the business's application be written to handle these database requests?
+
+- A. Configure the application to publish to an Amazon Simple Notification Service (Amazon SNS) topic. Subscribe the database to the SNS topic.
+- B. Configure the application to subscribe to an Amazon Simple Notification Service (Amazon SNS) topic. Publish the database updates to the SNS topic.
+- C. Use Amazon Simple Queue Service (Amazon SQS) FIFO queues to queue the database connection until the database has resources to write the data.
+- D. Use Amazon Simple Queue Service (Amazon SQS) FIFO queues for capturing the writes and draining the queue as each write is made to the database.
+
+
+
+> Only one consumer (DB), so SNS no need .. as it makes sense only for multiple consumers. So A and B Out... Between C and D, C asks for queuing DB Connections ..which can be done but thats not regular...so D which drains (empties via msg processing within Visibility time out and deleting msgs from SQS).
 
 
 

@@ -256,7 +256,11 @@ Unable to locate credentials. You can configure credentials by running "aws conf
 
 EC2 On Demand: pay for what you use
 
+想用就用，临时租用的感觉
+
 EC2 Reserved Instance: Up to 75% discount compared to On-Demand, Recomended for database
+
+长期租用嘛，当然打折扣
 
 Convertible Reserved instance: can change the EC2 instance type
 
@@ -651,6 +655,10 @@ So just click on "modify" for the database, it's Zero downtime operation.(no nee
 
 RDS的security group还是在EC2上统一管理的。
 
+> 您只能在创建 Amazon RDS 数据库实例时而不是创建该数据库实例之后加密该数据库实例。
+>
+> 不过，由于您可以加密未加密快照的副本，因此，您可以高效地为未加密的数据库实例添加加密。也就是说，您可以创建数据库实例快照，然后创建该快照的加密副本。然后，您可以从加密快照还原数据库实例，从而获得原始数据库实例的加密副本。
+
 ## 091 RDS Encryption+Security
 
 Encruption has to be defined at launch time.
@@ -1008,6 +1016,15 @@ Resource Based:
 
 
 
+Note: an IAM principle can access an S3 object if
+
+1. the user IAM permissions allow it OR the resource policy Allows it
+2. AND there is no explicit Deny.
+
+后者有三种状态：Allow，Deny，模糊。而前者是在后者没有Deny的前提下。
+
+
+
 Bucket Policies: JSON based policies
 
 Bucket settings for Block Public Access
@@ -1247,9 +1264,14 @@ Lock the policy for future edits(can no longer be changed)
 
 S3 Objects Lock(versioning must be enabled):
 
+1. Governance mode: users cannot overwrite or delete an object **version** or alter its lock setting unless they have special permission
+2. Complicance mode: 用于给监管部门查看的，随意甚至root也无法修改
+
 Adopt a WORM(Write Once Read Many) model
 
 Block an object version deletion for a specified amount of time
+
+
 
 没有hands on, 没有印象...
 
@@ -1601,9 +1623,11 @@ EC2 Instance Profile: EC2 Launch Type for ECS时，作为 EC2 instance上的ECS 
 
 理解以下层次：
 
-Container definition -> Task definition -> Service -> Cluster
+Container definition （比如httpd）-> Task definition （选择 Launch Type） -> Service -> Cluster
 
 然后介绍了ALB对于两种方式的ECS的不同点，EC2 Launch Type就是如何找right port，Fargete Launch Type的话，Each task has a unique IP, 如何找IP了.
+
+=> ECS Cluster是最高层次的，Container就是个起特定端口的进程嘛（比如httpd）。ALB可以进行端口映射...
 
 最后讲了一个 ECS tasks invoked by Event Bridge的例子.
 
@@ -1612,6 +1636,8 @@ Container definition -> Task definition -> Service -> Cluster
 也是配合 CloudWatch Metric(ECS seivice CPU Usage)监视CPU Usage来trigger CloudWatch Alarm, 然后去scale
 
 对于EC2 Launch Type for ECS，当没有足够EC2来启动Contaner时候也会在更高层次上（Scale ECS Capacity Providers）去scale EC2 instances，所以这里有两个层次的扩展: Auto scaling, Auto scaling Group
+
+=>就是说EC2上launch Container，可以搞Auto scaling；但是EC2空间被大量Container用完了，那么再通过Scale ECS Capacity Providers去做Auto scaling Group来提供更多的EC2.   也就是说两个层次的扩展: 进程和服务器
 
 
 
@@ -2127,7 +2153,11 @@ Share AWS resources that you own with other AWS accounts
 
 Centrally manage Single Sign-On to access multiple accounts and 3rd-party business applications.
 
+所谓的accounts是指比如同时登陆脸书，谷歌邮箱这种感觉。 
+
 Intergrated with AWS Organizations
+
+Intergration with on-premise Active Directory
 
 > 提到SAML (Security Assertion Markup Language), 很多人都会联想到单点登录SSO。那么Saml到底是什么，它跟sso到底有什么联系？
 >
