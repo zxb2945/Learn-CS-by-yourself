@@ -2717,3 +2717,41 @@ Integrated with Microsoft Active Directory
 
 User => Virtual Desktop => Corporate data center/ AWS Cloud
 
+## 347 AppSync 20220803
+
+Store ans sync data across mobile and web apps in real-time
+
+Offline data synchronization(Replaces Cognito Sync)
+
+Make use of GraphQL(mobile technology from Facebook)
+
+## 348 Cost Explorer
+
+Visualize, understand, and manage your AWS costs and usage over time.
+
+Create custom reports that analyze cost and usage data.
+
+## 351 Well Architected Framework Overview
+
+Well-Architected Tool
+
+更像一个turiol，给你一份问卷，让你评估...
+
+### Operational Excellence
+
+Perform operations as code
+
+=> **CloudFormation**, Config, CloudTrail, CloudWatch,
+
+### Security
+
+CloudFront,VPC,Shield,WAF,Inspector
+
+### Reliability
+
+### Performance Efficiency
+
+### Cost Optimization
+
+Pay only for what you use : AWS Auto Scaling, Lambda
+
