@@ -356,7 +356,7 @@ Which solution satisfies these parameters and is the MOST OPTIMAL in terms of op
 
 
 
-**Question #21**
+### **Question #21**
 
 Management need a summary of AWS billed items broken down by user as part of their budget planning process. Budgets for departments will be created using the data. A solutions architect must ascertain the most effective method of obtaining this report data.
 
