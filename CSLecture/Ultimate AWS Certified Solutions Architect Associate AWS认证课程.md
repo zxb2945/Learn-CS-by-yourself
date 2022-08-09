@@ -2785,3 +2785,16 @@ CloudFront,VPC,Shield,WAF,Inspector
 
 Pay only for what you use : AWS Auto Scaling, Lambda
 
+## 357 AWS Trusted Advisor Overview 20220809
+
+Analyze your AWS accounts and providers reconmendation: 
+
+1. Cost Optmization
+2. Performance
+3. Security
+4. Fault Tolerance
+5. Service Limits
+
+前提是：Available for Business & Enterprise support plans
+
+FAQ = Frequently asked questions
