@@ -926,3 +926,34 @@ How should the business's application be written to handle these database reques
 
 
 
+### 20220810
+
+### Question #51
+
+On a huge fleet of Amazon EC2 instances, a business runs an application. The program reads and writes items to a DynamoDB database hosted by Amazon. The DynamoDB database increases in size regularly, yet the application requires just data from the previous 30 days. The organization need a solution that is both cost effective and time efficient to implement.
+
+Which solution satisfies these criteria?
+
+- A. Use an AWS CloudFormation template to deploy the complete solution. Redeploy the CloudFormation stack every 30 days, and delete the original stack.
+- B. Use an EC2 instance that runs a monitoring application from AWS Marketplace. Configure the monitoring application to use Amazon DynamoDB Streams to store the timestamp when a new item is created in the table. Use a script that runs on the EC2 instance to delete items that have a timestamp that is older than 30 days.
+- C. Configure Amazon DynamoDB Streams to invoke an AWS Lambda function when a new item is created in the table. Configure the Lambda function to delete items in the table that are older than 30 days.
+- D. Extend the application to add an attribute that has a value of the current timestamp plus 30 days to each new item that is created in the table. Configure DynamoDB to use the attribute as the TTL attribute.
+
+
+
+> D is correct. Amazon DynamoDB Time to Live (TTL) allows you to define a per-item timestamp to determine when an item is no longer needed. Shortly after the date and time of the specified timestamp, DynamoDB deletes the item from your table without consuming any write throughput. TTL is provided at no extra cost as a means to reduce stored data volumes by retaining only the items that remain current for your workload’s needs. TTL is useful if you store items that lose relevance after a specific time. The following are example TTL use cases: Remove user or sensor data after one year of inactivity in an application. Archive expired items to an Amazon S3 data lake via Amazon DynamoDB Streams and AWS Lambda. Retain sensitive data for a certain amount of time according to contractual or regulatory obligations. https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html
+
+
+
+### Question #52
+
+Previously, a corporation moved their data warehousing solution to AWS. Additionally, the firm has an AWS Direct Connect connection. Through the use of a visualization tool, users in the corporate office may query the data warehouse. Each query answered by the data warehouse is on average 50 MB in size, whereas each webpage supplied by the visualization tool is around 500 KB in size. The data warehouse does not cache the result sets it returns.
+
+Which approach results in the LOWEST OUTGOING DATA TRANSFER COSTS FOR THE COMPANY?
+
+- A. Host the visualization tool on premises and query the data warehouse directly over the internet.
+- B. Host the visualization tool in the same AWS Region as the data warehouse. Access it over the internet.
+- C. Host the visualization tool on premises and query the data warehouse directly over a Direct Connect connection at a location in the same AWS Region.
+- D. Host the visualization tool in the same AWS Region as the data warehouse and access it over a DirectConnect connection at a location in the same Region.
+
+> https://aws.amazon.com/getting-started/hands-on/connect-data-center-to-aws/services-costs/: "Data transfer pricing over Direct Connect is lower than data transfer pricing over the internet" A and B are out I would take D over C as transfer from AWS to on-premises would cost more than transfer from AWS to AWS
