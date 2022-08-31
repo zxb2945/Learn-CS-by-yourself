@@ -1607,7 +1607,7 @@ Fargate: You do not provision the infrastructure(no EC2 instances to manage) -si
 
 AWS just runs containers for you based on the CPU/RAM you need.(再分配一个ENI，确保足够的IP分配)
 
-所以Fatgeta是ECS的一种启动类型？: Fargete Launch Type for ECS; EC2 Launch Type for ECS
+所以Fargate是ECS的一种启动类型？: Fargete Launch Type for ECS; EC2 Launch Type for ECS
 
 
 
@@ -1617,7 +1617,7 @@ EC2 Instance Profile: EC2 Launch Type for ECS时，作为 EC2 instance上的ECS 
 
 
 
-共享资源用EFS去mount.
+**共享资源用EFS去mount.**
 
 ## 199 ECS Service & Tasks, Load Balancing
 
