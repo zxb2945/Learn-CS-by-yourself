@@ -266,7 +266,7 @@ Convertible Reserved instance: can change the EC2 instance type
 
 Scheduled Reserved instance: lauch within time window you reserve
 
-EC2 Spot Instance: Up to 90% discount compared to On-Demand, Instance that you can lose at any point of time if your max price is less than the current spot price. suitable for Batch jobs, Data analysis, any distributed workloads...
+EC2 Spot Instance: Up to 90% discount compared to On-Demand, **Instance that you can lose at any point of time if your max price is less than the current spot price.** suitable for Batch jobs, Data analysis, any distributed workloads...
 
 EC2 Dedicated Hosts: More expensive
 
@@ -289,7 +289,7 @@ You must first cancel a spot request, and then terminate the associated spot ins
 
 
 
-Spot Fleets (最省钱)= set of Spot instance +(optional)On-Demand Instance
+Spot Fleets (**最省钱**)= set of Spot instance +(optional)On-Demand Instance
 
 Strategies to allocate Spot Instances:
 
@@ -563,7 +563,7 @@ Scaling policies can be on CPU,Network,even schedule
 
 1. Dynamic scaling policies => target tracking policy(比如CPU利用率)
 2. Predictive scaling policies  => based on machine learning
-3. Scheduled actions
+3. **Scheduled actions**
 
 
 
@@ -573,6 +573,12 @@ ASG Default Termination Policy:
 2. If there are multiple instances in the AZ to choose from, delete the one with the oldest launch configuration
 
 ASG tries the balance the number of instances across AZ by default.
+
+
+
+**Lifecycle Hooks:** You have the ability to perform extra steps before the instance in service(Pending state or terminating state)
+
+为什么叫Hooks，就是说ASG流程中Pending到Inservice状态流程外挂上一个钩子，在钩子里进行额外操作，比如向instance配置文件，收集log.
 
 
 
@@ -854,7 +860,7 @@ Latency is based on the traffic between users and AWS Regiones
 
 对一个DNS name, 两个IP的情况，将两个IP分为Primary和Secondary，前者的
 
-Health Check是mandatory, 后者optional，前者失败failover到后者。
+**Health Check**是mandatory, 后者optional，前者失败failover到后者。
 
 ### Geolocation
 
@@ -1142,6 +1148,16 @@ Intelligent Tiering: Automatically moves objects between two access tiers based 
 
 Glacier: very low cost, 取用时需要额外的唤醒时间(1-12hours)
 
+​	Amazon Glacier-3 retriecal options:
+
+​		Expedited(1 to 5 minutes)
+
+​		Standard(3 to 5 hours)
+
+​		Bulk(5 to 12 hours)
+
+​		**这个说明，即便Glacier也可以5分钟以内搜索到，只是搜索成本高一些。**
+
 Glacier Deep Archive: for super long storage, even cheaper, more retrieval time(12-48hours) 
 
 ## 153 S3 Lifecycle Rules
@@ -1372,9 +1388,9 @@ AWS Storage Gateway: Bridge between on -premises data(本地？) and cloud data 
 
 3 types of Storage Gateway:
 
-1. File gateway: Store files as objects in S3, with a local cache for low-latency access to your most recently used data.
-2. Volume gateway: Block storage in S3 with point-in-time backups as EBS snapshots.
-3. Tape gateway: Backup your data to S3 and archive in Glacier using your existing tape-based processes.
+1. File gateway: Store files as objects in S3, with a local cache for low-latency access to your most recently used data. =>NFS
+2. Volume gateway: Block storage in S3 with point-in-time backups as EBS snapshots. =>iSCSI
+3. Tape gateway: Backup your data to S3 and archive in Glacier using your existing tape-based processes. =>iSCSI
 
 这个gateway应该在你本地网络虚拟化，如果没有，也可以向Amazon买Hardware appliance. Tape gateway是本地磁盘化然后存到S3去？File gateway似乎可以用NFS相关协议...而后两者用iSCSI interface来连接Application Server和Gateway，Volume gateway可以整个cache到本地，定期向云端backup？所介绍的功能越来越边缘且无趣...
 
@@ -1386,7 +1402,7 @@ EFS is a shared POSIX system for Linux systems
 
 FSx for Windows is a fully managed Windows file system share drive
 
-Support SMB protocol & Windows NTFS
+Support **SMB protocol** & Windows NTFS
 
 
 
@@ -1546,7 +1562,7 @@ SNS - FIFO Topic
 
 SNS - Message Filtering
 
-所以原则是SNS发所有消息去所有SQS，但相应SQS可以配套filtering，从而各个SQS得到不同的消息。
+所以原则是SNS发所有消息去所有SQS，但相应SQS可以配套filtering，从而各个SQS得到不同的消息。=>SNS+SQS Pattern
 
 ## 192 Kinesis Overview
 
@@ -2269,7 +2285,7 @@ Protects from common attack-SQL injection and Cross-Site Scripting(XSS)
 
 Difine Web ACL：IP, HTTP headers, or URL...
 
- 还可以设定特定国家区域的请求通不通过
+ **还可以设定特定国家区域的请求通不通过**
 
 Rate-based rules - for DDos protection
 
@@ -2643,7 +2659,7 @@ NACL，Security group(虽然没有deny rule，但allow rule反过来就是deny)�
 
 注意：NLB跟ALB不同，没有SG，它对Client来的流量是透传，既不像ALB收到后，然后以ALB的IP重新包装给EC2的步骤
 
-如果ALB与Cient存在CloudFront，后者可以用Geo Restriction屏蔽一个特定国家IP，另外也可以装WAF功能，指定复杂的IP address filtering的规则屏蔽特定IP，WAF也可以加在ALB，作为补充。
+如果ALB与Cient存在**CloudFront，后者可以用Geo Restriction屏蔽一个特定国家IP，另外也可以装WAF功能，指定复杂的IP address filtering的规则屏蔽特定IP**，WAF也可以加在ALB，作为补充。
 
 ## 335 High Performance Computing(HPC) on AWS
 
