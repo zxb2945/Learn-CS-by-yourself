@@ -317,6 +317,8 @@ Strategies for the group:
 2. Spread: spreads instances across undelying hardware(max 7 instances per group per AZ)
 3. Patition:spreads instances across many different partitions(which rely on different sets of racks) within an AZ. Scales to 100s of EC2 instances per group(Hadoop,Cassandra,Kafka). The instances in a partition do not share racks with the instances in the other partitions.
 
+以上策略的优缺点，就是网络性能与Availability 之间的取舍。
+
 ## 050 Elastic Network Interfaces(ENI)
 
 Logical component in a VPC that represent a virtual network card
@@ -345,7 +347,7 @@ Under the hood: the RAM state is written to a file in the root EBS volume
 
 ##   055 EC2-Advanced Concepts(Nitro, vCPU,Capacity Reservation)
 
-Nitro: Underlying Platform for the next generation of EC2 instances
+**Nitro**: Underlying Platform for **the next generation of EC2 instances**
 
 Understanding vCPU:
 
@@ -475,6 +477,8 @@ Types of load balancers on AWS
 4. Gateway Load Balancer-2020-GWLB, Operating at layer3(IP)
 
 Overall,it is recommended to use the newer generation load balancers as they provide more features.
+
+所以ELB是一个统称
 
 ## 074 Application Load Balancer(ALB)
 
@@ -665,6 +669,18 @@ RDS的security group还是在EC2上统一管理的。
 >
 > 不过，由于您可以加密未加密快照的副本，因此，您可以高效地为未加密的数据库实例添加加密。也就是说，您可以创建数据库实例快照，然后创建该快照的加密副本。然后，您可以从加密快照还原数据库实例，从而获得原始数据库实例的加密副本。
 
+> 例题
+>
+> Application developers have noticed that a production application is very slow when business reporting users run large production reports against the Amazon
+> RDS instance backing the application. The CPU and memory utilization metrics for the RDS instance do not exceed 60% while the reporting queries are running.
+> The business reporting users must be able to generate reports without affecting the application's performance.
+> Which action will accomplish this?
+>
+> - A. Increase the size of the RDS instance.
+> - B. Create a read replica and connect the application to it.
+> - C. Enable multiple Availability Zones on the RDS instance.
+> - D. Create a read replica and connect the business reports to it. **Most Voted**
+
 ## 091 RDS Encryption+Security
 
 Encruption has to be defined at launch time.
@@ -706,6 +722,16 @@ Writer Endpoint：Pointing to the master, DNS name don't change even failover
 Reader Endpoint: Connection Load Balancing because of Auto Scaling 
 
 这里的Auto Scaling大概是两个层次，其一是单一Aurora，其二是read-only server层面的自动扩容。
+
+> 例题
+>
+> A company decides to migrate its three-tier web application from on-premises to the AWS Cloud. The new database must be capable of dynamically scaling storage capacity and performing table joins.
+> Which AWS service meets these requirements?
+>
+> - A. Amazon Aurora
+> - B. Amazon RDS for SqlServer
+> - C. Amazon DynamoDB Streams
+> - D. Amazon DynamoDB on-demand
 
 ## 094 Aurora-Advanced Concepts
 
@@ -1344,9 +1370,15 @@ Field Level Encryption: Sensitive information encrypted at the edge close to use
 
 Unicast IP: one server holds one IP address
 
-Anycast IP: all servers hold the same IP address and the client is routed to the nearest one
+Anycast IP: all servers **hold the same IP address** and the client is routed to the nearest one
 
-后者是怎么实现的呢？就是不同IP的服务器通过~~同一台~~Proxy向全球各地users提供服务，而这台Proxy就是所谓的Accelerator
+~~后者是怎么实现的呢？就是不同IP的服务器通过同一台Proxy向全球各地users提供服务，而这台Proxy就是所谓的Accelerator~~
+
+在全球各地部署同一个静态IP的Proxy来收取packet？
+
+Work with Elastic IP, EC2 instances, ALB, NLB, public or private
+
+Security：only 2 external IP to be whitelisted?=>私网的两个端点IP...不太懂
 
 AWS Global Acceleraor vs CloudFront:
 
@@ -1355,6 +1387,16 @@ AWS Global Acceleraor vs CloudFront:
 Both services integrate with AWS Shield for DDos protection.
 
 因为AWS Global Acceleraor更多是Proxy，而不是缓存，所以我觉得更安全
+
+> 例题
+>
+> A company that develops web applications has launched hundreds of Application Load Balancers (ALBs) in multiple Regions. The company wants to create an allow list for the IPs of all the load balancers on its firewall device. A solutions architect is looking for a one-time, highly available solution to address this request, which will also help reduce the number of IPs that need to be allowed by the firewall.
+> What should the solutions architect recommend to meet these requirements?
+>
+> - A. Create a AWS Lambda function to keep track of the IPs for all the ALBs in different Regions. Keep refreshing this list.
+> - B. Set up a Network Load Balancer (NLB) with Elastic IPs. Register the private IPs of all the ALBs as targets to this NLB. **（B is wrong, because IP of ALB is always changing.）**
+> - C. Launch AWS Global Accelerator and create endpoints for all the Regions. Register all the ALBs in different Regions to the corresponding endpoints. （**assist lower the number of IPs that the firewall must accept or AnyCast IP -> Usually associated with Global Accelator**）
+> - D. Set up an Amazon EC2 instance, assign an Elastic IP to this EC2 instance, and configure the instance as a proxy to forward traffic to all the ALBs.
 
 ## 170 AWS Snow Family Overview
 
@@ -1388,11 +1430,27 @@ AWS Storage Gateway: Bridge between on -premises data(本地？) and cloud data 
 
 3 types of Storage Gateway:
 
-1. File gateway: Store files as objects in S3, with a local cache for low-latency access to your most recently used data. =>NFS
+1. File gateway: Store files as objects in S3, with a local cache for low-latency access to your most recently used data. =>NFS or SMB protocol
 2. Volume gateway: Block storage in S3 with point-in-time backups as EBS snapshots. =>iSCSI
 3. Tape gateway: Backup your data to S3 and archive in Glacier using your existing tape-based processes. =>iSCSI
 
 这个gateway应该在你本地网络虚拟化，如果没有，也可以向Amazon买Hardware appliance. Tape gateway是本地磁盘化然后存到S3去？File gateway似乎可以用NFS相关协议...而后两者用iSCSI interface来连接Application Server和Gateway，Volume gateway可以整个cache到本地，定期向云端backup？所介绍的功能越来越边缘且无趣...
+
+> 例题
+>
+> A company requires a durable backup storage solution for its on-premises database servers while ensuring on-premises applications maintain access to these backups for quick recovery. The company will use AWS storage services as the destination for these backups. A solutions architect is designing a solution with minimal operational overhead.
+> Which solution should the solutions architect implement?
+>
+> - A. Deploy an AWS Storage Gateway file gateway on-premises and associate it with an Amazon S3 bucket.
+> - B. Back up the databases to an AWS Storage Gateway volume gateway and access it using the Amazon S3 API.
+> - C. Transfer the database backup files to an Amazon Elastic Block Store (Amazon EBS) volume attached to an Amazon EC2 instance.
+> - D. Back up the database directly to an AWS Snowball device and use lifecycle rules to move the data to Amazon S3 Glacier Deep Archive.
+>
+> 解析
+>
+> it should be A. For SG volume gateway, you cannot directly access the backups using Amazon S3 API. Q: When I look in Amazon S3 why can’t I see my volume data? A: Your volumes are stored in an Amazon S3 bucket maintained by the AWS Storage Gateway service. Your volumes are accessible for I/O operations through AWS Storage Gateway. You cannot directly access them using Amazon S3 API actions. You can take point-in-time snapshots of gateway volumes that are made available in the form of Amazon EBS snapshots, which can be turned into either Storage Gateway Volumes or EBS Volumes. Use the File Gateway to work with your data natively in S3.
+
+
 
 ## 175 Amazon FSx Overview
 
@@ -1419,7 +1477,7 @@ FSx for Lustre: a type  of parallel distributed file system, for large-scale com
 > - 提供几十万个 IOPS 以及一致的亚毫秒级延迟，以及高达 3 GB/s 的吞吐量。
 > - 提供高度可用且高度持久的多可用区 SSD 存储，支持跨区域复制并内置完全托管式备份功能。
 > - 自动将不频繁访问的数据分层到容量池存储，容量池存储是一个完全弹性的存储层，可以扩展到 PB 级，并为不频繁访问数据优化了成本。
-> - 与 Microsoft Active Directory (AD)集成以支持基于 Windows 的环境和企业。
+> - 与 **Microsoft Active Directory (AD)**集成以支持基于 Windows 的环境和企业。
 
 
 
@@ -1432,6 +1490,18 @@ FSx for Lustre: a type  of parallel distributed file system, for large-scale com
 > - 提供高达 100 万 IOPS 和仅仅数百微秒的延迟，同时吞吐量高达 12.5 GB/s。
 > - 提供高度可用且高度持久的单可用区 SSD 存储，以及内置的完全托管备份。
 > - 通过每个文件系统的多个卷、精简资源预置和用户/组配额，跨多个用户和应用程序实现成本高效的共享文件系统。
+
+
+
+> 例题
+>
+> A company is migrating to the AWS Cloud. A file server is the first workload to migrate. Users must be able to access the file share using the Server Message
+> Block (SMB) protocol. Which AWS managed service meets these requirements?
+>
+> - A. Amazon Elastic Block Store (Amazon EBS)
+> - B. Amazon EC2
+> - C. Amazon FSx
+> - D. Amazon S3
 
 ## 177 AWS Transfer Family
 
@@ -1455,7 +1525,7 @@ Message retention: default 4 days, up to 14 days
 
 
 
-SQS with Auto Scaling Group(ASG) => common in exam
+**SQS with Auto Scaling Group(ASG) => common in exam**(可以通过CloudWatch)
 
 Security=>In -flight encryption using HTTPS API => 它是个服务器？
 
@@ -2403,11 +2473,23 @@ NAT实际上也是一个EC2(can be used as Bastion Host)，因为需要改写IP�
 
 AWS-managed NAT, higher bandwidth, high availability, no administration
 
-Requirea an IGW (Private Subnet => NATGW => IGW)
+Requirea an Internet Gateway (Private Subnet => NATGW => IGW)
 
-Can't be used by EC2 instance in the same subnet(only from other subnets)?
+Can't be used by EC2 instance in the same subnet(only from other subnets)?=>NAT Gateways在公网，instance在私网，当然不是同一个subnet啦
 
 操作很简单，直接创建，然后编辑私网中EC2的路由器指向这个NAT Gatways就行，大概IGW需要提前创建，然后会自动连接？
+
+注意NAT Gateway与NAT instance的区别：前者Managed by AWS, 后者Managed by you.
+
+> 例题：
+>
+> A company recently deployed a two-tier application in two Availability Zones in the us-east-1 Region. The databases are deployed in a private subnet while the web servers are deployed in a public subnet. An internet gateway is attached to the VPC. The application and database run on Amazon EC2 instances. The database servers are unable to access patches on the internet. A solutions architect needs to design a solution that maintains database security with the least operational overhead.
+> Which solution meets these requirements?
+>
+> - A. Deploy a NAT gateway inside the public subnet for each Availability Zone and associate it with an Elastic IP address. Update the routing table of the private subnet to use it as the default route.
+> - B. Deploy a NAT gateway inside the private subnet for each Availability Zone and associate it with an Elastic IP address. Update the routing table of the private subnet to use it as the default route.
+> - C. Deploy two NAT instances inside the public subnet for each Availability Zone and associate them with Elastic IP addresses. Update the routing table of the private subnet to use it as the default route.
+> - D. Deploy two NAT instances inside the private subnet for each Availability Zone and associate them with Elastic IP addresses. Update the routing table of the private subnet to use it as the default route.
 
 ## 297 DNS Resolution Options & Route 53 Praivate zones
 
@@ -2463,6 +2545,26 @@ Must update route tables in each VPC's subnets
 ## 305 VPC Endpoints
 
 比如说Amazon DynamoDB因为是Public Serves, EC2可以通过Internet Gateway去访问。但CloudWatch， S3这些服务应当有不经过公网的更好的访问形式-VPCEndpoints
+
+(对于特定VPC通过Endpoint访问S3=>可以使用存储桶策略控制从 VPC 端点的访问)
+
+=>补充Endpoint到S3之间，有两层控制策略：endpoint policy与bucket policy
+
+> 例题
+>
+> A company mandates that an Amazon S3 gateway endpoint must allow traffic to trusted buckets only.
+> Which method should a solutions architect implement to meet this requirement?
+>
+> - A. Create a bucket policy for each of the company's trusted S3 buckets that allows traffic only from the company's trusted VPCs.
+> - B. Create a bucket policy for each of the company's trusted S3 buckets that allows traffic only from the company's S3 gateway endpoint IDs.
+> - C. Create an S3 endpoint policy for each of the company's S3 gateway endpoints that blocks access from any VPC other than the company's trusted VPCs.
+> - D. Create an S3 endpoint policy for each of the company's S3 gateway endpoints that provides access to the Amazon Resource Name (ARN) of the trusted S3 buckets.
+>
+> 解析
+>
+> Ans: D Although B works, it is extremely tedious to create bucket policies if the company has 100's of buckets.
+>
+> （The difference between B and D is who should be restricted. B is to restrict endpoints while D is to restrict buckets. The question is to restrict buckets, not endpoints.）
 
 VPC Endpoints(AWS PrivateLink):
 
@@ -2525,6 +2627,19 @@ Direct Connect Gateway: If you want to setup a Direct Connect to one or more VPC
 
 这个Direct Connect Gateway就在AWS Direct Connect location和多个VPC的VPG之间。
 
+Direct Connect - Resiliency：一个VPC配置多个AWS Direct Connect Location去连接客户data center（one connection at multiple locations），进一步在同一个Location配置多条线路
+
+> 例题
+>
+> A solutions architect is designing a hybrid application using the AWS cloud. The network between the on-premises data center and AWS will use an AWS Direct
+> Connect (DX) connection. The application connectivity between AWS and the on-premises data center must be highly resilient.
+> Which DX configuration should be implemented to meet these requirements?
+>
+> - A. Configure a DX connection with a VPN on top of it.
+> - B. Configure DX connections at multiple DX locations.
+> - C. Configure a DX connection using the most reliable DX partner.
+> - D. Configure multiple virtual interfaces on top of a DX connection.
+
 ## 312 AWS PrivateLink - VPC Endpoint Service
 
 背景：Exposing services in your VPC to other VPC. 你可以通过Public Internet，不怎么安全，也可以通过VPC peering，但需要将VPC全部expose.
@@ -2558,6 +2673,17 @@ Site to site VPN ECMP: Equal-cost multi-path routing
 这个功能也要收钱，过分...
 
 Share Direct Connect between multiple accouts
+
+> 例题
+>
+> A company is using a VPC peering strategy to connect its VPCs in a single Region to allow for cross-communication. A recent increase in account creations and
+> VPCs has made it difficult to maintain the VPC peering strategy, and the company expects to grow to hundreds of VPCs. There are also new requests to create site-to-site VPNs with some of the VPCs. A solutions architect has been tasked with creating a centrally managed networking setup for multiple accounts, VPCs, and VPNs.
+> Which networking solution meets these requirements?
+>
+> - A. Configure shared VPCs and VPNs and share to each other.
+> - B. Configure a hub-and-spoke VPC and route all traffic through VPC peering.
+> - C. Configure an AWS Direct Connect connection between all VPCs and VPNs.
+> - D. Configure a transit gateway with AWS Transit Gateway and connect all VPCs and VPNs.
 
 ## 316 VPC Traffic Mirroring
 

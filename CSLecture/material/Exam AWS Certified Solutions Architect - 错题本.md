@@ -54,3 +54,71 @@ What should a solutions architect do to reduce costs?
 - D. Rearchitect the website to run on a combination of Amazon API Gateway and AWS Lambda.
 
 > A - correct. Reason: whenever architecture is about massive data & reads (or cached rezults) -here it said output- server by the (global) customers, CloudFront helps with distribution of S3 data and less distribution costs (for reads); however CloudFront does not help for uploads (writes) to S3, if so it would be, most likely, about Transfer Accelerator for those cases. Here only A makes sense between all options.
+
+
+
+## 20220906
+
+No131-
+
+### Question #131
+
+A company runs a website on Amazon EC2 instances behind an ELB Application Load Balancer. Amazon Route 53 is used for the DNS. The company wants to set up a backup website with a message including a phone number and email address that users can reach if the primary website is down.
+How should the company deploy this solution?
+
+- A. Use Amazon S3 website hosting for the backup website and Route 53 failover routing policy.
+- B. Use Amazon S3 website hosting for the backup website and Route 53 latency routing policy.
+- C. Deploy the application in another AWS Region and use ELB health checks for failover routing.
+- D. Deploy the application in another AWS Region and use server-side redirection on the primary website.
+
+> Option A : S3 website hosting for the backup website and Route 53 failover routing policy.
+>
+> A for sure since Route53 is used
+
+
+
+### Question #134
+
+An application is running on Amazon EC2 instances. Sensitive information required for the application is stored in an Amazon S3 bucket. The bucket needs to be protected from internet access while only allowing services within the VPC access to the bucket.
+Which combination of actions should solutions archived take to accomplish this? (Choose two.)
+
+- A. Create a VPC endpoint for Amazon S3.
+- B. Enable server access logging on the bucket.
+- C. Apply a bucket policy to restrict access to the S3 endpoint.
+- D. Add an S3 ACL to the bucket that has sensitive information.
+- E. Restrict users using the IAM policy to use the specific bucket.
+
+> => A, C https://docs.aws.amazon.com/AmazonS3/latest/userguide/example-bucket-policies-vpc-endpoint.html
+
+
+
+### Question #140
+
+A solutions architect is designing an architecture for a new application that requires low network latency and high network throughput between Amazon EC2 instances. Which component should be included in the architectural design?
+
+- A. An Auto Scaling group with Spot Instance types.
+- B. A placement group using a cluster placement strategy.
+- C. A placement group using a partition placement strategy.
+- D. An Auto Scaling group with On-Demand instance types.
+
+> HPC requirement, so Cluster placement should be the choice. Hence B is the right answer.
+>
+> https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-groups.html#placement-groups-cluster
+
+
+
+### Question #142
+
+A company wants to migrate a workload to AWS. The chief information security officer requires that all data be encrypted at rest when stored in the cloud. The company wants complete control of encryption key lifecycle management.
+The company must be able to immediately remove the key material and audit key usage independently of AWS CloudTrail. The chosen services should integrate with other storage services that will be used on AWS.
+Which services satisfies these security requirements?
+
+- A. AWS CloudHSM with the CloudHSM client
+- B. AWS Key Management Service (AWS KMS) with AWS CloudHSM
+- C. AWS Key Management Service (AWS KMS) with an external key material origin
+- D. AWS Key Management Service (AWS KMS) with AWS managed customer master keys (CMKs)
+
+> This is a difficult one. But I think option B is the right choice here. https://aws.amazon.com/blogs/security/are-kms-custom-key-stores-right-for-you/
+
+
+
