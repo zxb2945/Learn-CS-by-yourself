@@ -424,7 +424,7 @@ io1/io2 with Multi-Attach: Attach the same EBS Volume to multiple EC2 instances 
 
 Managed NFS(network file system) that can be mounted on many EC2
 
-EFS works with EC2 instances in multi-AZ (conpared to EBS)
+EFS works with EC2 instances in multi-AZ (compared to EBS)
 
 scalable,expensive(3 x gp2)
 
@@ -447,7 +447,18 @@ Throughout mode:
 Storage Tiers:( Lifecycle management , 30days default)
 
 1. Standard: for frequently accessed files
-2. Infrequent access: cost to retrieve files, lower price to store
+2. **Infrequent access**: cost to retrieve files, lower price to store
+
+> 例题
+>
+> A solutions architect is designing the cloud architecture for a new application being deployed to AWS. The application allows users to interactively download and upload files. Files older than 2 years will be accessed less frequently. The solutions architect needs to ensure that the application can scale to any number of files while maintaining high availability and durability.
+> Which scalable solutions should the solutions architect recommend? (Choose two.)
+>
+> - A. Store the files on Amazon S3 with a lifecycle policy that moves objects older than 2 years to S3 Glacier.
+> - B. Store the files on Amazon S3 with a lifecycle policy that moves objects older than 2 years to S3 Standard-Infrequent Access (S3 Standard-IA) 
+> - C. Store the files on Amazon Elastic File System (Amazon EFS) with a lifecycle policy that moves objects older than 2 years to EFS Infrequent Access (EFS IA).
+> - D. Store the files in Amazon Elastic Block Store (Amazon EBS) volumes. Schedule snapshots of the volumes. Use the snapshots to archive data older than 2 years.
+> - E. Store the files in RAID-striped Amazon Elastic Block Store (Amazon EBS) volumes. Schedule snapshots of the volumes. Use the snapshots to archive data older than 2 years.
 
 ## 068 EBS vs EFS - Elastic Block Storage 20220704
 
@@ -563,11 +574,21 @@ The goal of an Auto Scaling Group is to:
 
 Auto Scaling Group in AWS with Load Balancer
 
-Scaling policies can be on CPU,Network,even schedule
+**Scaling policies** can be on CPU,Network,even schedule
 
-1. Dynamic scaling policies => target tracking policy(比如CPU利用率)
+1. Dynamic scaling policies => **target tracking policy**(比如CPU利用率)
 2. Predictive scaling policies  => based on machine learning
 3. **Scheduled actions**
+
+> 例题
+>
+> A company hosts its website on AWS. To address the highly variable demand, the company has implemented Amazon EC2 Auto Scaling. Management is concerned that the company is over-provisioning its infrastructure, especially at the front end of the three-tier application. A solutions architect needs to ensure costs are optimized without impacting performance.
+> What should the solutions architect do to accomplish this?
+>
+> - A. Use Auto Scaling with Reserved Instances.
+> - B. Use Auto Scaling with a scheduled scaling policy.
+> - C. Use Auto Scaling with the suspend-resume feature.
+> - D. Use Auto Scaling with a target tracking scaling policy.
 
 
 
@@ -1638,20 +1659,36 @@ SNS - Message Filtering
 
 Make it easy to collect, process, and analyze streaming data in real-time
 
-1. Kinesis Data Streams: capture, process, and store data streams
-2. Kinesis Data Firehose: load data streams into AWS data stores=> S3,Amazon Redshift(copy through S3), Amazon ElasticSearch or Custom HTTP Destinations
+1. **Kinesis Data Streams**: capture, process, and **store** data streams
+2. **Kinesis Data Firehose**: load data streams into AWS data stores=> S3,Amazon Redshift(copy through S3), Amazon ElasticSearch or Custom HTTP Destinations
 3. Kinesis Data Analytics: analyze data streams with SQL or Apache Flink
 4. Kinesis Video Streams: capture, process, and store video streams
 
-用Kinesis Data Streams收集data，再利用Kinesis Data Firehose转运到S3去，注意Kinesis Data Firehose会有一个缓存，缓存未满一定时间后才发送到S3. 
+用Kinesis Data Streams收集data，再利用Kinesis Data Firehose转运到S3去，注意Kinesis Data Firehose会有一个缓存，缓存未满一定时间后才发送到S3. （两者不一定要配合：最终都是producer=>XXX=>consumer模式）
+
+> Apache Kafka 是一个开源，分布式，可伸缩的发布-订阅消息系统。 依赖 ZooKeeper 来运行。
+>
+> Kinesis 就是 AWS 的对Kafka 在云平台的实现。
 
 ## 194 Kinesis vs SQS ordering
 
-Kinesis 可以有许多shards 来hash各种数据的种类，而SQS只有一个接收端口，必须要指定Group ID 来给consumer分组...(视频里虽说有很大不同，但据我理解感觉一样...)
+Kinesis 可以有许多shards 来hash各种数据的种类，而SQS只有一个接收端口，必须要指定Group ID 来给consumer分组..~~.(视频里虽说有很大不同，但据我理解感觉一样...)~~
+
+=>最关键的是Kinesis是分布式并发，所以很容易给数据分类，一个shard一种数据类型嘛，SQS是FIFO，肯定需要对信息标识才能分类嘛。
 
 ## 195 Kinesis vs SNS vs SQS
 
 SNS: Data is not persisted(lost if not delivered)
+
+> 例题
+>
+> A company is designing a web application using AWS that processes insurance quotes. Users will request quotes from the application. Quotes must be separated by quote type must be responded to within 24 hours, and must not be lost. The solution should be simple to set up and maintain.
+> Which solution meets these requirements?
+>
+> - A. Create multiple Amazon Kinesis data streams based on the quote type. Configure the web application to send messages to the proper data stream. Configure each backend group of application servers to pool messages from its own data stream using the Kinesis Client Library (KCL).
+> - B. Create multiple Amazon Simple Notification Service (Amazon SNS) topics and register Amazon SQS queues to their own SNS topic based on the quote type. Configure the web application to publish messages to the SNS topic queue. Configure each backend application server to work its own SQS queue.
+> - C. Create a single Amazon Simple Notification Service (Amazon SNS) topic and subscribe the Amazon SQS queues to the SNS topic. Configure SNS message filtering to publish messages to the proper SQS queue based on the quote type. Configure each backend application server to work its own SQS queue. 
+> - D. Create multiple Amazon Kinesis Data Firehose delivery streams based on the quote type to deliver data streams to an Amazon Elasticsearch Service (Amazon ES) cluster. Configure the web application to send messages to the proper delivery stream. Configure each backend group of application servers to search for the messages from Amazon ES and process them accordingly.
 
 ## 196 Amazon MQ
 
@@ -1683,7 +1720,7 @@ Resources are shared with the host => many containers on one server
 
 ECS = Elastic Container Service
 
-Launch Docker containers on AWS
+Launch **Docker containers** on AWS
 
 Has integrations with ALB
 
@@ -1747,13 +1784,25 @@ Fully integrated with ECS&IAM for security, backed by Amzon S3
 
 Amazon Elastic Kubernetes Service
 
+> K8S的全称为Kubernetes，用于自动部署、扩展和管理“容器化（containerized）应用程序“的开源系统。可以理解成K8S是负责自动化运维管理多个容器化程序（比如Docker）的集群，是一个生态极其丰富的容器编排框架工具。
+
 It is a way to launch managed Kubernetes clusters on AWS
 
-Kubernetes is an open-source system for automatic deployment, scaling and management of containerized(usually Docker) application
+Kubernetes is an **open-source** system for automatic deployment, scaling and management of containerized(usually Docker) application
 
 It's an altenative to ECS, similar goal but different API
 
 Use case: if your company is already using Kubernetes on-premises or in another cloud, and wants to migrate to AWS using Kubernetes.
+
+> 例题
+>
+> A company is building applications in containers. The company wants to migrate its on-premises development and operations services from its on-premises data center to AWS. Management states that production systems must be cloud agnostic and use the same configuration and administrator tools across production systems. A solutions architect needs to design a managed solution that will align open-source software.
+> Which solution meets these requirements?
+>
+> - A. Launch the containers on Amazon EC2 with EC2 instance worker nodes.
+> - B. Launch the containers on Amazon Elastic Kubernetes Service (Amazon EKS) and EKS worker nodes.
+> - C. Launch the containers on Amazon Elastic Containers service (Amazon ECS) with AWS Fargate instances.
+> - D. Launch the containers on Amazon Elastic Container Service (Amazon ECS) with Amazon EC2 instance worker nodes.
 
 ## 206 Serverless Introduction
 
@@ -1814,7 +1863,17 @@ Intergrated with IAM for security, authorization and administration
 Read/Write Capacity Modes:
 
 1. Provisioned Mode(default)
-2. On-Demand Mode => more expensive, great for unpredictable workloads.
+2. On-Demand Mode => more expensive, automatically scale up/down, great for unpredictable workloads.
+
+> 例题
+>
+> A solutions architect is helping a developer design a new ecommerce shopping cart application using AWS services. The developer is **unsure of the current database schema** and expects to make changes as the ecommerce site grows. The solution needs to be highly resilient and capable of automatically scaling read and write capacity.
+> Which database solution meets these requirements?
+>
+> - A. Amazon Aurora PostgreSQL
+> - B. Amazon DynamoDB with on-demand enabled **Most Voted**
+> - C. Amazon DynamoDB with DynamoDB Streams enabled
+> - D. Amazon SQS and Amazon Aurora PostgreSQL
 
 ## 213 DynamoDB Advanced Fratures
 
@@ -2113,17 +2172,37 @@ AWS Config Rule does not prevent actions from happening(no deny)
 
 你虽然不能阻止不合规变化发生，但你可以在Config中进行Remediations 补救。
 
+> 例题
+>
+> A company is reviewing its AWS Cloud deployment to ensure its data is not accessed by anyone without appropriate authorization. A solutions architect is tasked with identifying all open Amazon S3 buckets and recording any S3 bucket configuration changes.
+> What should the solutions architect do to accomplish this?
+>
+> - A. Enable AWS Config service with the appropriate rules
+> - B. Enable AWS Trusted Advisor with the appropriate checks.
+> - C. Write a script using an AWS SDK to generate a bucket report
+> - D. Enable Amazon S3 server access logging and configure Amazon CloudWatch Events.
+
 ## 253 CloudTrail vs CloudWatch vs Config
 
 For example, for an ELB
 
-CloudTrail: Track who made any changes to the ELB with API calls
+CloudTrail: Track who made any changes to the ELB with API calls => **record API calls made** within your account by everyone
 
 Cloudwatch: Monitor metric and make a dashboard to get an idea of performance
 
-Config:Track security group rules and configuration changes for ELB
+Config:Track security group rules and configuration changes for ELB =>**record configuration changes**
 
 三者互补
+
+> 例题
+>
+> An operations team has a standard that states IAM policies should not be applied directly to users. Some new team members have not been following this standard. The operations manager needs a way to easily identify the users with attached policies.
+> What should a solutions architect do to accomplish this?
+>
+> - A. Monitor using AWS CloudTrail.
+> - B. Create an AWS Config rule to run daily.
+> - C. Publish IAM user changes to Amazon SNS.
+> - D. Run AWS Lambda when a user is modified.
 
 ## 254 AWS STS Overview
 
@@ -2303,6 +2382,17 @@ Capability to force rotation of scerets every X days
 Secrets are encypted using KMS
 
 > 使用 Secrets Manager 来存储、转动、监控和控制对数据库凭证、API 密钥和 OAuth 令牌等密钥的访问。使用内置集成对 Amazon RDS 上的 MySQL、PostgreSQL 和 Amazon Aurora 启用密钥转动。您还可以使用 AWS Lambda 函数启用其他密钥的转动。要检索密钥，您只需通过调用 Secrets Manager API 来更换应用程序中的硬编码密钥，无需暴露明文密钥。
+
+> 例题
+>
+> A company has recently updated its internal security standards. The company must now ensure all Amazon S3 buckets and Amazon Elastic Block Store (Amazon
+> EBS) volumes are encrypted with keys created and periodically rotated by internal security specialists. The company is looking for a native, software-based AWS service to accomplish this goal.
+> What should a solutions architect recommend as a solution?
+>
+> - A. Use AWS Secrets Manager with customer master keys (CMKs) to store master key material and apply a routine to create a new CMK periodically and replace it in AWS Secrets Manager.
+> - B. Use AWS Key Management Service (AWS KMS) with customer master keys (CMKs) to store master key material and apply a routine to re-create a new key periodically and replace it in AWS KMS. 
+> - C. Use an AWS CloudHSM cluster with customer master keys (CMKs) to store master key material and apply a routine to re-create a new key periodically and replace it in the CloudHSM cluster nodes.
+> - D. Use AWS Systems Manager Parameter Store with customer master keys (CMKs) to store master key material and apply a routine to re-create a new key periodically and replace it in the Parameter Store.
 
 ## 274 CloudHSM
 
@@ -2610,6 +2700,20 @@ AWS VON CloudHub: Provide sevure communication between multiple sites, if you ha
 It's a VPN connection so it goes over the public internet.
 
 主义的是CGW实体虽然在对端，但AWS侧你还是要设置CGW IP等信息的。
+
+> 例题
+>
+> A company wants to use an AWS Region as a disaster recovery location for its on-premises infrastructure. The company has 10 TB of existing data, and the on- premise data center has a 1 Gbps internet connection. A solutions architect must find a solution so the company can have its existing data on AWS in 72 hours without transmitting it using an unencrypted channel.
+> Which solution should the solutions architect select?
+>
+> - A. Send the initial 10 TB of data to AWS using FTP.
+> - B. Send the initial 10 TB of data to AWS using AWS Snowball.
+> - C. Establish a VPN connection between Amazon VPC and the company's data center.
+> - D. Establish an AWS Direct Connect connection between Amazon VPC and the company's data center.
+>
+> 解析
+>
+> AWS prepares and ships the Snowball to you, and you receive it in approximately 4-6 days.
 
 ## 311 Direct Connect(DX)
 
