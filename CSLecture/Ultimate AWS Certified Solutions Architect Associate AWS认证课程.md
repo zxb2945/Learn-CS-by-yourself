@@ -6,6 +6,8 @@ B站课程地址: https://www.bilibili.com/video/BV1wR4y1F7YM?p=11&vd_source=cfe
 
 知乎分享：https://zhuanlan.zhihu.com/p/512791644
 
+刷题网站：https://www.examtopics.com/exams/amazon/aws-certified-solutions-architect-associate-saa-c02/view/
+
 ## 011 IAM Introduction 
 
 IAM = Identity and Access Management, Global service
@@ -400,6 +402,22 @@ We can create your own AMI
 
 Compared to EBS, EC2 Instance Store has better I/O performance, and risk to loss data if hardware fails.
 
+> 例题
+>
+> A company has a custom application running on an Amazon EC instance that:
+> \* Reads a large amount of data from Amazon S3
+> \* Performs a multi-stage analysis
+> \* Writes the results to Amazon DynamoDB
+> The application writes a significant number of large, temporary files during the multi-stage analysis. The process performance depends on the temporary storage performance.
+> What would be the fastest storage option for holding the temporary files?
+>
+> - A. Multiple Amazon S3 buckets with Transfer Acceleration for storage.
+> - B. Multiple Amazon Elastic Block Store (Amazon EBS) drives with Provisioned IOPS and EBS optimization.
+> - C. Multiple Amazon Elastic File System (Amazon EFS) volumes using the Network File System version 4.1 (NFSv4.1) protocol.
+> - D. Multiple **instance store volumes** with software RAID 0.
+
+
+
 ## 063 EBS Volume Types
 
 gp(SSD): General purpose SSD
@@ -515,6 +533,16 @@ Network load balances(Layer 4) allow to:
 
 NLB has **one static IP** per AZ, and supprots assigning Elastic IP(helpful for whitelisting specific IP)
 
+> 例题
+>
+> A company is designing a new web service that will run on Amazon EC2 instances behind an Elastic Load Balancer. However, many of the web service clients can only reach IP addresses whitelisted on their firewalls.
+> What should a solutions architect recommend to meet the clients' needs?
+>
+> - A. A Network Load Balancer with an associated Elastic IP address. **Most Voted**
+> - B. An Application Load Balancer with an associated Elastic IP address
+> - C. An A record in an Amazon Route 53 hosted zone pointing to an Elastic IP address
+> - D. An EC2 instance with a public IP address running as a proxy in front of the load balancer
+
 ## 078 Gateway Load Balancer(GWLB)
 
 Deploy,scale,and manage a fleet of 3rd party network virtual appliances in AWS.
@@ -610,6 +638,18 @@ ASG tries the balance the number of instances across AZ by default.
 Lauch Template vs Launch Configuration:
 
 都能提供AMI去launch EC2 instances, 只是前者更newer，Recommended By AWS
+
+另外Launch Configuration Must be re-created every time.
+
+> 例题
+>
+> A company must re-evaluate its need for the Amazon EC2 instances it currently has provisioned in an Auto Scaling group. At present, the Auto Scaling group is configured for a minimum of two instances and a maximum of four instances across two Availability Zones. A Solutions architect reviewed Amazon CloudWatch metrics and found that CPU utilization is consistently low for all the EC2 instances.
+> What should the solutions architect recommend to maximize utilization while ensuring the application remains fault tolerant?
+>
+> - A. Remove some EC2 instances to increase the utilization of remaining instances.
+> - B. Increase the Amazon Elastic Block Store (Amazon EBS) capacity of instances with less CPU utilization.
+> - C. Modify the Auto Scaling group scaling policy to scale in and out based on a higher CPU utilization metric.
+> - D. Create a new launch configuration that uses smaller instance types. Update the existing Auto Scaling group.
 
 ## 088 Amazon RDS Overview 20220705
 
@@ -1080,6 +1120,24 @@ Note: an IAM principle can access an S3 object if
 
 Bucket Policies: JSON based policies
 
+Use S3 bucket for policy to:
+
+1. Grant public access to the bucket
+2. Force objects to be encrypted at upload
+3. Grant access to another accout(Cross Accout)
+
+> 例题
+>
+> A company has multiple AWS accounts for various departments. One of the departments wants to share an Amazon S3 bucket with all other department.
+> Which solution will require the LEAST amount of effort?
+>
+> - A. Enable cross-account S3 replication for the bucket.
+> - B. Create a pre-signed URL for the bucket and share it with other departments.
+> - C. Set the S3 bucket policy to allow cross-account access to other departments.
+> - D. Create IAM users for each of the departments and configure a read-only IAM policy.
+
+
+
 Bucket settings for Block Public Access
 
 **These settings were created to prevent company data leaks**
@@ -1172,6 +1230,12 @@ After activatin, only new objects are replicated
 There is no "chaining" of replication(不会连续复制，1自动复制到2，2不会将此自动复制到3，所以2不将复制过来的文件视为写入。)
 
 For Delete oprations: can replicate delete markers from source to target(optional setting)
+
+
+
+> Amazon S3 Transfer Acceleration 是一项存储桶级别功能，可在您的客户端和 S3 Bucket 之间实现快速、轻松、安全的远距离文件传输。Transfer Acceleration 旨在优化从世界各地传入 S3 存储桶的传输速度。Transfer Acceleration 利用 Amazon CloudFront 中的全球分布式边缘站点。当数据到达某个边缘站点时，数据会被经过优化的网络路径路由至 Amazon S3。
+
+
 
 ## 149 S3 Pre-sgined URLs
 
@@ -1850,6 +1914,16 @@ You can also generate responses to viewers without ever sending the request to t
 
 (Runs code in each CloudFront Edge, globally)
 
+> 例题
+>
+> A company's packaged application dynamically creates and returns **single-use text files** in response to user requests. The company is using Amazon CloudFront for distribution, but wants to further reduce data transfer costs. The company cannot modify the application's source code.
+> What should a solutions architect do to reduce costs?
+>
+> - A. Use Lambda@Edge to compress the files as they are sent to users.
+> - B. Enable Amazon S3 Transfer Acceleration to reduce the response times.
+> - C. Enable caching on the CloudFront distribution to store generated files at the edge.
+> - D. Use Amazon S3 multipart uploads to move the files to Amazon S3 before returning them to users.
+
 ## 211 DynamoDB Overview
 
 NoSQL database - not a relational database
@@ -2099,6 +2173,16 @@ You need to run a CloudWatch agent on EC2 to push the log files you want.
 
 
 想想有道理，之前均是像S3这样的serverless的服务可以无agent就发送log至CloudWatch.
+
+> 例题
+>
+> A company operates a website on Amazon EC2 Linux instances. Some of the instances are failing. Troubleshooting points to insufficient swap space on the failed instances. The operations team lead needs a solution to monitor this.
+> What should a solutions architect recommend?
+>
+> - A. Configure an Amazon CloudWatch SwapUsage metric dimension. Monitor the SwapUsage dimension in the EC2 metrics in CloudWatch.
+> - B. Use EC2 metadata to collect information, then publish it to Amazon CloudWatch custom metrics. Monitor SwapUsage metrics in CloudWatch.
+> - C. Install an Amazon CloudWatch agent on the instances. Run an appropriate script on a set schedule. Monitor SwapUtilization metrics in CloudWatch. **Most Voted**
+> - D. Enable detailed monitoring in the EC2 console. Create an Amazon CloudWatch SwapUtilization custom metric. Monitor SwapUtilization metrics in CloudWatch.
 
 ## 243 AWS CloudWatch Alarms
 
@@ -2447,9 +2531,19 @@ Difine Web ACL：IP, HTTP headers, or URL...
 
  **还可以设定特定国家区域的请求通不通过**
 
-Rate-based rules - for DDos protection
+Rate-based rules - for **DDos** protection
 
 不是免费的
+
+> 例题
+>
+> A solutions architect is performing a security review of a recently migrated workload. The workload is a web application that consists of Amazon EC2 instances in an Auto Scaling group behind an Application Load Balancer. The solutions architect must improve the security posture and minimize the impact of a DDoS attack on resources.
+> Which solution is MOST effective?
+>
+> - A. Configure an AWS WAF ACL with rate-based rules. Create an Amazon CloudFront distribution that points to the Application Load Balancer. Enable the WAF ACL on the CloudFront distribution.
+> - B. Create a custom AWS Lambda function that adds identified attacks into a common vulnerability pool to capture a potential DDoS attack. Use the identified information to modify a network ACL to block access.
+> - C. Enable VPC Flow Logs and store then in Amazon S3. Create a custom AWS Lambda functions that parses the logs looking for a DDoS attack. Modify a network ACL to block identified source IP addresses.
+> - D. Enable Amazon GuardDuty and configure findings written to Amazon CloudWatch. Create an event with CloudWatch Events for DDoS alerts that triggers Amazon Simple Notification Service (Amazon SNS). Have Amazon SNS invoke a custom AWS Lambda function that parses the logs, looking for a DDoS attack. Modify a network ACL to block identified source IP addresses.
 
 
 
@@ -2602,6 +2696,18 @@ NACL = Network Access Control List
 NACL are like a firewall which control traffic on a subnet level. (SG operates at the instance level)
 
 客户端回信时，会选择一个临时端口，Ephemeral Ports, 所以NACL设置rule时对于回信是设置一个端口范围的。
+
+> 例题
+>
+> A company has a web server running on an Amazon EC2 instance in a public subnet with an Elastic IP address. The default security group is assigned to the EC2 instance. The default network ACL has been modified to block all traffic. A solutions architect needs to make the web server accessible from everywhere on port
+> 443.
+> Which combination of steps will accomplish this task? (Choose two.)
+>
+> - A. Create a security group with a rule to allow TCP port 443 from source 0.0.0.0/0. **Most Voted**
+> - B. Create a security group with a rule to allow TCP port 443 to destination 0.0.0.0/0.
+> - C. Update the network ACL to allow TCP port 443 from source 0.0.0.0/0.
+> - D. Update the network ACL to allow inbound/outbound TCP port 443 from source 0.0.0.0/0 and to destination 0.0.0.0/0.
+> - E. Update the network ACL to allow inbound TCP port 443 from source 0.0.0.0/0 and outbound TCP port 32768-65535 to destination 0.0.0.0/0. **Most Voted**
 
 ```
 #安装web服务器
