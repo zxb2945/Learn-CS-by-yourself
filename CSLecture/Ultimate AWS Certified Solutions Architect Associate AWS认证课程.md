@@ -254,6 +254,20 @@ Unable to locate credentials. You can configure credentials by running "aws conf
 
 这个Role代表你去操作EC2这个服务，那么问题是这个“你”指哪个账户？
 
+> 例题
+>
+> An application running on an Amazon EC2 instance needs to access an Amazon DynamoDB table. Both the EC2 instance and the DynamoDB table are in the same AWS account. A solutions architect must configure the necessary permissions.
+> Which solution will allow least privilege access to the DynamoDB table from the EC2 instance?
+>
+> - A. Create an IAM role with the appropriate policy to allow access to the DynamoDB table. Create an instance profile to assign this IAM role to the EC2 instance. **Most Voted**
+> - B. Create an IAM role with the appropriate policy to allow access to the DynamoDB table. Add the EC2 instance to the trust relationship policy document to allow it to assume the role.
+> - C. Create an IAM user with the appropriate policy to allow access to the DynamoDB table. Store the credentials in an Amazon S3 bucket and read them from within the application code directly.
+> - D. Create an IAM user with the appropriate policy to allow access to the DynamoDB table. Ensure that the application stores the IAM credentials securely on local storage and uses them to make the DynamoDB calls.
+>
+> 分析
+>
+> A is correct Roles are designed to be “assumed” by other principals which do define “who am I?”, such as users, Amazon services, and EC2 instances. An instance profile, on the other hand, defines “who am I?” Just like an IAM user represents a person, an instance profile represents EC2 instances. The only permissions an EC2 instance profile has is the power to assume a role. So the EC2 instance runs under the EC2 instance profile, defining “who” the instance is. It then “assumes” the IAM role, which ultimately gives it any real power. https://medium.com/devops-dudes/the-difference-between-an-aws-role-and-an-instance-profile-ae81abd700d#:~:text=Roles%20are%20designed%20to%20be,instance%20profile%20represents%20EC2%20instances.
+
 ## 043 EC2 Instance Launch Types
 
 EC2 On Demand: pay for what you use
@@ -461,6 +475,21 @@ Throughout mode:
 
 1. Bursting(1TB = 50MiB/s + burst of up to 100MiB/s) 与容量成正比
 2. Provisioned: set your throughput regardless of storage size.
+
+> 例题
+>
+> A solutions architect is designing a solution that involves orchestrating a series of Amazon Elastic Container Service (Amazon ECS) task types running on
+> Amazon EC2 instances that are part of an ECS cluster. The output and state data for all tasks needs to be stored. The amount of data output by each task is approximately 10 MB, and there could be hundreds of tasks running at a time. The system should be optimized for high-frequency reading and writing. As old outputs are archived and deleted, the storage size is not expected to exceed 1 TB.
+> Which storage solution should the solutions architect recommend?
+>
+> - A. An Amazon DynamoDB table accessible by all ECS cluster instances.
+> - B. An Amazon Elastic File System (Amazon EFS) with Provisioned Throughput mode.
+> - C. An Amazon Elastic File System (Amazon EFS) file system with Bursting Throughput mode.
+> - D. An Amazon Elastic Block Store (Amazon EBS) volume mounted to the ECS cluster instances.
+>
+> 分析
+>
+> Keywords: data for all tasks needs to be stored - meaning EFS by each task is approximately 10 MB - meaning storage could get really low once archived optimized for high-frequency reading and writing not expected to exceed 1 TB - this one is begging not to chose Bursting mode “There are two throughput modes to choose from for your file system, Bursting Throughput and Provisioned Throughput. With Bursting Throughput mode, throughput on Amazon EFS scales as the size of your file system in the standard storage class grows. For more information about EFS storage classes, see EFS storage classes. With Provisioned Throughput mode, you can instantly provision the throughput of your file system (in MiB/s) independent of the amount of data stored.” High Throughput regardless of storage which can be provided only by B
 
 Storage Tiers:( Lifecycle management , 30days default)
 
@@ -723,6 +752,16 @@ RDS-From Single-AZ to Muti-AZ:
 3. Synchronization is established between the two databases.
 
 So just click on "modify" for the database, it's Zero downtime operation.(no need to stop the DB)
+
+> 例题
+>
+> A company hosts an online shopping application that stores all orders in an Amazon RDS for PostgreSQL Single-AZ DB instance. Management wants to eliminate single points of failure and has asked a solutions architect to recommend an approach to **minimize database downtime** without requiring any changes to the application code.
+> Which solution meets these requirements?
+>
+> - A. Convert the existing database instance to a Multi-AZ deployment by modifying the database instance and specifying the Multi-AZ option.
+> - B. Create a new RDS Multi-AZ deployment. Take a snapshot of the current RDS instance and restore the new Multi-AZ deployment with the snapshot.
+> - C. Create a read-only replica of the PostgreSQL database in another Availability Zone. Use Amazon Route 53 weighted record sets to distribute requests across the databases.
+> - D. Place the RDS for PostgreSQL database in an Amazon EC2 Auto Scaling group with a minimum group size of two. Use Amazon Route 53 weighted record sets to distribute requests across instances.
 
 RDS的security group还是在EC2上统一管理的。
 
@@ -1487,13 +1526,34 @@ Both services integrate with AWS Shield for DDos protection.
 
 Highly-secure, portable **devices** to collect and process data at the edge, and migrate data into and out of AWS.
 
+
+
+Times to Transfer:
+
+|       | 100Mbps | 1Gbps   | 10Gbps  |
+| ----- | ------- | ------- | ------- |
+| 10TB  | 12days  | 30hours | 3hours  |
+| 100TB | 124days | 12days  | 30hours |
+
+
+
 Amazon将一些硬件邮寄给你，你可以用来比网络速度更快的硬件数据迁移，然后寄回去，直接插到网络服务中...下面从小到大共有三种，最小的Snowcone可以放到无人机上，最大的Snowmobile居然是辆大卡车...
 
 1. Snowcone
 2. Snowball Edge
-3. Snowmobile
+3. Snowmobile (100PB of capcity)
 
 除了Data migration外，上述前两者还可以做Edge computing，就是暂时不能联网的地方，比如海船上做机器学习产生了大量数据，所以要求除了硬盘，还要CPU.
+
+> 例题
+>
+> A company has a 143 TB MySQL database that it wants to migrate to AWS. The plan is to use Amazon Aurora MySQL as the platform going forward. The company has a 100 Mbps AWS Direct Connect connection to Amazon VPC.
+> Which solution meets the company's needs and takes the LEAST amount of time?
+>
+> - A. Use a gateway endpoint for Amazon S3. Migrate the data to Amazon S3. Import the data into Aurora.
+> - B. Upgrade the Direct Connect link to 500 Mbps. Copy the data to Amazon S3. Import the data into Aurora.
+> - C. Order an AWS Snowmobile and copy the database backup to it. Have AWS import the data into Amazon S3. Import the backup into Aurora.
+> - D. Order four 50-TB AWS Snowball devices and copy the database backup onto them. Have AWS import the data into Amazon S3. Import the data into Aurora.
 
 不是所有地区都提供...
 
@@ -1796,6 +1856,17 @@ AWS just runs containers for you based on the CPU/RAM you need.(再分配一个E
 
 所以Fargate是ECS的一种启动类型？: Fargete Launch Type for ECS; EC2 Launch Type for ECS
 
+> 例题
+>
+> A company's near-real-time streaming application is running on AWS. As the data is ingested, a job runs on the data and takes 30 minutes to complete. The workload frequently experiences high latency due to large amounts of incoming data. A solutions architect needs to design a scalable and serverless solution to enhance performance.
+> Which combination of steps should the solutions architect take? (Choose two.)
+>
+> - A. Use Amazon Kinesis Data Firehose to ingest the data. **Most Voted**
+> - B. Use AWS Lambda with AWS Step Functions to process the data. (**We know lambda can run max for 15 min and the job is of 30 min so lambda is out.**)
+> - C. Use AWS Database Migration Service (AWS DMS) to ingest the data.
+> - D. Use Amazon EC2 instances in an Auto Scaling group to process the data.
+> - E. Use AWS Fargate with Amazon Elastic Container Service (Amazon ECS) to process the data. **Most Voted**
+
 
 
 ECS Task Role: Allow each task to have a specific role. Use different roles for the different ECS Servie you run.  简而言之，由ECS启动的container访问特定服务如S3所使用的IAM Roles.
@@ -1936,8 +2007,8 @@ Intergrated with IAM for security, authorization and administration
 
 Read/Write Capacity Modes:
 
-1. Provisioned Mode(default)
-2. On-Demand Mode => more expensive, automatically scale up/down, great for unpredictable workloads.
+1. Provisioned Mode(default)=> **predictable** application traffic=> Auto Scaling.
+2. On-Demand Mode => more expensive, automatically scale up/down, great for **unpredictable** workloads.
 
 > 例题
 >
@@ -1962,6 +2033,25 @@ DAX vs ElatiCache: 前者适应于DynamoDB的Query & Scan cache, 而后者比如
 **DynamoDB Global Tables**: Application an read/write to the table in any region
 
 并不是一张table，而是各个区域的table通过DynamoDB Streams来同步
+
+> 例题
+>
+> A company with facilities in North America, Europe, and Asia is designing new distributed application to optimize its global supply chain and manufacturing process. The orders booked on one continent should be visible to all Regions in a second or less. The database should be able to support failover with a short
+> Recovery Time Objective (RTO). The uptime of the application is important to ensure that manufacturing is not impacted.
+> What should a solutions architect recommend?
+>
+> - A. Use Amazon DynamoDB global tables.
+> - B. Use Amazon Aurora Global Database. 
+> - C. Use Amazon RDS for MySQL with a cross-Region read replica.
+> - D. Use Amazon RDS for PostgreSQL with a cross-Region read replica.
+>
+> 分析
+>
+> Answer is A 
+>
+> because 1. RTO is comparable for both Global database and global table but 2. Aurora has one primary region for Read and Write and other regions can only do read which means order update/write in other regions wont be possible except primary region but with DynamoDb global table Instead of writing your own code, you could create a global table consisting of your three Region-specific CustomerProfiles tables. DynamoDB would then automatically replicate data changes among those tables so that changes to CustomerProfiles data in one Region would seamlessly propagate to the other Regions. In addition, if one of the AWS Regions were to become temporarily unavailable, your customers could still access the same CustomerProfiles data in the other Regions. https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GlobalTables.html 
+>
+> So Dynamodb Global Table is true answer here
 
 **TTL**: Automatically delete items after an expiry timestamp
 
@@ -3077,6 +3167,16 @@ Hadoop
 >
 > ​    Hadoop集群是一种分布式的计算平台，用来处理海量数据，它的两大核心组件分别是HDSF文件系统和分布式计算处理框架mapreduce。HDFS是分布式存储系统，其下的两个子项目分别是namenode和datanode;namenode管理着文件系统的命名空间包括元数据和datanode上数据块的位置，datanode在本地保存着真实的数据。它们都分别运行在独立的节点上。Mapreduce的两大子项目分别是jobtracker和tasktracker，jobtracker负责管理资源和分配任务，tasktracker负责执行来自jobtracker的任务。
 
+> 例题
+>
+> A company receives structured and semi-structured data from various sources once every day. A solutions architect needs to design a solution that leverages big data processing frameworks. The data should be accessible using SQL queries and business intelligence tools.
+> What should the solutions architect recommend to build the MOST high-performing solution?
+>
+> - A. Use AWS Glue to process data and Amazon S3 to store data.
+> - B. Use Amazon EMR to process data and Amazon Redshift to store data. **Most Voted**
+> - C. Use Amazon EC2 to process data and Amazon Elastic Block Store (Amazon EBS) to store data.
+> - D. Use Amazon Kinesis Data Analytics to process data and Amazon Elastic File System (Amazon EFS) to store data.
+
 ## 345 AWS Opsworks
 
 Chef & Puppet help you perform server configuration automatically, or repetitive actions    => configuration as code
@@ -3112,6 +3212,16 @@ Make use of GraphQL(mobile technology from Facebook)
 Visualize, understand, and manage your AWS costs and usage over time.
 
 Create custom reports that analyze cost and usage data.
+
+> 例题
+>
+> As part of budget planning, management wants a report of AWS billed items listed by user. The data will be used to create department budgets. A solutions architect needs to determine the most efficient way to obtain this report information.
+> Which solution meets these requirements?
+>
+> - A. Run a query with Amazon Athena to generate the report.
+> - B. Create a report in Cost Explorer and download the report. **Most Voted**
+> - C. Access the bill details from the billing dashboard and download the bill.
+> - D. Modify a cost budget in AWS Budgets to alert with Amazon Simple Email Service (Amazon SES).
 
 ## 351 Well Architected Framework Overview
 
