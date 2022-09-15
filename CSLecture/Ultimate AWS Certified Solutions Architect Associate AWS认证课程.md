@@ -295,6 +295,20 @@ EC2 Decicated Instances:像EC2 Dedicated Hosts软件版本，类似于共享硬�
 
 Dedicated Hosts大概可以配合硬件搞专属服务器的意思？不是很理解Dedicated Instance既然来说别的root account也没法进来配置，那不是客观上可以让你独自改动硬件配置嘛...
 
+> 例题
+>
+> A company is planning to migrate a commercial off-the-shelf application from its on-premises data center to AWS. The software has a software licensing model using sockets and cores with predictable capacity and uptime requirements. The company wants to use its existing licenses, which were purchased earlier this year.
+> Which Amazon EC2 pricing option is the MOST cost-effective?
+>
+> - A. Dedicated Reserved Hosts
+> - B. Dedicated On-Demand Hosts
+> - C. Dedicated Reserved Instances
+> - D. Dedicated On-Demand Instances
+>
+> 分析
+>
+> requirement is "software has a software licensing model using sockets and cores" dedicated-hosts = visibility of sockets and physical cores
+
 ## 044 Spot Instances & Spot Fleet
 
 You can only cancel spot instance requests that are open, active, or disable.
@@ -1262,6 +1276,18 @@ Buckets can be in different accouts
 
 
 
+> 例题
+>
+> A company has copied 1 PB of data from a colocation facility to an Amazon S3 bucket in the us-east-1 Region using an AWS Direct Connect link. The company now wants to copy the data to another S3 bucket in the us-west-2 Region. The colocation facility does not allow the use of AWS Snowball.
+> What should a solutions architect recommend to accomplish this?
+>
+> - A. Order a Snowball Edge device to copy the data from one Region to another Region.
+> - B. Transfer contents from the source S3 bucket to a target S3 bucket using the S3 console.
+> - C. Use the aws S3 sync command to copy data from the source bucket to the destination bucket. 
+> - D. Add a cross-Region replication configuration to copy objects across S3 buckets in different Regions. 
+
+
+
 Notes；
 
 After activatin, only new objects are replicated
@@ -1500,7 +1526,7 @@ Anycast IP: all servers **hold the same IP address** and the client is routed to
 
 在全球各地部署同一个静态IP的Proxy来收取packet？
 
-Work with Elastic IP, EC2 instances, ALB, NLB, public or private
+Work with Elastic IP, EC2 instances, **ALB**, NLB, public or private
 
 Security：only 2 external IP to be whitelisted?=>私网的两个端点IP...不太懂
 
@@ -2083,6 +2109,16 @@ API Gateway can invoke Lambda function, easy way to expose REST API backed by AW
 
 所以你用一个定位到该API的URL就可以触发相应Lambda，为什么不把Lambda直接暴露给client呢，有IAM上的考虑，API Gateway 也有其它功能：rate limit, caching, authenticatins...
 
+> 例题
+>
+> A company provides an API to its users that automates inquiries for tax computations based on item prices. The company experiences a larger number of inquiries during the holiday season only that cause slower response times. A solutions architect needs to design a solution that is scalable and elastic.
+> What should the solutions architect do to accomplish this?
+>
+> - A. Provide an API hosted on an Amazon EC2 instance. The EC2 instance performs the required computations when the API request is made.
+> - B. Design a REST API using Amazon API Gateway that accepts the item names. API Gateway passes item names to AWS Lambda for tax computations. **Most Voted**
+> - C. Create an Application Load Balancer that has two Amazon EC2 instances behind it. The EC2 instances will compute the tax on the received item names.
+> - D. Design a REST API using Amazon API Gateway that connects with an API hosted on an Amazon EC2 instance. API Gateway accepts and passes the item names to the EC2 instance for tax computations.
+
 ## 216 API Gateway Security
 
 IAM Permissions
@@ -2466,7 +2502,17 @@ Consolidated Billing across all accouts- single payment method
 
 Organizational Units = OU: OU是高于Account的level
 
-Service Control Policies(SCP): Whitelist or blacklist IAM actions
+Service Control Policies(**SCP**): Whitelist or blacklist IAM actions
+
+> 例题
+>
+> A solutions architect is designing a security solution for a company that wants to provide developers with individual AWS accounts through AWS Organizations, while also maintaining standard security controls. Because the individual developers will have AWS account root user-level access to their own accounts, the solutions architect wants to ensure that the mandatory AWS CloudTrail configuration that is applied to new developer accounts is not modified.
+> Which action meets these requirements?
+>
+> - A. Create an IAM policy that prohibits changes to CloudTrail, and attach it to the root user.
+> - B. Create a new trail in CloudTrail from within the developer accounts with the organization trails option enabled.
+> - C. Create a service control policy (SCP) the prohibits changes to CloudTrail, and attach it the developer accounts.
+> - D. Create a service-linked role for CloudTrail with a policy condition that allows changes only from an Amazon Resource Name (ARN) in the management account.
 
 ## 259 IAM Adavanced
 
