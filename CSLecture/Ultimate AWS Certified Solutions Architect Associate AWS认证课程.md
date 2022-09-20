@@ -375,6 +375,18 @@ Under the hood: the RAM state is written to a file in the root EBS volume
 
 > To enable hibernation, space is allocated on the root volume to store the instance memory (RAM). Make sure that the root volume is large enough to store the RAM contents and accommodate your expected usage, e.g. OS, applications. To use hibernation, the root volume must be an encrypted EBS volume.
 
+
+
+> 例题
+>
+> A company runs an application on an Amazon EC2 instance backed by Amazon Elastic Block Store (Amazon EBS). The instance needs to be available for 12 hours daily. The company wants to save costs by making the instance unavailable outside the window required for the application. However, the contents of the instance's memory must be preserved whenever the instance is unavailable.
+> What should a solutions architect do to meet this requirement?
+>
+> - A. Stop the instance outside the application's availability window. Start up the instance again when required.
+> - B. Hibernate the instance outside the application's availability window. Start up the instance again when required. **Most Voted**
+> - C. Use Auto Scaling to scale down the instance outside the application's availability window. Scale up the instance when required.
+> - D. Terminate the instance outside the application's availability window. Launch the instance by using a preconfigured Amazon Machine Image (AMI) when required.
+
 ##   055 EC2-Advanced Concepts(Nitro, vCPU,Capacity Reservation)
 
 **Nitro**: Underlying Platform for **the next generation of EC2 instances**
@@ -1876,7 +1888,7 @@ Has integrations with ALB
 
 
 
-Fargate: You do not provision the infrastructure(no EC2 instances to manage) -simpler!   That's why it's called serverless offering.(所谓的serverless是指无服务器的服务？)
+Fargate: You do not provision the infrastructure(no EC2 instances to manage) -simpler!   That's why it's called **serverless** offering.(所谓的serverless是指无服务器的服务？)
 
 AWS just runs containers for you based on the CPU/RAM you need.(再分配一个ENI，确保足够的IP分配)
 
@@ -2366,7 +2378,25 @@ Can put logs from CloudTrail into CloudWatch Logs or S3
 
  
 
-CloudTrail Insights:to detect unusual activity in your accout.
+CloudTrail Events:
+
+1.Management Event: Example, Configuring security,  routing data...
+
+2.Data Event: By default, are not logged. S3 object-level activity(get,put,delete..)
+
+3.CloudTrail Insights Evnet:to detect unusual activity in your accout.
+
+> 例题
+>
+> The financial application at a company stores monthly reports in an Amazon S3 bucket. The vice president of finance has mandated that all access to these reports be logged and that any modifications to the log files be detected.
+> Which actions can a solutions architect take to meet these requirements?
+>
+> - A. Use S3 server access logging on the bucket that houses the reports with the read and write data events and log file validation options enabled.
+> - B. Use S3 server access logging on the bucket that houses the reports with the read and write management events and log file validation options enabled.
+> - C. Use AWS CloudTrail to create a new trail. Configure the trail to log read and write data events on the S3 bucket that houses the reports. Log these events to a new bucket, and enable log file validation. **Most Voted**
+> - D. Use AWS CloudTrail to create a new trail. Configure the trail to log read and write management events on the S3 bucket that houses the reports. Log these events to a new bucket, and enable log file validation.
+
+
 
 Retention:Events are stored for 90 days in CloudTrail, to keep events beyong this period, log them to S3 and use Athena
 
@@ -2909,7 +2939,18 @@ VPC Endpoints(powered by AWS PrivateLink) allows you to connect to AWS services 
 Types of Endpoints:
 
 1. Interface Endpoints: 配置一个ENI，所以要设置SG，support most AWS Service
-2. Gateway Endpoints:must be used as a target in a route table, only support S3 and DynamoDB
+2. Gateway Endpoints:must be used as a target in a route table, only support S3 and DynamoDB  => Free?
+
+> 例题
+>
+> A company has an image processing workload running on Amazon Elastic Container Service (Amazon ECS) in two private subnets. Each private subnet uses a
+> NAT instance for internet access. All images are stored in Amazon S3 buckets. The company is concerned about the data transfer costs between Amazon ECS and Amazon S3.
+> What should a solutions architect do to reduce costs?
+>
+> - A. Configure a NAT gateway to replace the NAT instances.
+> - B. Configure a gateway endpoint for traffic destined to Amazon S3.
+> - C. Configure an interface endpoint for traffic destined to Amazon S3.
+> - D. Configure Amazon CloudFront for the S3 bucket storing the images.
 
 ## 307 VPC Flow Logs 20220728
 
