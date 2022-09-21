@@ -2123,13 +2123,19 @@ API Gateway can invoke Lambda function, easy way to expose REST API backed by AW
 
 > 例题
 >
-> A company provides an API to its users that automates inquiries for tax computations based on item prices. The company experiences a larger number of inquiries during the holiday season only that cause slower response times. A solutions architect needs to design a solution that is scalable and elastic.
-> What should the solutions architect do to accomplish this?
+> A company wants to move a multi-tiered application from on premises to the AWS Cloud to improve the application's performance. The application consists of application tiers that communicate with each other by way of RESTful services. Transactions are dropped when one tier becomes overloaded. A solutions architect must design a solution that resolves these issues and modernizes the application.
+> Which solution meets these requirements and is the MOST operationally efficient?
 >
-> - A. Provide an API hosted on an Amazon EC2 instance. The EC2 instance performs the required computations when the API request is made.
-> - B. Design a REST API using Amazon API Gateway that accepts the item names. API Gateway passes item names to AWS Lambda for tax computations. **Most Voted**
-> - C. Create an Application Load Balancer that has two Amazon EC2 instances behind it. The EC2 instances will compute the tax on the received item names.
-> - D. Design a REST API using Amazon API Gateway that connects with an API hosted on an Amazon EC2 instance. API Gateway accepts and passes the item names to the EC2 instance for tax computations.
+> - A. Use Amazon API Gateway and direct transactions to the AWS Lambda functions as the application layer. Use Amazon Simple Queue Service (Amazon SQS) as the communication layer between application services. **Most Voted**
+> - B. Use Amazon CloudWatch metrics to analyze the application performance history to determine the server's peak utilization during the performance failures. Increase the size of the application server's Amazon EC2 instances to meet the peak requirements.
+> - C. Use Amazon Simple Notification Service (Amazon SNS) to handle the messaging between application servers running on Amazon EC2 in an Auto Scaling group. Use Amazon CloudWatch to monitor the SNS queue length and scale up and down as required.
+> - D. Use Amazon Simple Queue Service (Amazon SQS) to handle the messaging between application servers running on Amazon EC2 in an Auto Scaling group. Use Amazon CloudWatch to monitor the SQS queue length and scale up when communication failures are detected.
+>
+> 解析
+>
+> I think it's A as it both decouples (modernizes) the application using SQS, and provides scalability through Lambda.
+>
+> "RESTful services" -> API gateway to be used
 
 ## 216 API Gateway Security
 
@@ -3034,6 +3040,17 @@ Direct Connect - Resiliency：一个VPC配置多个AWS Direct Connect Location�
  Service VPC需要设置一个Network Load Balancer, Customer VPC需要设置ENI，然后两者组成了AWS Private Link.
 
 注意305p所讲的VPC endpoint是指内部私网EC2 如何去访问S3, 这里是另一个VPC通过endpoint去访问，当然其构架基础肯定有共通之处。
+
+> 例题
+>
+> A software vendor is deploying a new software-as-a-service (SaaS) solution that will be utilized by many AWS users. The service is hosted in a VPC behind a
+> Network Load Balancer. The software vendor wants to provide access to this service to users with the least amount of administrative overhead and without exposing the service to the public internet.
+> What should a solutions architect do to accomplish this goal?
+>
+> - A. Create a peering VPC connection from each user's VPC to the software vendor's VPC.
+> - B. Deploy a transit VPC in the software vendor's AWS account. Create a VPN connection with each user account.
+> - C. Connect the service in the VPC with an AWS Private Link endpoint. Have users subscribe to the endpoint.
+> - D. Deploy a transit VPC in the software vendor's AWS account. Create an AWS Direct Connect connection with each user account.
 
 ## 314 AWS ClassicLink
 
