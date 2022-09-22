@@ -520,7 +520,7 @@ Throughout mode:
 Storage Tiers:( Lifecycle management , 30days default)
 
 1. Standard: for frequently accessed files
-2. **Infrequent access**: cost to retrieve files, lower price to store
+2. **Infrequent access**: cost to retrieve files, lower price to store =>不止S3有，EFS也有这个功能。
 
 > 例题
 >
@@ -863,6 +863,16 @@ Reader Endpoint: Connection Load Balancing because of Auto Scaling
 
 Aurora Replicas-Auto Scaling
 
+> 例题
+>
+> A company recently started using Amazon Aurora as the data store for its global ecommerce application. When large reports are run, developers report that the ecommerce application is performing poorly. After reviewing metrics in Amazon CloudWatch, a solutions architect finds that the ReadIOPS and CPUUtilization metrics are spiking when monthly reports run.
+> What is the MOST cost-effective solution?
+>
+> - A. Migrate the monthly reporting to Amazon Redshift.
+> - B. Migrate the monthly reporting to an Aurora Replica. **Most Voted**
+> - C. Migrate the Aurora database to a larger instance class.
+> - D. Increase the Provisioned IOPS on the Aurora instance.
+
 Custom Endpoints: Define a subset of Aurora Instances as a Custom Endpoint. Example-Run analytical queries on specific replicas. The reader endpoint is generally not used after defining Custom Endpoints.
 
 Aurora Serverless: Automated database instantiation and auto-scaling based on actual usage.
@@ -877,7 +887,7 @@ Aurora Machine Learning: Simple ,optimized, and secure intergration between Auro
 
 The same way RDS is to get managed Relational Database...
 
-ElasticCache is to get managed Redis or Mencahced.
+ElasticCache is to get managed Redis or Memcahced.
 
 Cache are in-memory databases with really high performance,low latency
 
@@ -896,7 +906,17 @@ ElasticCache Solution Architecture:
 
 Redis vs Memcached:  High availibity vs No High availibity 
 
- 
+> 例题
+>
+> A company has developed a new video game as a web application. The application is in a three-tier architecture in a VPC with Amazon RDS for MySQL. In the database layer several players will compete concurrently online. The game's developers want to display a top-10 scoreboard in near-real time and offer the ability to stop and restore the game while preserving the current scores.
+> What should a solutions architect do to meet these requirements?
+>
+> - A. Set up an Amazon ElastiCache for Memcached cluster to cache the scores for the web application to display.
+> - B. Set up an Amazon ElastiCache for Redis cluster to compute and cache the scores for the web application to display. **Most Voted**
+> - C. Place an Amazon CloudFront distribution in front of the web application to cache the scoreboard in a section of the application.
+> - D. Create a read replica on Amazon RDS for MySQL to run queries to compute the scoreboard and serve the read traffic to the web application.
+
+
 
 All caches in ElastiCache:
 
@@ -1250,6 +1270,16 @@ curl http://169.254.169.254/latest/meta-data/
 
 It allows AWS EC2 instances to "learn about themselves" without using an IAM Role for that purpose.
 
+> 例题
+>
+> A user wants to list the IAM role that is attached to their Amazon EC2 instance. The user has login access to the EC2 instance but does not have IAM permissions.
+> What should a solutions architect do to retrieve this information?
+>
+> - A. Run the following EC2 command: curl http://169.254.169.254/latest/meta-data/iam/info **Most Voted**
+> - B. Run the following EC2 command: curl http://169.254.169.254/latest/user-data/iam/info
+> - C. Run the following EC2 command: http://169.254.169.254/latest/dynamic/instance-identity/
+> - D. Run the following AWS CLI command: aws iam get-instance-profile --instance-profile-name ExampleInstanceProfile
+
 ## 142 S3 MFA Delete
 
 字面是理解是要完全删除某个版本需要MFA的功能。
@@ -1328,11 +1358,25 @@ Users given a pre-signed URL inherit the permissions of the person who generated
 
 Standard: High durabiliry(99.999999%)
 
-Standard-Infrequent Access(IA):useCases=>backup
+Standard-Infrequent Access(IA):useCases=>backup => suitable for data that is less frequently accessed, but requires rapid access when needed.
 
 One Zone-infrequent Access:Low cost compared to IA
 
-Intelligent Tiering: Automatically moves objects between two access tiers based on changing access patterns(Standard <=> IA)
+**Intelligent Tiering**: Automatically moves objects between two access tiers based on changing access patterns(Standard <=> IA)
+
+> 例题
+>
+> A company is creating a web application that will store a large number of images in Amazon S3. The images will be accessed by users over variable periods of time. The company wants to:
+> ✑ Retain all the images
+> ✑ Incur no cost for retrieval.
+> ✑ Have minimal management overhead.
+> ✑ Have the images available with no impact on retrieval time.
+> Which solution meets these requirements?
+>
+> - A. Implement S3 Intelligent-Tiering
+> - B. Implement S3 storage class analysis
+> - C. Implement an S3 Lifecycle policy to move data to S3 Standard-Infrequent Access (S3 Standard-IA).
+> - D. Implement an S3 Lifecycle policy to move data to S3 One Zone-Infrequent Access (S3 One Zone-IA).
 
 Glacier: very low cost, 取用时需要额外的唤醒时间(1-12hours)
 
@@ -1546,6 +1590,8 @@ AWS Global Acceleraor vs CloudFront:
 
 **They both use the AWS global network and its edge locations around the world**
 
+但是：cloudfront are talking about application layer - serves HTTP requests. only for Layer7 HTTP/HTTPS/websites and S3 mostly??
+
 Both services integrate with AWS Shield for DDos protection.
 
 因为AWS Global Acceleraor更多是Proxy，而不是缓存，所以我觉得更安全
@@ -1614,7 +1660,7 @@ AWS Storage Gateway: Bridge between on -premises data(本地？) and cloud data 
 3 types of Storage Gateway:
 
 1. File gateway: Store files as objects in S3, with a local cache for low-latency access to your most recently used data. =>NFS or SMB protocol
-2. Volume gateway: Block storage in S3 with point-in-time backups as EBS snapshots. =>iSCSI
+2. Volume gateway: **Block storage** in S3 with point-in-time backups as EBS snapshots. =>**iSCSI**  =>联想SAN，就像一个硬盘
 3. Tape gateway: Backup your data to S3 and archive in Glacier using your existing tape-based processes. =>iSCSI
 
 这个gateway应该在你本地网络虚拟化，如果没有，也可以向Amazon买Hardware appliance. Tape gateway是本地磁盘化然后存到S3去？File gateway似乎可以用NFS相关协议...而后两者用iSCSI interface来连接Application Server和Gateway，Volume gateway可以整个cache到本地，定期向云端backup？所介绍的功能越来越边缘且无趣...
@@ -1774,6 +1820,16 @@ Make sure to process the message in the DLQ before they expire(Useful for debugg
 相当于一个自动定期清理的垃圾箱
 
 这个DLQ基于普通的Queue，设定一个retention of period, 然后就可以作为其他Queue的DLQ.
+
+> 例题
+>
+> A company has two applications: a sender application that sends messages with payloads to be processed and a processing application intended to receive messages with payloads. The company wants to implement an AWS service to handle messages between the two applications. The sender application can send about 1,000 messages each hour. The messages may take up to 2 days to be processed. If the messages fail to process, they must be retained so that they do not impact the processing of any remaining messages.
+> Which solution meets these requirements and is the MOST operationally efficient?
+>
+> - A. Set up an Amazon EC2 instance running a Redis database. Configure both applications to use the instance. Store, process, and delete the messages, respectively.
+> - B. Use an Amazon Kinesis data stream to receive the messages from the sender application. Integrate the processing application with the Kinesis Client Library (KCL).
+> - C. Integrate the sender and processor applications with an Amazon Simple Queue Service (Amazon SQS) queue. Configure a dead-letter queue to collect the messages that failed to process.
+> - D. Subscribe the processing application to an Amazon Simple Notification Service (Amazon SNS) topic to receive notifications to process. Integrate the sender application to write to the SNS topic.
 
 ## 185 SQS - Request-Response Systems
 
@@ -2863,6 +2919,23 @@ enableDnsHostname默认的VPC是启动的，自建的VPC关闭，它赋予你在
 
 NACL和SG都可以编辑出入规则，组合使用。区别在于前者是Stateless =>(return traffic must be explicitly allowed by rules, think of ephemeral ports)，就是不管你的信息是发送还是回复，一律检查；而后者是Stateful => (return traffic is automatically allowed, regardless of any rules)，回复的消息就直接通过。
 
+还有一点： **security group has only "Allow" option.**
+
+> 例题
+>
+> A company is planning on deploying a newly built application on AWS in a default VPC. The application will consist of a web layer and database layer. The web server was created in public subnets, and the MySQL database was created in private subnets. All subnets are created with the default network ACL settings, and the default security group in the VPC will be replaced with new custom security groups.
+> The following are the key requirements:
+> ✑ The web servers must be accessible only to users on an SSL connection.
+> ✑ The database should be accessible to the web layer, which is created in a public subnet only.
+> ✑ All traffic to and from the IP range 182.20.0.0/16 subnet should be blocked.
+> Which combination of steps meets these requirements? (Choose two.)
+>
+> - A. Create a database server security group with inbound and outbound rules for MySQL port 3306 traffic to and from anywhere (0 0.0.0/0).
+> - B. Create a database server security group with an inbound rule for MySQL port 3306 and specify the source as a web server security group.
+> - C. Create a web server security group with an inbound allow rule for HTTPS port 443 traffic from anywhere (0.0.0.0/0) and an inbound deny rule for IP range 182.20.0.0/16.
+> - D. Create a web server security group with an inbound rule for HTTPS port 443 traffic from anywhere (0.0.0.0/0). Create network ACL inbound and outbound deny rules for IP range 182.20.0.0/16.
+> - E. Create a web server security group with inbound and outbound rules for HTTPS port 443 traffic to and from anywhere (0.0.0.0/0). Create a network ACL inbound deny rule for IP range 182.20.0.0/16.
+
 NACL = Network Access Control List
 
 NACL are like a firewall which control traffic on a subnet level. (SG operates at the instance level)
@@ -3141,6 +3214,16 @@ You must create an EC2 instance to perform the replication tasks
 
 AWS Schema Conversion Tool(SCT): 两个不同的database enginner之间迁移时所需要
 
+> 例题
+>
+> A company is moving its on-premises Oracle database to Amazon Aurora PostgreSQL. The database has several applications that write to the same tables. The applications need to be migrated one by one with a month in between each migration Management has expressed concerns that the database has a high number of reads and writes. The data must be kept in sync across both databases throughout tie migration.
+> What should a solutions architect recommend?
+>
+> - A. Use AWS DataSync for the initial migration. Use AWS Database Migration Service (AWS DMS) to create a change data capture (CDC) replication task and a table mapping to select all cables.
+> - B. Use AWS DataSync for the initial migration. Use AWS Database Migration Service (AWS DMS) to create a full load plus change data capture (CDC) replication task and a table mapping to select all tables.
+> - C. Use the AWS Schema Conversion Tool with AWS DataBase Migration Service (AWS DMS) using a memory optimized replication instance. Create a full load plus change data capture (CDC) replication task and a table mapping to select all tables. **Most Voted**
+> - D. Use the AWS Schema Conversion Tool with AWS Database Migration Service (AWS DMS) using a compute optimized replication instance. Create a full load plus change data capture (CDC) replication task and a table mapping to select the largest tables.
+
 ## 327 On-Premise strategy with AWS
 
 Ability to download Amazon Linux 2 AMI as a VM(.iso format) => VMWare
@@ -3153,7 +3236,23 @@ VM Import/Export: Migrate existing applications into EC2; Can export back the VM
 
 Move large amount of data from on-premise to AWS
 
-在本地设置一个AWS DataSync Agent，与AWS DataSync 用TLS连接，进行本地与云数据同步
+Can synchronize to: S3, EFS, FSx
+
+Move data from your NAS or file system via NFS or SMB
+
+在本地设置一个AWS DataSync Agent，与AWS DataSync Service endpoint用TLS连接，进行本地与云数据同步
+
+> 例题
+>
+> A company has an on-premises application that collects data and stores it to an on-premises NFS server. The company recently set up a 10 Gbps AWS Direct
+> Connect connection. The company is running out of storage capacity on premises. The company needs to migrate the application data from on premises to the
+> AWS Cloud while maintaining low-latency access to the data from the on-premises application.
+> What should a solutions architect do to meet these requirements?
+>
+> - A. Deploy AWS Storage Gateway for the application data, and use the file gateway to store the data in Amazon S3. Connect the on-premises application servers to the file gateway using NFS.
+> - B. Attach an Amazon Elastic File System (Amazon EFS) file system to the NFS server, and copy the application data to the EFS file system. Then connect the on-premises application to Amazon EFS.
+> - C. Configure AWS Storage Gateway as a volume gateway. Make the application data available to the on-premises application from the NFS server and with Amazon Elastic Block Store (Amazon EBS) snapshots.
+> - D. Create an AWS DataSync agent with the NFS server as the source location and an Amazon Elastic File System (Amazon EFS) file system as the destination for application data transfer. Connect the on-premises application to the EFS file system.
 
 另一个用例- EFS to EFS: 在一个region的VPC搞一个EC2 instance with DataSync Agent与EFS相连，然后另一个region的VPC中搞一个AWS DataSync Service endpoint与EFS相连。
 
