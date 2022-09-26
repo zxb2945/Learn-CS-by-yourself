@@ -8,6 +8,8 @@ B站课程地址: https://www.bilibili.com/video/BV1wR4y1F7YM?p=11&vd_source=cfe
 
 刷题网站：https://www.examtopics.com/exams/amazon/aws-certified-solutions-architect-associate-saa-c02/view/
 
+Udemy试题：https://www.udemy.com/cart/success/821309364/
+
 ## 011 IAM Introduction 
 
 IAM = Identity and Access Management, Global service
@@ -357,7 +359,19 @@ Logical component in a VPC that represent a virtual network card
 2. One Public IPv4
 3. A MAC address
 
-You can create ENI independentlu and attach them on the fly(move them)on EC2 instances for failover.（意思是可以随便移动ENI去别的instance来定位网络问题）
+You can create ENI independently and attach them on the fly(move them)on EC2 instances for failover.（意思是可以随便移动ENI去别的instance来定位网络问题）
+
+> 例题
+>
+> A company plans to run a monitoring application on an Amazon EC2 instance in a VPC. Connections  are made to the EC2 instance using the instance’s private IPv4 address. A solutions architect needs to  design a solution that will allow traffic to be quickly directed to a standby EC2 instance if the application  fails and becomes unreachable. Which approach will meet these requirements? 
+>
+> A) Deploy an Application Load Balancer configured with a listener for the private IP address and register the  primary EC2 instance with the load balancer. Upon failure, de-register the instance and register the  standby EC2 instance.  
+>
+> B) Configure a custom DHCP option set. Configure DHCP to assign the same private IP address to the  standby EC2 instance when the primary EC2 instance fails. 
+>
+> C) Attach a secondary elastic network interface to the EC2 instance configured with the private IP address.  Move the network interface to the standby EC2 instance if the primary EC2 instance becomes  unreachable.  
+>
+> D) Associate an Elastic IP address with the network interface of the primary EC2 instance. Disassociate the  Elastic IP from the primary instance upon failure and associate it with a standby EC2 instance.
 
 首先什么是VPC？其次，虚拟网卡独立于具体instance，这可怎么实现哦...一种软件技术吗？
 
@@ -873,7 +887,23 @@ Aurora Replicas-Auto Scaling
 > - C. Migrate the Aurora database to a larger instance class.
 > - D. Increase the Provisioned IOPS on the Aurora instance.
 
+Writer **Endpoint** :与Client相连，writer与read通过不同endpoint
+
+Reader Endpoint
+
 Custom Endpoints: Define a subset of Aurora Instances as a Custom Endpoint. Example-Run analytical queries on specific replicas. The reader endpoint is generally not used after defining Custom Endpoints.
+
+> 例题
+>
+> An application running on AWS uses an Amazon Aurora Multi-AZ DB cluster deployment for its  database. When evaluating performance metrics, a solutions architect discovered that the database reads  are causing high I/O and adding latency to the write requests against the database. What should the solutions architect do to separate the read requests from the write requests? 
+>
+> A) Enable read-through caching on the Aurora database. 
+>
+> B) Update the application to read from the Multi-AZ standby instance. 
+>
+> C) Create an Aurora replica and modify the application to use the appropriate endpoints. 
+>
+> D) Create a second Aurora database and link it to the primary database as a read replica
 
 Aurora Serverless: Automated database instantiation and auto-scaling based on actual usage.
 
@@ -1181,6 +1211,20 @@ There are 4 methods of encrypting objects in S3:
 
 前三者都是 server-side encryption, 只是前两者的key由S3提供。
 
+> 例题
+>
+> A company’s security team requires that all data stored in the cloud be encrypted at rest at all times  using encryption keys stored on premises. Which encryption options meet these requirements? (Select TWO.) 
+>
+> A) Use server-side encryption with Amazon S3 managed encryption keys (SSE-S3). 
+>
+> B) Use server-side encryption with AWS KMS managed encryption keys (SSE-KMS). 
+>
+> **C)** Use server-side encryption with customer-provided encryption keys (SSE-C). 
+>
+> **D)** Use client-side encryption to provide at-rest encryption. 
+>
+> E) Use an AWS Lambda function invoked by Amazon S3 events to encrypt the data using the customer’s  keys.
+
 ## 132 S3 Security & Bucket policies
 
 User based: 
@@ -1253,6 +1297,18 @@ The requests won't be fulfilled unless the other origin allows for the requests,
 Web Browser based mechanism to allow requests to other ogrigins while visting the main origin.
 
 浏览器会去被引用的网站问一下是否允许被引用，no的话浏览器就拒绝加载
+
+> 例题
+>
+> An analytics company is planning to offer a web analytics service to its users. The service will require  that the users’ webpages include a JavaScript script that makes authenticated GET requests to the  company’s Amazon S3 bucket. What must a solutions architect do to ensure that the script will successfully execute? 
+>
+> A) Enable cross-origin resource sharing (CORS) on the S3 bucket. 
+>
+> B) Enable S3 Versioning on the S3 bucket. 
+>
+> C) Provide the users with a signed URL for the script. 
+>
+> D) Configure an S3 bucket policy to allow public execute privileges.
 
 ## 138 IAM Roles and Policies
 
@@ -1568,7 +1624,17 @@ Multi-Origin
 
 Origin Groups: High availibilty
 
-Field Level Encryption: Sensitive information encrypted at the edge close to user
+**Field Level Encryption**: Sensitive information encrypted at the edge close to user
+
+> 例题
+>
+> A solutions architect is creating a new Amazon CloudFront distribution for an application. Some of the information submitted by users is sensitive. The application uses HTTPS but needs another layer of security. The sensitive information should be protected throughout the entire application stack, and access to the information should be restricted to certain applications.
+> Which action should the solutions architect take?
+>
+> - A. Configure a CloudFront signed URL
+> - B. Configure a CloudFront signed cookie.
+> - C. Configure a CloudFront field-level encryption profile.
+> - D. Configure a CloudFront and set the Origin Protocol Policy setting to HTTPS. Only for the Viewer Protocol Pokey.
 
 ## 168 AWS Global Accelerator Overview 20220710
 
@@ -1695,6 +1761,18 @@ Support **SMB protocol** & Windows NTFS
 
 FSx for Lustre: a type  of parallel distributed file system, for large-scale computing. The name Lustre is derived from "Linux" and "cluster" => Machine Learning, High Performance Computing(HPC), Seamless integration with S3...
 
+> 例题
+>
+> A company wants to use high performance computing (HPC) infrastructure on AWS for financial risk modeling. The company's HPC workloads run on Linux. Each
+> HPC workflow runs on hundreds of AmazonEC2 Spot Instances, is short-lived, and generates thousands of output files that are ultimately stored in persistent storage for analytics and long-term future use.
+> The company seeks a cloud storage solution that permits the copying of on premises data to long-term persistent storage to make data available for processing by all EC2 instances. The solution should also be a high performance file system that is integrated with persistent storage to read and write datasets and output files.
+> Which combination of AWS services meets these requirements?
+>
+> - A. Amazon FSx for Lustre integrated with Amazon S3
+> - B. Amazon FSx for Windows File Server integrated with Amazon S3
+> - C. Amazon S3 Glacier integrated with Amazon Elastic Block Store (Amazon EBS)
+> - D. Amazon S3 bucket with a VPC endpoint integrated with an Amazon Elastic Block Store (Amazon EBS) General Purpose SSD (gp2) volume
+
 
 
 > **Amazon FSx for NetApp ONTAP**
@@ -1793,6 +1871,16 @@ Publish S3 Event Notifications TO SQS Queue
 # failure... Please check again
 ```
 
+> 例题
+>
+> A company is working with an external vendor that requires write access to the company's Amazon Simple Queue Service (Amazon SQS) queue. The vendor has its own AWS account.
+> What should a solutions architect do to implement least privilege access?
+>
+> - A. Update the permission policy on the SQS queue to give write access to the vendor's AWS account. **Most Voted**
+> - B. Create an IAM user with write access to the SQS queue and share the credentials for the IAM user.
+> - C. Update AWS Resource Access Manager to provide write access to the SQS queue from the vendor's AWS account.
+> - D. Create a cross-account role with access to all SQS queues and use the vendor's AWS account in the trust document for the role.
+
 ## 183 SQS - Message Visibility Timeout
 
 After a message is polled by consumer, it becomes invisible to other consumers
@@ -1813,7 +1901,19 @@ If a cosumer fails to process a message within the Visibility Timeout...the mess
 
 We can set a threshold of how many times a message can go back to the queue
 
-After the MaximumRecieves threshold is exceeded, the message goes into a dead letter queue(DLQ)
+After the **MaximumRecieves** threshold is exceeded, the message goes into a dead letter queue(DLQ) 
+
+> 例题
+>
+> A solutions architect is redesigning a monolithic application to be a loosely coupled application composed of two microservices: Microservice A and Microservice
+> B.
+> Microservice A places messages in a main Amazon Simple Queue Service (Amazon SQS) queue for Microservice B to consume. When Microservice B fails to process a message after four retries, the message needs to be removed from the queue and stored for further investigation.
+> What should the solutions architect do to meet these requirements?
+>
+> - A. Create an SQS dead-letter queue. Microservice B adds failed messages to that queue after it receives and fails to process the message four times.
+> - B. Create an SQS dead-letter queue. Configure the main SQS queue to deliver messages to the dead-letter queue after the message has been received four times.
+> - C. Create an SQS queue for failed messages. Microservice A adds failed messages to that queue after Microservice B receives and fails to process the message four times.
+> - D. Create an SQS queue for failed messages. Configure the SQS queue for failed messages to pull messages from the main SQS queue after the original message has been received four times.
 
 Make sure to process the message in the DLQ before they expire(Useful for debugging)
 
@@ -1834,6 +1934,20 @@ Make sure to process the message in the DLQ before they expire(Useful for debugg
 ## 185 SQS - Request-Response Systems
 
 通过Correlation ID来标记
+
+不同的Producer通过同一个Request Queue标记不同的Correlation ID来发信息到应用ASG的Responders，然后Responders创建不同的Response Queue来回信。
+
+To implement this pattern: use the SQS Temporary Queue Client
+
+> 例题
+>
+> A company is Re-architecting a strongly coupled application to be loosely coupled. Previously the application used a request/response pattern to communicate between tiers. The company plans to use Amazon Simple Queue Service (Amazon SQS) to achieve decoupling requirements. The initial design contains one queue for requests and one for responses. However, this approach is not processing all the messages as the application scales.
+> What should a solutions architect do to resolve this issue?
+>
+> - A. Configure a dead-letter queue on the ReceiveMessage API action of the SQS queue.
+> - B. Configure a FIFO queue, and use the message deduplication ID and message group ID.
+> - C. Create a temporary queue, with the Temporary Queue Client to receive each response message. **Most Voted**
+> - D. Create a queue for each request and response on startup for each producer, and use a correlation ID message attribute.
 
 ## 186 SQS - Delay Queues
 
@@ -2148,6 +2262,19 @@ DAX vs ElatiCache: 前者适应于DynamoDB的Query & Scan cache, 而后者比如
 > So Dynamodb Global Table is true answer here
 
 **TTL**: Automatically delete items after an expiry timestamp
+
+> 例题
+>
+> A company is creating a three-tier web application consisting of a web server, an application server, and a database server. The application will track GPS coordinates of packages as they are being delivered. The application will update the database every 0-5 seconds.
+> The tracking will need to read a fast as possible for users to check the status of their packages. Only a few packages might be tracked on some days, whereas millions of package might be tracked on other days. Tracking will need to be searchable by tracking ID customer ID and order ID. Order than 1 month no longer read to be tracked.
+> What should a solutions architect recommend to accomplish this with minimal cost of ownership?
+>
+> - A. Use Amazon DynamoDB Enable Auto Scaling on the DynamoDB table. Schedule an automatic deletion script for items older than 1 month.
+> - B. Use Amazon DynamoDB with global secondary indexes. Enable Auto Scaling on the DynamoDB table and the global secondary indexes. Enable TTL on the DynamoDB table. **Most Voted**
+> - C. Use an Amazon RDS On-Demand instance with Provisioned IOPS (PIOPS). Enable Amazon CloudWatch alarms to send notifications when PIOPS are exceeded. Increase and decrease PIOPS as needed.
+> - D. Use an Amazon RDS Reserved Instance with Provisioned IOPS (PIOPS). Enable Amazon CloudWatch alarms to send notification when PIOPS are exceeded. Increase and decrease PIOPS as needed.
+
+
 
 ## 214 API Gateway Overview
 
