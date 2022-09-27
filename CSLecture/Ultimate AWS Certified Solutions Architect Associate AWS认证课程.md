@@ -831,7 +831,13 @@ SSL certificates to encrypt data to RDS in flight.
 
 
 
+Access Management:
+
 IAM database authentication only works with MySQL and PostgreSQL.
+
+**IAM Authentication**: Yout don't need a password, just an authentication token obtained through IAM $ RDS API calls 
+
+IAM centrally manage users instead of DB. => 用于EC2和RDS通信，安全加密且方便登录
 
 ## 092 Aurora Overview
 
@@ -2749,7 +2755,9 @@ IAM Permission Boundaries : Advanced feature to use a managed policy to set the 
 
 ## 261 Resource Access Manager(RAM)
 
-Share AWS resources that you own with other AWS accounts
+Share AWS resources that you own with other AWS accounts.
+
+Share with any accout or **within your Organization**
 
 比如, 账户1创建一个VPC，Private subnet，它可以将这个subnet分享给账户2，但是这两个账号各自管理在这个subnet上的资源，所分享的仅仅是网络层配置。
 
