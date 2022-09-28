@@ -899,7 +899,7 @@ Writer **Endpoint** :与Client相连，writer与read通过不同endpoint
 
 Reader Endpoint
 
-Custom Endpoints: Define a subset of Aurora Instances as a Custom Endpoint. Example-Run analytical queries on specific replicas. The reader endpoint is generally not used after defining Custom Endpoints.
+**Custom Endpoints**: Define a subset of Aurora Instances as a Custom Endpoint. Example-Run analytical queries on specific replicas. The reader endpoint is generally not used after defining Custom Endpoints.
 
 > 例题
 >
