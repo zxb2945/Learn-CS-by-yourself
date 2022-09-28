@@ -2310,7 +2310,7 @@ Support for the WebSocket Protocol
 
 API Gateway can invoke Lambda function, easy way to expose REST API backed by AWS Lambda
 
-所以你用一个定位到该API的URL就可以触发相应Lambda，为什么不把Lambda直接暴露给client呢，有IAM上的考虑，API Gateway 也有其它功能：rate limit, caching, authenticatins...
+所以你用一个定位到该API的URL就可以触发相应Lambda，为什么不把Lambda直接暴露给client呢，有IAM上的考虑，API Gateway 也有其它功能：**rate limit, caching**, authenticatins...
 
 > 例题
 >
