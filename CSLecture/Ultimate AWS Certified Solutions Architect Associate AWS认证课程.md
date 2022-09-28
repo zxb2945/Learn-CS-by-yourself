@@ -693,7 +693,7 @@ Auto Scaling Group in AWS with Load Balancer
 ASG Default Termination Policy:
 
 1. Find the AZ which has the most number of instances
-2. If there are multiple instances in the AZ to choose from, delete the one with the oldest launch configuration
+2. If there are multiple instances in the AZ to choose from, delete the one with **the oldest launch** configuration
 
 ASG tries the balance the number of instances across AZ by default.
 
