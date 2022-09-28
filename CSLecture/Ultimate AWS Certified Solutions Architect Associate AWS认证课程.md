@@ -1834,7 +1834,7 @@ Oldest offering(over 10 years old), Fully managed service, used t decouple appli
 
 Produced to SQS using the SDK (SendMessage API)
 
-The message is persisted in SQS until a consumer deletes it
+The message is persisted in SQS **until a consumer deletes it**
 
 Message retention: default 4 days, up to 14 days
 
