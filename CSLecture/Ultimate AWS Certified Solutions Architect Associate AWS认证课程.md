@@ -1403,7 +1403,7 @@ For Delete oprations: can replicate delete markers from source to target(optiona
 
 
 
-> Amazon S3 Transfer Acceleration 是一项存储桶级别功能，可在您的客户端和 S3 Bucket 之间实现快速、轻松、安全的远距离文件传输。Transfer Acceleration 旨在优化从世界各地传入 S3 存储桶的传输速度。Transfer Acceleration 利用 Amazon CloudFront 中的全球分布式边缘站点。当数据到达某个边缘站点时，数据会被经过优化的网络路径路由至 Amazon S3。
+> **Amazon S3 Transfer Acceleration** 是一项存储桶级别功能，可在您的客户端和 S3 Bucket 之间实现快速、轻松、安全的远距离文件传输。Transfer Acceleration 旨在优化从世界各地传入 S3 存储桶的传输速度。Transfer Acceleration 利用 Amazon CloudFront 中的全球分布式边缘站点。当数据到达某个边缘站点时，数据会被经过优化的网络路径路由至 Amazon S3。
 
 
 
