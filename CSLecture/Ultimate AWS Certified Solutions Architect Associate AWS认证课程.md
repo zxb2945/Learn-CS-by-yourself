@@ -958,11 +958,11 @@ Redis vs Memcached:  High availibity vs No High availibity
 
 All caches in ElastiCache:
 
-​	Do not support IAM authentication
+​	**Do not support IAM authentication**
 
 ​	IAM policies on ElastiCache are only used for AWS API-level security
 
-Redis AUTH
+**Redis AUTH**   =>Using Redis AUTH command can improve data security by requiring the user to enter a password before they are granted permission to execute Redis commands on a password-protected Redis server.
 
 ​	You can set a password/token when you create a Redis cluster
 
