@@ -1616,7 +1616,7 @@ You want to distribute paid shared content to premium users over the world.
 
 Signed URL = access to individual files( one signed URL per file)
 
-Signed Cookies = access to multiple files( one signed cookie for many files)
+**Signed Cookies** = access to multiple files( one signed cookie for many files)
 
 CloudFront Signed URL vs S3 Pre-Signed URl, 差不多，非要说就是是否直连S3 bucket，前者CloudFront与S3之间还有个OAI.
 
