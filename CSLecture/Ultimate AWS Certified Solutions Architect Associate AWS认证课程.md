@@ -769,6 +769,7 @@ RDS Read Replicas for read scalability
 ​	With AZ, Cross AZ or Cross Region
 
 For RDS Read Replicas within the same region, you don't pay that fee.
+=> Read Replica provides an asynchronous replication instead of synchronous.
 
 (RDS 是托管服务)
 
@@ -776,7 +777,7 @@ For RDS Read Replicas within the same region, you don't pay that fee.
 
 RDS Muiti AZ (Disaster Recovery)
 
-​	SYNC replication
+​	**SYNC replication**
 
 ​	One DNS name-automatic app failover to standby
 
