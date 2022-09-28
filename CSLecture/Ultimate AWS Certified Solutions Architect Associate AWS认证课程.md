@@ -2946,7 +2946,7 @@ AWS Inspector Agent must be installed on OS in EC2 instances
 
 ## 280 Amazon Macie
 
-用机器学习来分析搜索在S3中的敏感数据，such as personally identifiable information(PII)
+用机器学习来分析搜索**在S3中的敏感数据**，such as personally identifiable information(PII)
 
 S3 => Macie => CloudWatch Events EventBridge => SNS, Lambda
 
