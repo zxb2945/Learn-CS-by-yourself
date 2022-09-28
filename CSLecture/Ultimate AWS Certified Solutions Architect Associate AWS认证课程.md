@@ -2896,7 +2896,7 @@ Difine Web ACL：IP, HTTP headers, or URL...
 
  **还可以设定特定国家区域的请求通不通过**
 
-Rate-based rules - for **DDos** protection
+**Rate-based** rules - for **DDos** protection     => Set rate limit 
 
 不是免费的
 
