@@ -1767,7 +1767,7 @@ Support **SMB protocol** & Windows NTFS
 
 
 
-FSx for Lustre: a type  of parallel distributed file system, for large-scale computing. The name Lustre is derived from "Linux" and "cluster" => Machine Learning, High Performance Computing(HPC), Seamless integration with S3...
+FSx for Lustre: a type  of **parallel distributed file system**, for large-scale computing. The name Lustre is derived from "Linux" and "cluster" =>** Machine Learning**, High Performance Computing(HPC), Seamless integration with S3...
 
 > 例题
 >
