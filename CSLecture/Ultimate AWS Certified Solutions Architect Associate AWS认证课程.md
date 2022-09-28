@@ -2940,6 +2940,8 @@ AWS Inspector Agent must be installed on OS in EC2 instances
 
 之后才能跟Inspector Service交互
 
+ 補足：AWS Artifact： is your go-to, central resource for compliance-related information that matters to you. 
+
 ## 280 Amazon Macie
 
 用机器学习来分析搜索在S3中的敏感数据，such as personally identifiable information(PII)
