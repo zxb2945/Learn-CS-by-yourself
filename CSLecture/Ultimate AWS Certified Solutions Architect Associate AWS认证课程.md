@@ -760,6 +760,8 @@ RDS backups and scales automatically for you.
 >
 > - **磁性** – Amazon RDS 还支持磁性存储以实现向后兼容。我们建议您采用通用型 SSD 或预配置 IOPS 来满足所有新存储需求。磁性存储上的数据库实例允许的最大存储量少于其他存储类型的这种量。
 
+Enhanced Monitoring is a feature of Amazon RDS.=>好像可以用来监测线程
+
 ## 089 RDS Read Replicas vs Multi AZ
 
 RDS Read Replicas for read scalability
@@ -1216,6 +1218,14 @@ There are 4 methods of encrypting objects in S3:
 2. SSE-KMS
 3. SSE-C: S3 does not store the encryption key you provide,HTTPS is mandatory for SSE-C.
 4. Client Side Encryption
+
+**Client-side encryption** is the act of encrypting data before sending it to Amazon S3. To enable client-side encryption, you have the following options:
+
+\- Use an AWS KMS-managed customer master key. （you provide an AWS KMS customer master key ID (CMK ID) to AWS. ）
+
+\- Use a client-side master key.
+
+
 
 前三者都是 server-side encryption, 只是前两者的key由S3提供。
 
@@ -2187,7 +2197,7 @@ Execution:
 
 ## 210 Lambda@Edge
 
-You have deployed a CDN using CloudFront
+You have deployed a CDN using **CloudFront**
 
 What if you wanted to run a global AWS Lambda alongside?
 
@@ -2312,6 +2322,8 @@ API Gateway can invoke Lambda function, easy way to expose REST API backed by AW
 
 所以你用一个定位到该API的URL就可以触发相应Lambda，为什么不把Lambda直接暴露给client呢，有IAM上的考虑，API Gateway 也有其它功能：**rate limit, caching**, authenticatins...
 
+（Throttling limits can be set for standard rates and bursts. Although it can scale using AWS Edge locations, you still need to configure the throttling to further manage the bursts of your APIs.）
+
 > 例题
 >
 > A company wants to move a multi-tiered application from on premises to the AWS Cloud to improve the application's performance. The application consists of application tiers that communicate with each other by way of RESTful services. Transactions are dropped when one tier becomes overloaded. A solutions architect must design a solution that resolves these issues and modernizes the application.
@@ -2386,7 +2398,7 @@ Mobile client <->Cognito <->API Gateway
 
 Client->CloudFront Global distribution->S3->Lambda/SQS/SNS: trigger thumnail->S3
 
-Moble client <-> API Gateway ->Lambda <- DAX Caching layer-> DynamoDB Global Table->DynamoDB Stream->Lambda->Amazon Simple Email Service(SES)
+Moble client <-> API Gateway ->Lambda <- DAX Caching layer-> DynamoDB Global Table->**DynamoDB Stream->Lambda**->Amazon Simple Email Service(SES)
 
 要做到全球分发，就要想到CloudFront，边缘缓存，S3可以调用Lambda去做缩略图存储. 另外，注册新用户发邮件的架构可利用Lambda去处理DynamoDB Stream.
 
@@ -2442,6 +2454,8 @@ Reshift is based on PostgreSQL, but it's not used for OLTP
 
 It's OLAP- online analytical processing
 
+> **OLAP，也叫联机分析处理（Online Analytical Processing）**系统，有的时候也叫DSS决策支持系统，就是我们说的数据仓库。在这样的系统中，语句的执行量不是考核标准，因为一条语句的执行时间可能会非常长，读取的数据也非常多。所以，在这样的系统中，考核的标准往往是磁盘子系统的吞吐量（带宽），如能达到多少MB/s的流量
+
 Data is loaded from S3, DynamoDB, other DBs...
 
 可以通过Kinesis Data Firehose从S3 Loding data，也可以直接用copy command.
@@ -2477,6 +2491,8 @@ It's common to use ElasticSearch as a complement to another database.
 CloudWatch provides merics for every service in AWS
 
 Metric is a variable to monitor( CPU utilization,erc...)
+
+**Note**:EC2 Memeory usage is by fault not pushed(must be pushed from inside the instance as a custon metric)
 
 ## 239 CloudWatch Custom Metrics
 
@@ -2655,7 +2671,13 @@ Federation lets users outside of AWS to assume temporary role for accessing AWS 
 
 比如你用你的facebook账号来登录amazon
 
-STS相当于amazon内部提供credential的第三方，但推荐用Cognito？<=错...
+过程：
+
+1. 去访问Identity provider(如Facebook)拿Client SAML assertion;
+2. 拿着SAML assertion去访问AWS的STS拿temporary security credentials；
+3. 用credentials去访问AWS resource如S3； 
+
+一般不同的Identity provider与Federated Identity间用SAML2.0协议来规范，但如果不采用，那么Custom侧要用Identity Broker Application来determine the appropriate IAM policy来用于接收credentials后去访问S3.
 
 > ADFS的全称是Active Directory Federation Services.
 >
@@ -2697,23 +2719,23 @@ Centralized security management, create accout, assign permission.
 >
 > 适用于 Microsoft Active Directory 的 Directory Service 解决方案：
 >
-> AWS Managed Microsoft AD:
+> **AWS Managed Microsoft AD**:
 >
 > Create your own AD in AWS, manage users locally, support MFA
 >
 > AWS Directory Service for Microsoft Active Directory (标准版或企业版)是 AWS 云中的实际 Microsoft Active Directory。您可以使用它来支持 Active Directory 可识别的工作负载；适用于 Microsoft SQL Server 的 Amazon Relational Database Service；AWS Managed Services，例如 Amazon WorkSpaces 和 Amazon QuickSight；或需要 LDAP 目录的 Linux 应用程序。您的最终用户可从 Windows 集成的单一登录体验中受益，无论您是在 AWS 云中将它用作单独目录，还是使用 Active Directory 信任将现有 Active Directory 基础架构扩展到 AWS Cloud 中。
 >
-> AD Connector:
+> **AD Connector**:
 >
 > Directory Gateway(Proxy) to redirect to on-premise AD
 >
 > AD Connector 是一种代理，它允许您将现有的自托管 Microsoft Active Directory (AD)中的身份用于兼容的 AWS 应用程序。您还可以使用 AD Connector 将 Amazon EC2 实例连接到您的 AD 域，并使用现有的组策略对象管理这些实例。这样一来，您可以更轻松地在这些 Amazon EC2 实例上部署 AD 感知应用程序，并使用您的自托管 AD 进行用户和组授权。
 >
-> Simple AD:
+> **Simple AD**:
 >
 > AD-compatible managed directory on AWS
 >
-> Simple AD 是一种兼容基础 Active Directory 的小规模的低成本目录。您可以在 AWS Cloud 中将它用作独立目录以支持 AWS 应用程序和服务、Samba 4 兼容的应用程序以及需要 LDAP 目录的 Linux 应用程序。
+> Simple AD 是一种兼容基础 Active Directory 的小规模的低成本目录。您可以在 AWS Cloud 中将它用作独立目录以支持 AWS 应用程序和服务、Samba 4 兼容的应用程序以及需要 LDAP (Lightweight Directory Access Protocol )目录的 Linux 应用程序。
 
 总而言之就是Amazon提供的兼容Microsoft AD的方案。
 
@@ -2942,7 +2964,7 @@ AWS Inspector Agent must be installed on OS in EC2 instances
 
 之后才能跟Inspector Service交互
 
- 補足：AWS Artifact： is your go-to, central resource for compliance-related information that matters to you. 
+
 
 ## 280 Amazon Macie
 
@@ -3028,7 +3050,7 @@ Requirea an Internet Gateway (Private Subnet => NATGW => IGW)
 
 Can't be used by EC2 instance in the same subnet(only from other subnets)?=>NAT Gateways在公网，instance在私网，当然不是同一个subnet啦
 
-操作很简单，直接创建，然后编辑私网中EC2的路由器指向这个NAT Gatways就行，大概IGW需要提前创建，然后会自动连接？
+操作很简单，直接创建，然后编辑**私网中**EC2的路由器指向这个NAT Gatways就行，大概IGW需要提前创建，然后会自动连接？
 
 注意NAT Gateway与NAT instance的区别：前者Managed by AWS, 后者Managed by you.
 
@@ -3602,3 +3624,13 @@ Analyze your AWS accounts and providers reconmendation:
 前提是：Available for Business & Enterprise support plans
 
 FAQ = Frequently asked questions
+
+
+
+## 360 SAA-C03 topics 20220929
+
+ If you're using messaging with existing applications and want to move your messaging service to the cloud quickly and easily, it is recommended that you consider **Amazon MQ**.
+
+**AWS Artifact**： is your go-to, central resource for compliance-related information that matters to you. 
+
+**AWS Lake Formation** is a service that makes it easy to set up a secure data lake in days. A data lake is a centralized, curated, and secured repository that stores all your data, both in its original form and prepared for analysis. AWS Lake Formation is integrated with **AWS Glue** which you can use to create a data catalog that describes available datasets and their appropriate business applications.
