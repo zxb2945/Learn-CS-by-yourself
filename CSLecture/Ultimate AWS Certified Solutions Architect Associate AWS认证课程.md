@@ -571,7 +571,7 @@ Health Check are crucial for Load Balancers
 Types of load balancers on AWS
 
 1. Classic Load Balancer-2009-CLB, HTTP,HTTPS,TCP,SSL
-2. Application Load Balancer-2016-ALB, HTTP,HTTPS,WebSocket
+2. Application Load Balancer-2016-ALB, HTTP,HTTPS,WebSocket,**gRPC**
 3. Network Load Balancer-2017-NLB, TCP,TLS,UDP ->(layer4)
 4. Gateway Load Balancer-2020-GWLB, Operating at layer3(IP)
 
@@ -1854,6 +1854,10 @@ Message retention: default 4 days, up to 14 days
 
 Security=>In -flight encryption using HTTPS API => 它是个服务器？
 
+
+
+you cannot set a priority to individual items in the SQS queue. it is best to create 2 separate SQS queues for each type of member. 
+
 ## 182 SQS Queue Access Policy 20220711
 
 Cross Accout Access
@@ -2001,9 +2005,9 @@ Push onece in SNS, receive in all SQS queues that are subscribers
 
 SNS - FIFO Topic
 
-SNS - Message Filtering
+SNS - **Message Filtering** => **Filter Policy是在SNS中的Json，而不是SQS**
 
-所以原则是SNS发所有消息去所有SQS，但相应SQS可以配套filtering，从而各个SQS得到不同的消息。=>SNS+SQS Pattern
+所以原则是SNS发所有消息去所有SQS，但相应SQS可以在SNS里配套filtering，从而各个SQS得到不同的消息。=>SNS+SQS Pattern
 
 ## 192 Kinesis Overview
 
@@ -2647,6 +2651,8 @@ Config:Track security group rules and configuration changes for ELB =>**record c
 
 三者互补
 
+CloudTrail相当于对某一资源更改履历，你可以特定谁该了某个动作；而Config预先设定了rule，然后这个rule可以评估任何configuration改动是否compliance. 
+
 > 例题
 >
 > An operations team has a standard that states IAM policies should not be applied directly to users. Some new team members have not been following this standard. The operations manager needs a way to easily identify the users with attached policies.
@@ -2954,15 +2960,19 @@ Can protect against CryptoCurrency attacks
 
 CloudTrail Logs, DNS logs => GuardDuty => CloudWatch Event => SNS, Lambda
 
+
+
+Amazon GuardDuty can generate findings based on suspicious activities such as requests coming from known **malicious IP addresses, changing of bucket policies/ACLs** to expose an S3 bucket publicly, or suspicious API call patterns that attempt to discover misconfigured bucket permissions. => 守卫不被可疑IP更改各种安全策略
+
 ## 279 Amazon Inspector
 
 Only for EC2 instances
 
-Analyze the running OS against known vulnerabilities
+Analyze the **running OS** against known vulnerabilities => OS层面上有什么不安全的
 
 AWS Inspector Agent must be installed on OS in EC2 instances
 
-之后才能跟Inspector Service交互
+之后才能跟Inspector Service交互 
 
 
 
@@ -3179,7 +3189,7 @@ VPC Endpoints(powered by AWS PrivateLink) allows you to connect to AWS services 
 Types of Endpoints:
 
 1. Interface Endpoints: 配置一个ENI，所以要设置SG，support most AWS Service
-2. Gateway Endpoints:must be used as a target in a route table, only support S3 and DynamoDB  => Free?
+2. **Gateway Endpoint**s:must be used as a target in a route table, only support S3 and DynamoDB  => Since DynamoDB tables are **public resources**, applications within a VPC rely on an Internet Gateway to route traffic to/from Amazon DynamoDB. You can use a **Gateway endpoint** if you want to keep the traffic between your VPC and Amazon DynamoDB within the Amazon network.
 
 > 例题
 >
@@ -3222,7 +3232,7 @@ AWS VON CloudHub: Provide sevure communication between multiple sites, if you ha
 
 It's a VPN connection so it goes over the public internet.
 
-主义的是CGW实体虽然在对端，但AWS侧你还是要设置CGW IP等信息的。
+注意的是CGW实体虽然在对端，**但AWS侧你还是要设置CGW IP等信息的**。
 
 > 例题
 >
@@ -3373,7 +3383,9 @@ Quickly and securely migrate databases to AWS, resilient, self healing
 
 You must create an EC2 instance to perform the replication tasks
 
-AWS Schema Conversion Tool(SCT): 两个不同的database enginner之间迁移时所需要
+AWS Schema Conversion Tool(SCT): 两个不同的database enginner之间迁移时所需要。
+
+You need to implement a change data capture (CDC) replication to copy the recent changes after the migration. 
 
 > 例题
 >
@@ -3403,6 +3415,8 @@ Move data from your NAS or file system via NFS or SMB
 
 在本地设置一个AWS DataSync Agent，与AWS DataSync Service endpoint用TLS连接，进行本地与云数据同步
 
+With AWS DataSync, you can transfer data from on-premises directly to Amazon S3 Glacier Deep Archive. 
+
 > 例题
 >
 > A company has an on-premises application that collects data and stores it to an on-premises NFS server. The company recently set up a 10 Gbps AWS Direct
@@ -3423,9 +3437,11 @@ Fully managed service
 
 No need to create custom scripts and manual processes
 
-可以将EC2，EBS，RDS...各种Resources Automatacally backed up to Amazon S3
+可以将EC2，EBS，RDS，DynamoDB ...各种Resources Automatacally backed up to Amazon S3
 
 所以备份目的地除S3无它
+
+To create backup copies **across AWS accounts and Regions** and for other advanced features, you should use AWS Backup.
 
 ## 332 Event Processing in AWS 20220801
 
@@ -3521,7 +3537,7 @@ AWS SWF - Simple Workflow Service: 感觉像Step Function还不是serverless的�
 
 ## 344 Amazon EMR
 
-EMR stands for "Elastic MapReduce" =>Big Data
+EMR stands for "**E**lastic **M**ap**R**educe" =>Big Data
 
 The clusters can be made of hundreds of EC2 instances
 
@@ -3540,6 +3556,8 @@ Hadoop
 > - B. Use Amazon EMR to process data and Amazon Redshift to store data. **Most Voted**
 > - C. Use Amazon EC2 to process data and Amazon Elastic Block Store (Amazon EBS) to store data.
 > - D. Use Amazon Kinesis Data Analytics to process data and Amazon Elastic File System (Amazon EFS) to store data.
+
+EMR + Redshift for big data.
 
 ## 345 AWS Opsworks
 
@@ -3634,3 +3652,9 @@ FAQ = Frequently asked questions
 **AWS Artifact**： is your go-to, central resource for compliance-related information that matters to you. 
 
 **AWS Lake Formation** is a service that makes it easy to set up a secure data lake in days. A data lake is a centralized, curated, and secured repository that stores all your data, both in its original form and prepared for analysis. AWS Lake Formation is integrated with **AWS Glue** which you can use to create a data catalog that describes available datasets and their appropriate business applications.
+
+**RDS Proxy** helps you manage a large number of connections from Lambda to an RDS database by establishing a warm connection pool to the database. 
+
+**AWS Proton** allows you to deploy any serverless or container-based application with increased efficiency, consistency, and control. You can define infrastructure standards and effective continuous delivery pipelines for your organization. Proton breaks down the infrastructure into environment and service (“infrastructure as code” templates).
+
+**Amazon Rekognition** is simply a service that can identify the objects, people, text, scenes, and activities on your images or videos, as well as detect any inappropriate content.
