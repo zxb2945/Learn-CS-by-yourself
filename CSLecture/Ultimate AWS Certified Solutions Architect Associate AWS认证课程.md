@@ -421,7 +421,7 @@ An EBS(Elastic Block Store)Volume is a network drive you can attach to your inst
 
 Think of them as a "network USB srick"
 
-It's locked to an Availability Zone(AZ)
+It's locked to an Availability Zone(AZ) =>**EBS volumes can only be attached to an EC2 instance in the same Availability Zone.**
 
 Controls the EBS behaviour when an EC2 instance terminates
 
@@ -601,7 +601,7 @@ Network load balances(Layer 4) allow to:
 2. Handle milions of request per seconds
 3. Less latency ~100ms (vs 400ms for ALB)
 
-NLB has **one static IP** per AZ, and supprots assigning Elastic IP(helpful for whitelisting specific IP)
+NLB has **one static IP** per AZ, and supprots assigning Elastic IP(helpful for whitelisting specific IP)   => you can't assign an Elastic IP address to an Application Load Balancer. 
 
 > 例题
 >
@@ -696,6 +696,10 @@ ASG Default Termination Policy:
 2. If there are multiple instances in the AZ to choose from, delete the one with **the oldest launch** configuration
 
 ASG tries the balance the number of instances across AZ by default.
+
+
+
+Scaling Cooldowns: After a scaling activity happens, you are in the cooldown period( default 300 seconds). During the cooldown period, the ASG will not lauch or terminate additional instances( to allow for mereics to stabilize)
 
 
 
@@ -1006,7 +1010,7 @@ A:maps a hostname to IPv4
 
 AAAA:maps a hostname to IPv6
 
-CNAMW:maps a hostname to another hostname
+CNAME:maps a hostname to another hostname
 
 NS:Name Servers for the Hosted Zone => DNS name or address
 
@@ -1040,7 +1044,9 @@ CNAME是一般DNS服务器通用性质，而Alias是AWS特有的，an extension 
 
 Alias Record: Maps a hostname tp an AWS resource. Unlike CNAME,it can be used for the top node of a DNS namespace(Zone Apex). But you can't set TTL.
 
-Alias Records Targets: ELB, S3 Websites...but You can't set it for an EC2 DNS name
+Alias Records Targets: **ELB**, S3 Websites...but You can't set it for an EC2 DNS name
+
+=> To route domain traffic to an **ELB** load balancer, use Amazon Route 53 to create an **alias** record that points to your load balancer. 
 
 ## 106 Routing Policy 20220706
 
@@ -1294,6 +1300,8 @@ Bucket settings for Block Public Access
 S3 can host static websites and have them accessible on the WWW.
 
 Operation:Properties=>Static website hosting
+
+static content: **HTML, CSS, Javascript**
 
 接下来做两步对public开放：
 
@@ -2227,7 +2235,7 @@ You can also generate responses to viewers without ever sending the request to t
 
 ## 211 DynamoDB Overview
 
-NoSQL database - not a relational database
+NoSQL database - not a relational database => **key-value** store models
 
 Scales to massive workloads, distributed database
 
@@ -2460,6 +2468,8 @@ It's OLAP- online analytical processing
 
 > **OLAP，也叫联机分析处理（Online Analytical Processing）**系统，有的时候也叫DSS决策支持系统，就是我们说的数据仓库。在这样的系统中，语句的执行量不是考核标准，因为一条语句的执行时间可能会非常长，读取的数据也非常多。所以，在这样的系统中，考核的标准往往是磁盘子系统的吞吐量（带宽），如能达到多少MB/s的流量
 
+=>用于市场决策参考
+
 Data is loaded from S3, DynamoDB, other DBs...
 
 可以通过Kinesis Data Firehose从S3 Loding data，也可以直接用copy command.
@@ -2669,7 +2679,11 @@ AWS STS: Security Token Service
 
 Allows to grant limited and temporary access to AWS resources.
 
-AssumeRole, Cross Accout Access
+Token is valid for up to one hour.
+
+AssumeRole, **Cross Accout Access** =>别的账户通过STS来获得此账户的某个IAM Role的临时凭证，然后就可以用这个IAM Role去访问类如S3.
+
+Return cres for users logged with an Idp(Facebook Login, Google Login...), but AWS reconmends against using this, and using Cognito instead.
 
 ## 255 Identity Federation & Cognito 20220724
 
@@ -2791,7 +2805,7 @@ Share with any accout or **within your Organization**
 
 比如, 账户1创建一个VPC，Private subnet，它可以将这个subnet分享给账户2，但是这两个账号各自管理在这个subnet上的资源，所分享的仅仅是网络层配置。
 
-## 262 AWS Sinle Sign On(SSO) Overview 20220725
+## 262 AWS Single Sign On(SSO) Overview 20220725
 
 Centrally manage Single Sign-On to access multiple accounts and 3rd-party business applications.
 
@@ -2806,6 +2820,8 @@ Intergration with on-premise Active Directory
 > 安全声明标记语言（SAML）是一种开放标准，允许身份提供商（IDP）将授权凭证传递给服务提供商（SP）。 这个术语的含义是您可以使用一组凭据登录许多不同的网站。 管理每个用户仅需一次登录比管理电子邮件、客户关系管理（CRM）软件、Active Directory等公司业务系统都需要单独登录要简单得多。
 >
 > SAML使用可扩展标记语言（XML）进行身份提供商和服务提供商之间的标准化通信。 SAML是用户身份验证和使用服务授权之间的链接。
+
+SSO vs AssumeRoleWithSAML: 后者就是需要第三方3rd IDP Login Protal与AWS侧的Broser Interface用SAML协议交互，然后Broser Interface去STS去取Token来登录AWS的资源；而前者就不需要这个第三方了，roser Interface直接登录SSO Login Poral，内置集成SAML，一次性可以访问多个账户。需要注意的是即便是AWS跨账户临时访问，其核心还是STS. => Although the AWS SSO service uses STS, it does not issue short-lived credentials by itself. AWS Single Sign-On (SSO) is a cloud SSO service that makes it easy to centrally manage SSO access to multiple AWS accounts and business applications.
 
 ## 265 Encryption
 
@@ -2827,6 +2843,8 @@ KMS-Customer Master Key(CMK) Types:
 
 1. Symmetric(AES-256 keys) : 对称key，AWS大多时候采用的，可以调用KMS API
 2. Asymmetric(RSA & ECC key paris) : 非对称key，有公钥私钥，不能访问KMS API
+
+=> S3 doesn't provide AES-128 encryption, only AES-256
 
 
 
@@ -3658,3 +3676,9 @@ FAQ = Frequently asked questions
 **AWS Proton** allows you to deploy any serverless or container-based application with increased efficiency, consistency, and control. You can define infrastructure standards and effective continuous delivery pipelines for your organization. Proton breaks down the infrastructure into environment and service (“infrastructure as code” templates).
 
 **Amazon Rekognition** is simply a service that can identify the objects, people, text, scenes, and activities on your images or videos, as well as detect any inappropriate content.
+
+You can use **Amazon Data Lifecycle Manager** (Amazon DLM) to automate the creation, retention, and deletion of snapshots taken to back up your Amazon EBS volumes.
+
+**AWS Network Firewall** is a stateful, managed network firewall and intrusion detection and prevention service for your virtual private cloud (VPC) that you created in Amazon Virtual Private Cloud (Amazon VPC). With Network Firewall, you can filter traffic at the perimeter of your VPC. This includes filtering traffic going to and coming from an internet gateway, NAT gateway, or over VPN or AWS Direct Connect. Network Firewall uses the open source intrusion prevention system (IPS), Suricata, for stateful inspection. Network Firewall supports Suricata compatible rules.
+
+**AWS Control Tower** provides a single location to easily set up your new well-architected multi-account environment and govern your AWS workloads with rules for security, operations, and internal compliance. 
