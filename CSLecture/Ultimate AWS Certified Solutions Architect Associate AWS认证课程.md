@@ -16,6 +16,8 @@ IAM = Identity and Access Management, Global service
 
 **Users & Groups** can be assigned JSON documents called policies
 
+=>IAM是有Group的
+
 These policies define the permission of the users 
 
 Don't give more permissions than a user needs
@@ -276,6 +278,8 @@ EC2 On Demand: pay for what you use
 
 想用就用，临时租用的感觉
 
+=>There is a vCPU-based On-Demand Instance limit per region, when subsequent requests failed. Just submit the limit increase form to AWS 就是你有可能不能一次性启动太多EC2 On Demand，需要申请
+
 EC2 Reserved Instance: Up to 75% discount compared to On-Demand, Recomended for database
 
 长期租用嘛，当然打折扣
@@ -339,6 +343,8 @@ An Elastic IP is a public IPv4 Ip you own as long as you don't delete it.
 
 You can only have 5 Elastic IP in your account.
 
+=>  EIP will actually remain associated with your instance even after stopping it.
+
 Overall, try to avoid using Elastic IP. Instead, use a random public IP and register a DNS name to it.
 
 ## 048 EC2 Placement Groups
@@ -389,7 +395,7 @@ Under the hood: the RAM state is written to a file in the root EBS volume
 
 > To enable hibernation, space is allocated on the root volume to store the instance memory (RAM). Make sure that the root volume is large enough to store the RAM contents and accommodate your expected usage, e.g. OS, applications. To use hibernation, the root volume must be an encrypted EBS volume.
 
-
+=>It is not possible to enable or disable hibernation for an instance after it has been launched. =>所以如果要对原本不支持的instance搞hibernation，那就只能**Migrate**
 
 > 例题
 >
@@ -454,7 +460,7 @@ We can create your own AMI
 
 ## 062 EC2 Instance Store
 
-Compared to EBS, EC2 Instance Store has better I/O performance, and risk to loss data if hardware fails.
+Compared to EBS, **EC2 Instance Store** has better I/O performance, and risk to loss data if hardware fails.
 
 > 例题
 >
@@ -491,6 +497,8 @@ io1/io2 with Multi-Attach: Attach the same EBS Volume to multiple EC2 instances 
 ## 065 EBS Encryption
 
 这个episode谈论了两种方式，一个未加密的snapshot，先复制为一个加密的snapshot，然后在这个加密的snapshot创造出一个volume，自动继承加密；一个未加密的snapshot，创造出volume时候加密，也成为一个加密的volume...(好无聊...)
+
+=>**Amazon EBS encryption** offers a simple encryption solution for your EBS volumes without the need to build, maintain, and secure your own key management infrastructure.
 
 ## 066 EFS Overview
 
@@ -579,6 +587,8 @@ Overall,it is recommended to use the newer generation load balancers as they pro
 
 所以ELB是一个统称
 
+=>ELB is designed to only run in one region and not across multiple regions.所以搞ASG+ELB时，当只有一个ELB时，所有EC2就只能deploy在同一个region的不同AZ.
+
 ## 074 Application Load Balancer(ALB)
 
 Load balancing to multiple HTTP applications across machines
@@ -637,13 +647,17 @@ ELB必然也存在于一个特定的AZ，负载均衡时可以无视instance的A
 
 SSL: Secure Sockets Layer, used to encrypt connections (HTTPS)
 
-TLS: Transport Layer Security, which is a newer version of SSL
+**TLS**: Transport Layer Security, which is **a newer version of SSL**
+
+(Nowadays, TLS certificates are mainly used, but people still refer as SSL)
+
+Public SSL certificates are issued by Certificate Authorities(CA)
 
 
 
-SNL: Server Name Indication
+**SNI**: Server Name Indication
 
-SNI solves the problem of loading mutiple SSL certificates onto one web server(to serve multiple websites), it's a "newer" protocol, supported by ALB and NLB, not supported by CLB
+SNI solves the problem of **loading mutiple SSL certificates onto one web server**(to serve multiple websites), it's a "newer" protocol, **supported by ALB and NLB**, CloudFront, not supported by CLB
 
 CA: Certificate Authorities, such as Comodo, Symantec, etc...
 
@@ -709,7 +723,7 @@ Scaling Cooldowns: After a scaling activity happens, you are in the cooldown per
 
 
 
-Lauch Template vs Launch Configuration:
+Lauch Template vs **Launch Configuration**:
 
 都能提供AMI去launch EC2 instances, 只是前者更newer，Recommended By AWS
 
@@ -746,7 +760,7 @@ DB Snapshots compared to Backups:
 
 
 
-RDS backups and scales automatically for you.
+RDS backups and **scales automatically** for you.
 
 
 
@@ -775,7 +789,7 @@ RDS Read Replicas for read scalability
 ​	With AZ, Cross AZ or Cross Region
 
 For RDS Read Replicas within the same region, you don't pay that fee.
-=> Read Replica provides an asynchronous replication instead of synchronous.
+=> **Read Replica provides an asynchronous replication** instead of synchronous.
 
 (RDS 是托管服务)
 
@@ -919,7 +933,7 @@ Reader Endpoint
 >
 > D) Create a second Aurora database and link it to the primary database as a read replica
 
-Aurora Serverless: Automated database instantiation and auto-scaling based on actual usage.
+Aurora Serverless: Automated database instantiation and auto-scaling based on actual usage. =>Aurora DB cluster转变为Aurora Serverless需要用AWS Database Migration Service
 
 Aurora Multi-Master: Every node does R/W => an immediate failover for writer
 
@@ -1116,6 +1130,14 @@ Health checks that monitor CloudWatch Alarms(helpful for private resources)
 
 
 
+You can use **Route 53 health checking** to configure active-active and active-passive failover configurations. 
+
+**Active-Active Failover**：就是两个都Active,不分primary和secondary .
+
+**Active-Passive Failover**：primary resource 是Active， secondary resource只有当Failover是才从Passive变为Active.
+
+
+
 Tips for the whole lecture: if you see connection timeout, you should check firewall first.
 
 ## 114 Route 53 - Traffic flow
@@ -1257,7 +1279,7 @@ User based:
 
 Resource Based: 
 
-1. Bucket policies=>bucket wide rules from the s3 console-allows cross account
+1. Bucket policies=>bucket wide rules from the s3 console-allows **cross account**
 2. ACL(Access Control List)
 
 
@@ -1277,7 +1299,7 @@ Use S3 bucket for policy to:
 
 1. Grant public access to the bucket
 2. Force objects to be encrypted at upload
-3. Grant access to another accout(Cross Accout)
+3. Grant access to another accout(**Cross Accout**)
 
 > 例题
 >
@@ -1464,7 +1486,7 @@ Glacier: very low cost, 取用时需要额外的唤醒时间(1-12hours)
 
 ​	Amazon Glacier-3 retriecal options:
 
-​		Expedited(1 to 5 minutes)
+​		**Expedited**(1 to 5 minutes) +**Provisioned capacity**
 
 ​		Standard(3 to 5 hours)
 
@@ -1512,6 +1534,10 @@ Can filter by rows & colums(simple SQL statements)
 Less network transfer, less CPU cost client-side.
 
 大概是S3侧开启Server-side filtering功能...没有hands on, 具体不知...
+
+=>比如Get CSV with S3 Select, 在S3侧先过滤，然后通过网络传输的流量就少了
+
+=>**Amazon Glacier Select** is not an archive retrieval option, 与Expedited,Bulk等区别
 
 ## 158 S3 Event Notifications
 
@@ -1634,6 +1660,8 @@ Client<=> Edge Location <=> Origin:S3 or HTTP(Globally)
 
 You want to distribute paid shared content to premium users over the world.
 
+=>比如这样的场景：to deliver their content to a specific client
+
 Signed URL = access to individual files( one signed URL per file)
 
 **Signed Cookies** = access to multiple files( one signed cookie for many files)
@@ -1737,7 +1765,7 @@ Snowball cannnot import to Glacier directly, you must use Amzon S3 first, in com
 
 ## 173 Storage Gateway Overview
 
-所谓的Hybrid Cloud for Storage，就是一部分infrastructure在云上，一部分在本地...问题是怎样将S3（Unlike EFS/NFS）延伸到本地呢？
+所谓的Hybrid Cloud for Storage，就是一部分infrastructure在云上，一部分在本地...问题是**怎样将S3**（Unlike EFS/NFS）延伸到本地呢？
 
 AWS Storage Cloud Native Options:
 
@@ -1747,13 +1775,13 @@ AWS Storage Cloud Native Options:
 
 
 
-AWS Storage Gateway: Bridge between on -premises data(本地？) and cloud data in S3.
+AWS Storage Gateway: **Bridge** between **on -premises** data(本地？) and cloud data in **S3**.
 
 3 types of Storage Gateway:
 
-1. File gateway: Store files as objects in S3, with a local cache for low-latency access to your most recently used data. =>NFS or SMB protocol
-2. Volume gateway: **Block storage** in S3 with point-in-time backups as EBS snapshots. =>**iSCSI**  =>联想SAN，就像一个硬盘
-3. Tape gateway: Backup your data to S3 and archive in Glacier using your existing tape-based processes. =>iSCSI
+1. File gateway: Store files as objects in S3, with a local cache for low-latency access to your most recently used data. =>Configure S3 buckets are accessible using NFS and SMB protocol, intergrated with AD
+2. Volume gateway: **Block storage** in S3 with point-in-time backups as EBS snapshots. =>**iSCSI**  =>联想SAN，就像一个硬盘->不够准确，有两个类型 Cached volumes: low latency access to most recent data, Store volumes:entire dataset is on premise, schedules backups to S3.
+3. Tape gateway: Backup your data to S3 and archive in Glacier using your existing tape-based processes. =>iSCSI  ->Some companies have backup process using physical tapes.
 
 这个gateway应该在你本地网络虚拟化，如果没有，也可以向Amazon买Hardware appliance. Tape gateway是本地磁盘化然后存到S3去？File gateway似乎可以用NFS相关协议...而后两者用iSCSI interface来连接Application Server和Gateway，Volume gateway可以整个cache到本地，定期向云端backup？所介绍的功能越来越边缘且无趣...
 
@@ -1763,13 +1791,13 @@ AWS Storage Gateway: Bridge between on -premises data(本地？) and cloud data 
 > Which solution should the solutions architect implement?
 >
 > - A. Deploy an AWS Storage Gateway file gateway on-premises and associate it with an Amazon S3 bucket.
-> - B. Back up the databases to an AWS Storage Gateway volume gateway and access it using the Amazon S3 API.
+> - B. Back up the databases to an AWS Storage Gateway volume gateway and access it using the Amazon S3 API. 
 > - C. Transfer the database backup files to an Amazon Elastic Block Store (Amazon EBS) volume attached to an Amazon EC2 instance.
 > - D. Back up the database directly to an AWS Snowball device and use lifecycle rules to move the data to Amazon S3 Glacier Deep Archive.
 >
 > 解析
 >
-> it should be A. For SG volume gateway, you cannot directly access the backups using Amazon S3 API. Q: When I look in Amazon S3 why can’t I see my volume data? A: Your volumes are stored in an Amazon S3 bucket maintained by the AWS Storage Gateway service. Your volumes are accessible for I/O operations through AWS Storage Gateway. You cannot directly access them using Amazon S3 API actions. You can take point-in-time snapshots of gateway volumes that are made available in the form of Amazon EBS snapshots, which can be turned into either Storage Gateway Volumes or EBS Volumes. Use the File Gateway to work with your data natively in S3.
+> it should be A. **For SG volume gateway, you cannot directly access the backups using Amazon S3 API**. Q: When I look in Amazon S3 why can’t I see my volume data? A: Your volumes are stored in an Amazon S3 bucket maintained by the AWS Storage Gateway service. Your volumes are accessible for I/O operations through AWS Storage Gateway. You cannot directly access them using Amazon S3 API actions. You can take point-in-time snapshots of gateway volumes that are made available in the form of Amazon EBS snapshots, which can be turned into either Storage Gateway Volumes or EBS Volumes. Use the File Gateway to work with your data natively in S3.
 
 
 
@@ -2021,7 +2049,7 @@ SNS - **Message Filtering** => **Filter Policy是在SNS中的Json，而不是SQS
 
 Make it easy to collect, process, and analyze streaming data in real-time
 
-1. **Kinesis Data Streams**: capture, process, and **store** data streams
+1. **Kinesis Data Streams**: capture, process, and **store** data streams => A Kinesis data stream stores records from **24 hours by default** to a maximum of 8760 hours (365 days).
 2. **Kinesis Data Firehose**: load data streams into AWS data stores=> S3,Amazon Redshift(copy through S3), Amazon ElasticSearch or Custom HTTP Destinations
 3. Kinesis Data Analytics: analyze data streams with SQL or Apache Flink
 4. Kinesis Video Streams: capture, process, and store video streams
@@ -2088,7 +2116,7 @@ Has integrations with ALB
 
 
 
-Fargate: You do not provision the infrastructure(no EC2 instances to manage) -simpler!   That's why it's called **serverless** offering.(所谓的serverless是指无服务器的服务？)
+Fargate: You do not provision the infrastructure(no EC2 instances to manage) -simpler!   That's why it's called **serverless** offering.(所谓的serverless是指无服务器的服务？) =>By default, Fargate tasks are given a minimum of 20 GiB of free ephemeral storage
 
 AWS just runs containers for you based on the CPU/RAM you need.(再分配一个ENI，确保足够的IP分配)
 
@@ -2196,6 +2224,8 @@ Initially...Serverless was pioneered by AWS Lambda but now also includes anythin
 
 感觉Lambda像一个多语言支持的编译平台。
 
+而且，Lambda独立于用户的VPC，所以访问VPC中的component时要确保足够的subnet ENIs 和 IPs, 访问私网时要确保配置NAT gateway...
+
 ## 209 Lambda Limits 20220716
 
 Execution:
@@ -2232,6 +2262,8 @@ You can also generate responses to viewers without ever sending the request to t
 > - B. Enable Amazon S3 Transfer Acceleration to reduce the response times.
 > - C. Enable caching on the CloudFront distribution to store generated files at the edge.
 > - D. Use Amazon S3 multipart uploads to move the files to Amazon S3 before returning them to users.
+>
+> =>补充  The **Multipart upload** API enables you to upload large objects(比如超过5G) to S3
 
 ## 211 DynamoDB Overview
 
@@ -2243,9 +2275,9 @@ Intergrated with IAM for security, authorization and administration
 
 
 
-Read/Write Capacity Modes:
+Read/Write Capacity Models:
 
-1. Provisioned Mode(default)=> **predictable** application traffic=> Auto Scaling.
+1. Provisioned Mode(default)=> **predictable** application traffic=> **Possibility** to add Auto Scaling model. (也就是说不是default的)
 2. On-Demand Mode => more expensive, automatically scale up/down, great for **unpredictable** workloads.
 
 > 例题
@@ -3152,7 +3184,7 @@ sudo su
 echo "hello wrold" > /var/www/html/index.html
 ```
 
-在NACL中，Rule number很重要，它会据此自从排序，越小的数字越靠前执行，优先度越高。默认NACL的number是100，它允许所有流量通过。
+在NACL中，Rule number很重要，它会据此自从排序，**越小的数字越靠前执行**，优先度越高。默认NACL的number是100，它允许所有流量通过。
 
 ## 301 VPC Reachability Analyzer
 
@@ -3206,7 +3238,7 @@ VPC Endpoints(powered by AWS PrivateLink) allows you to connect to AWS services 
 
 Types of Endpoints:
 
-1. Interface Endpoints: 配置一个ENI，所以要设置SG，support most AWS Service
+1. Interface Endpoints: 配置一个ENI，所以要设置SG，support most AWS Service => relatively not cost-effective,  Interface endpoints extend the functionality of gateway endpoints by using ...
 2. **Gateway Endpoint**s:must be used as a target in a route table, only support S3 and DynamoDB  => Since DynamoDB tables are **public resources**, applications within a VPC rely on an Internet Gateway to route traffic to/from Amazon DynamoDB. You can use a **Gateway endpoint** if you want to keep the traffic between your VPC and Amazon DynamoDB within the Amazon network.
 
 > 例题
@@ -3455,7 +3487,7 @@ Fully managed service
 
 No need to create custom scripts and manual processes
 
-可以将EC2，EBS，RDS，DynamoDB ...各种Resources Automatacally backed up to Amazon S3
+可以将EC2，EBS，**RDS**，DynamoDB ...各种Resources Automatacally backed up to Amazon S3
 
 所以备份目的地除S3无它
 
@@ -3543,6 +3575,8 @@ CloudFromation is a declarative way of outlining your AWS Infrastructure for any
 
 StackSets: Create,update,or delete stacks across multople accounts and regions with a single operation
 
+> 将 `CreationPolicy` 属性与资源相关联，以防止在 AWS CloudFormation 收到指定数量的成功信号或超出超时期限之前进入“创建完成”状态。
+
 ## 343 Step Functions & SWF
 
 Build serverless visual workflow to orchestrate your Lambda functions
@@ -3558,6 +3592,8 @@ AWS SWF - Simple Workflow Service: 感觉像Step Function还不是serverless的�
 EMR stands for "**E**lastic **M**ap**R**educe" =>Big Data
 
 The clusters can be made of hundreds of EC2 instances
+
+=>It securely and reliably handles a broad set of big data use cases, including **log analysis**, web indexing, data transformations (ETL), machine learning, financial analysis, scientific simulation, and bioinformatics. 
 
 Hadoop
 
@@ -3682,3 +3718,13 @@ You can use **Amazon Data Lifecycle Manager** (Amazon DLM) to automate the creat
 **AWS Network Firewall** is a stateful, managed network firewall and intrusion detection and prevention service for your virtual private cloud (VPC) that you created in Amazon Virtual Private Cloud (Amazon VPC). With Network Firewall, you can filter traffic at the perimeter of your VPC. This includes filtering traffic going to and coming from an internet gateway, NAT gateway, or over VPN or AWS Direct Connect. Network Firewall uses the open source intrusion prevention system (IPS), Suricata, for stateful inspection. Network Firewall supports Suricata compatible rules.
 
 **AWS Control Tower** provides a single location to easily set up your new well-architected multi-account environment and govern your AWS workloads with rules for security, operations, and internal compliance. 
+
+**Amazon DocumentDB (with MongoDB compatibility)** is a fast, scalable, highly available, and fully managed document database service that supports MongoDB workloads.
+
+**Amazon Transcribe** is an AWS service that makes it easy for customers to convert speech-to-text. Using Automatic Speech Recognition (ASR) technology, customers can choose to use Amazon Transcribe for a variety of business applications, including transcription of voice-based customer service calls, generation of subtitles on audio/video content, and conduct (text-based) content analysis on audio/video content.
+
+**Amazon Translate** is a Neural Machine Translation (MT) service for translating text between supported languages.
+
+**Amazon Comprehend** is a natural language processing (NLP) service that uses machine learning to find meaning and insights in text.
+
+=>First, you'd have to create a transcription job using Amazon Transcribe to transform the recordings into text. Then, translate non-English calls to English using Amazon Translate. Finally, use Amazon Comprehend for sentiment analysis.
