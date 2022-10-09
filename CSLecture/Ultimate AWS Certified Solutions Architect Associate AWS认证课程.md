@@ -352,8 +352,8 @@ Overall, try to avoid using Elastic IP. Instead, use a random public IP and regi
 Strategies for the group:
 
 1. Cluster: Same Rack, Same AZ(Availability Zone)
-2. Spread: spreads instances across undelying hardware(max 7 instances per group per AZ)
-3. Patition:spreads instances across many different partitions(which rely on different sets of racks) within an AZ. Scales to 100s of EC2 instances per group(Hadoop,Cassandra,Kafka). The instances in a partition do not share racks with the instances in the other partitions.
+2. Spread: spreads instances across undelying hardware(max 7 instances per group per AZ) => can span across diffirent AZ
+3. Patition:spreads instances across many different partitions(which rely on different sets of racks) within an AZ. Scales to 100s of EC2 instances per group(Hadoop,Cassandra,Kafka). The instances in a partition do not share racks with the instances in the other partitions. => Can span across AZs in the same region
 
 以上策略的优缺点，就是网络性能与Availability 之间的取舍。
 
@@ -887,9 +887,9 @@ Between Client and Aurora DB cluster:
 
 Writer Endpoint：Pointing to the master, DNS name don't change even failover
 
-Reader Endpoint: Connection Load Balancing because of Auto Scaling 
+Reader Endpoint: Connection **Load Balancing** because of Auto Scaling 
 
-这里的Auto Scaling大概是两个层次，其一是单一Aurora，其二是read-only server层面的自动扩容。
+这里的Auto Scaling大概是两个层次，其一是单一Aurora，其二是read-only server层面的自动扩容(你可以设定)。
 
 > 例题
 >
@@ -933,7 +933,7 @@ Reader Endpoint
 >
 > D) Create a second Aurora database and link it to the primary database as a read replica
 
-Aurora Serverless: Automated database instantiation and auto-scaling based on actual usage. =>Aurora DB cluster转变为Aurora Serverless需要用AWS Database Migration Service
+Aurora Serverless: Automated database instantiation and auto-scaling based on actual usage. （似乎就不分master，read-only了）=>Aurora DB cluster转变为Aurora Serverless需要用AWS Database Migration Service
 
 Aurora Multi-Master: Every node does R/W => an immediate failover for writer
 
@@ -1959,7 +1959,7 @@ If a cosumer fails to process a message within the Visibility Timeout...the mess
 
 We can set a threshold of how many times a message can go back to the queue
 
-After the **MaximumRecieves** threshold is exceeded, the message goes into a dead letter queue(DLQ) 
+After the **MaximumRecieves** threshold is exceeded, the message goes into a dead letter queue(DLQ)  => Clinet 发回 SQS， SQS察觉超threshold了，发给DLQ
 
 > 例题
 >
@@ -1993,7 +1993,7 @@ Make sure to process the message in the DLQ before they expire(Useful for debugg
 
 通过Correlation ID来标记
 
-不同的Producer通过同一个Request Queue标记不同的Correlation ID来发信息到应用ASG的Responders，然后Responders创建不同的Response Queue来回信。
+不同的Producer通过同一个Request Queue标记不同的Correlation ID来发信息到应用ASG的Responders，然后Responders创建不同的Response Queue来回信。=> 一条Request Queue 和多条数量动态变化的Response Queue
 
 To implement this pattern: use the SQS Temporary Queue Client
 
@@ -2004,7 +2004,7 @@ To implement this pattern: use the SQS Temporary Queue Client
 >
 > - A. Configure a dead-letter queue on the ReceiveMessage API action of the SQS queue.
 > - B. Configure a FIFO queue, and use the message deduplication ID and message group ID.
-> - C. Create a temporary queue, with the Temporary Queue Client to receive each response message. **Most Voted**
+> - C. Create a **temporary** queue, with the Temporary Queue Client to receive each response message. **Most Voted**
 > - D. Create a queue for each request and response on startup for each producer, and use a correlation ID message attribute.
 
 ## 186 SQS - Delay Queues
@@ -2412,15 +2412,15 @@ Example: provide(temporary access to write to S3 bucket using Facebook Login)
 
 
 
-以上两者的区别还是不清不楚..是后者可以第三方进行验证，直接访问AWS资源？？前者跟Google，Facebook一个性质，后者把他们对接了？前者可以用Google来代替，与后者配合...
+~~以上两者的区别还是不清不楚..是后者可以第三方进行验证，直接访问AWS资源？？前者跟Google，Facebook一个性质，后者把他们对接了？前者可以用Google来代替，与后者配合...~~
+
+=> CUP就是和Google，Facebook一样的Identity Provider，并可以跟API Gateway集成。而CIP通过跟STS交流来回应，给临时凭证
 
 关键是Coginito可以提供一个临时凭证给远端手机用户去访问S3...
 
 > Amazon Cognito 提供用户池和身份池。用户池是为您的应用程序提供注册和登录选项的用户目录。身份池提供 AWS 凭证以向用户授予对其他 AWS 服务的访问权限。
 
 CUP可以提供Token去登陆Facebook，而CIP是来验证Facebook的Token来访问S3一类的东西。
-
-
 
 ## 218 AWS SAM
 
@@ -2453,6 +2453,8 @@ Moble client <-> API Gateway ->Lambda <- DAX Caching layer-> DynamoDB Global Tab
 We want to switch to a micro service architecture
 
 Many services interact with each other directly using a REST API
+
+=> 用API Gateway+Lambda, ELB+ECS等框架
 
 ## 222 Distributing Paid Content
 
@@ -2544,7 +2546,7 @@ Metric is a variable to monitor( CPU utilization,erc...)
 
 Possibility to define and send your own custom metrics to CloudWatch
 
-Example: memory(RAM) usage...
+Example: memory(RAM) usage, disk space...
 
 Use API call Put MetricData
 
