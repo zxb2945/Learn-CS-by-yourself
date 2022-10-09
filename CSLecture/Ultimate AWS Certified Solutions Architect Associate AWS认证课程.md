@@ -2088,6 +2088,8 @@ Traditional applications running from on-premise may use open protocos such as:M
 
 When migrating to the cloud, instead of re-engineering the application to use SQS and SNS, we can use Amazon MQ.
 
+If you're using messaging with existing applications and want to move your messaging service to the cloud quickly and easily, it is recommended that you consider **Amazon MQ**.
+
 ## 197 Docker Introduction
 
 Docker is a software development platform to deploy apps
@@ -2880,11 +2882,18 @@ KMS-Customer Master Key(CMK) Types:
 
 => S3 doesn't provide AES-128 encryption, only AES-256
 
+Three types of Customer Master Keys(CMK):
+
+1. AWS Managed Service Default CMK:free
+2. User keys created in KMS
+
+3. User keys imported(must be 256-bit symmetric key)
+
+比如你要加密数据库登录密码，你可以发送到KMS加密，对方可以发送去KMS解密
+
 
 
 Coping Snapshots across regions: key跟region对应，跨区要重新加密
-
-
 
 AWS managed keys or Custom managed keys : 即便是后者也是调用KMS API来创建的。
 
@@ -2904,9 +2913,11 @@ Serverless
 
 ## 272 AWS Secrets Manager
 
-Newer service, meant for storing secrets
+Newer service, meant for storing secrets （newer to SSM Parameter Store）
 
 Capability to force rotation of scerets every X days
+
+Intergraion with Amazon RDS(Mostly meant for RDS integration)
 
 Secrets are encypted using KMS
 
@@ -2933,7 +2944,7 @@ Supports both symmetric ans asymmetric encryption(SSL/TLS keys)
 
 有相应的客户端软件
 
-可以比较一下CloudHSM和KMS的区别
+可以比较一下CloudHSM和KMS的区别: 前者有三种Master keys: AWS owned CMK, AWS Managed CMK, Customer Managed CMK, 后者只有Customer Managed CMK
 
 ## 275 Shield - DDos Protection
 
@@ -3076,7 +3087,7 @@ Must be created separetely from a VPC
 
 Route table must also be edited!
 
-创建一个VPC，划分出数个子网，创建路由表指向本地部分子网，最后创建网关，编辑路由表指向此互联网网关，最终该子网上的EC2就可以使用Public IP了。
+创建一个VPC，划分出数个子网，在Router中创建路由表指向本地部分子网，最后创建网关，编辑路由表指向此互联网网关，最终该子网上的EC2就可以使用Public IP了。
 
 ## 291 Bastion Hosts
 
@@ -3312,11 +3323,15 @@ Access public resources S3 and private(EC2) on same connection
 
 总的而言，似乎是Customer Network与VPC之间建立一个AWS Direct Connect location（其中有AWS Direct Connect Endpoint, Customer router等节点），然后通过Private virtual interface 去连接VPG. 而S3等可以用AWS Direct Connect Endpoint用Public virtual interface去连接.
 
+=> 还可以在Customer Network 与 AWS Direct Connect location间加一个VPN来提供Encryption.
+
 Direct Connect Gateway: If you want to setup a Direct Connect to one or more VPC in many different regions(same account), you must use a Direct Connect Gateway
 
 这个Direct Connect Gateway就在AWS Direct Connect location和多个VPC的VPG之间。
 
 Direct Connect - Resiliency：一个VPC配置多个AWS Direct Connect Location去连接客户data center（one connection at multiple locations），进一步在同一个Location配置多条线路
+
+=>理解DX Location, 就是个网路区域
 
 > 例题
 >
@@ -3333,7 +3348,9 @@ Direct Connect - Resiliency：一个VPC配置多个AWS Direct Connect Location�
 
 背景：Exposing services in your VPC to other VPC. 你可以通过Public Internet，不怎么安全，也可以通过VPC peering，但需要将VPC全部expose.
 
- Service VPC需要设置一个Network Load Balancer, Customer VPC需要设置ENI，然后两者组成了AWS Private Link.
+ Service VPC需要设置一个Network Load Balancer跟Application service连接, Customer VPC需要设置ENI与Consumer Application连接，然后两者组成了AWS Private Link.
+
+比如ALB背后连接着许多ECS task，然后这个ALB跟NLB连接，就能通过AWS Private Link被另一个配置了ENI的VPC访问了.
 
 注意305p所讲的VPC endpoint是指内部私网EC2 如何去访问S3, 这里是另一个VPC通过endpoint去访问，当然其构架基础肯定有共通之处。
 
@@ -3702,8 +3719,6 @@ FAQ = Frequently asked questions
 
 
 ## 360 SAA-C03 topics 20220929
-
- If you're using messaging with existing applications and want to move your messaging service to the cloud quickly and easily, it is recommended that you consider **Amazon MQ**.
 
 **AWS Artifact**： is your go-to, central resource for compliance-related information that matters to you. 
 
