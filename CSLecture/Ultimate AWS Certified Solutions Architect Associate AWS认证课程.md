@@ -484,7 +484,7 @@ gp(SSD): General purpose SSD
 
 iol(SSD): Highest performance SSD
 
-stl/scl(HDD): Low cost HDD
+stl/scl(HDD): Low cost HDD  =>Magnetic volumes
 
 
 
@@ -492,7 +492,7 @@ Only gp/iol can be used as boot volumes（用于操作系统启动，HDD也可�
 
 
 
-io1/io2 with Multi-Attach: Attach the same EBS Volume to multiple EC2 instances in the same AZ. Application must manage concurrent write operations. (only io1/io2 can multi-attcach)
+io1/io2 with Multi-Attach: Attach the same EBS Volume to multiple EC2 instances in the same AZ. Application must manage concurrent write operations. (**only io1/io2** can multi-attcach)
 
 ## 065 EBS Encryption
 
@@ -663,6 +663,10 @@ CA: Certificate Authorities, such as Comodo, Symantec, etc...
 
 ELB为不同instances上的instances去申请不同CA的能力
 
+SAA-03:
+If you got your certificate from a third-party CA, import the certificate into ACM(AWS Certificate Manager) or upload it to the IAM certificate store. 
+ACM lets you import third-party certificates from the ACM console, as well as programmatically. If ACM is not available in your region, use AWS CLI to upload your third-party certificate to the IAM certificate store.
+
 ## 082 Connection Draining
 
 在CLB，被称为Connection Draining, 对于ALB&NLB，叫作Deregistration Delay。
@@ -689,7 +693,7 @@ Auto Scaling Group in AWS with Load Balancer
 **Scaling policies** can be on CPU,Network,even schedule
 
 1. Dynamic scaling policies => **target tracking policy**(比如CPU利用率)
-2. Predictive scaling policies  => based on machine learning
+2. **Predictive scaling policies**  => based on machine learning
 3. **Scheduled actions**
 
 > 例题
@@ -779,6 +783,7 @@ RDS backups and **scales automatically** for you.
 > - **磁性** – Amazon RDS 还支持磁性存储以实现向后兼容。我们建议您采用通用型 SSD 或预配置 IOPS 来满足所有新存储需求。磁性存储上的数据库实例允许的最大存储量少于其他存储类型的这种量。
 
 Enhanced Monitoring is a feature of Amazon RDS.=>好像可以用来监测线程
+=>Enhanced Monitoring metrics are useful when you want to see how different processes or threads on a DB instance use the CPU.
 
 ## 089 RDS Read Replicas vs Multi AZ
 
@@ -1207,6 +1212,8 @@ Managed service:
 
 We still have full control over the configuration.
 
+=>Elastic Beanstalk environments have limited resources; for example, Elastic Beanstalk does not create a VPC for you. CloudFormation on the other hand is more of a low-level service that you can use to model the entirety of your AWS environment. In fact, Elastic Beanstalk uses CloudFormation under the hood to create resources.
+
 ## 126 S3 Buckets and Objects
 
 Amazon S3 allows people to store objects(file) in "buckets"(directories)
@@ -1242,8 +1249,8 @@ Notes:
 
 There are 4 methods of encrypting objects in S3:
 
-1. SSE-S3
-2. SSE-KMS
+1. SSE-S3 : Each object is encrypted with a unique key. As an additional safeguard, it encrypts the key itself with a master key that it regularly rotates. (AES-256)
+2. SSE-KMS =>**refer to Chapter 266** : Similar to SSE-S3, but also provides you with an audit trail that shows when your CMK was used and by whom. Additionally, you can create and manage customer-managed CMKs or use AWS managed CMKs that are unique to you
 3. SSE-C: S3 does not store the encryption key you provide,HTTPS is mandatory for SSE-C.
 4. Client Side Encryption
 
@@ -1550,6 +1557,11 @@ In general ,bucket owners pay for all Amazon S3 storage and data transfer costs 
 With Requester Pays buckets, the requester instead of the bucket owner pays the cost of the request and the data download from the bucket.
 
 Helpful when you wang to share large datasets with other accounts
+
+=>You pay for all bandwidth into and out of Amazon S3, except for the following:
+- Data transferred in from the Internet.
+- Data transferred out to an Amazon EC2 instance, when the instance is in the same AWS Region as the S3 bucket (including to a different account in the same AWS region).
+- Data transferred out to Amazon CloudFront.
 
 ## 161 Athena Overview
 
@@ -2386,6 +2398,8 @@ API Gateway can invoke Lambda function, easy way to expose REST API backed by AW
 >
 > "RESTful services" -> API gateway to be used
 
+You can use **AWS X-Ray** to trace and analyze user requests as they travel through your Amazon API Gateway APIs to the underlying services. 
+
 ## 216 API Gateway Security
 
 IAM Permissions
@@ -2407,6 +2421,8 @@ Can enable Federated Identities(Facebook, Google...) 用脸书账号登录,作�
 Send back a Json Wen Tokens
 
 本质上，Cognito User Pools(CUP)是和Google，Facebook一样的Identity Provider.
+
+=>You can add multi-factor authentication (MFA) to a user pool to protect the identity of your users. 
 
 **Cognito Identity Pools(Federated Identity)**: Integrate with Cognito User Pools as an identity provider
 
@@ -2510,6 +2526,8 @@ Data is loaded from S3, DynamoDB, other DBs...
 
 可以通过Kinesis Data Firehose从S3 Loding data，也可以直接用copy command.
 
+=>configure cross-region snapshot copy to implement a disaster recovery plan
+
 ### Glue
 
 Managed extract, transform, and load (ETL) service
@@ -2542,7 +2560,8 @@ CloudWatch provides merics for every service in AWS
 
 Metric is a variable to monitor( CPU utilization,erc...)
 
-**Note**:EC2 Memeory usage is by fault not pushed(must be pushed from inside the instance as a custon metric)
+**Note**:EC2 Memeory usage is by fault not pushed(must be pushed from inside the instance as a custom metric)
+Remember that by default, CloudWatch doesn't monitor memory usage but only the CPU utilization, Network utilization, Disk performance, and Disk Reads/Writes.
 
 ## 239 CloudWatch Custom Metrics
 
@@ -3281,11 +3300,11 @@ Athena如何去操作S3呢？Athena在某个S3路径下对其log进行表创建�
 
 ## 309 Site to Site VPN Connections
 
-Virtual Praivate Gateway (VGW): VPN concentrator on the AWS side of the VPN connection
+Virtual Praivate Gateway (VGW): VPN concentrator on the AWS side of the VPN connection => compared to Internet Gateway 
 
 Customer Gateway(CGW): Software application or physical device on customer side of the VPN connection
 
-AWS VON CloudHub: Provide sevure communication between multiple sites, if you have multiple VPN connections.
+AWS VPN CloudHub: Provide sevure communication between multiple sites, if you have multiple VPN connections.
 
 就是多个CGW跟这个VGW通信的话，这些CGW之间也可以通过这个VPN交流，此时VGW就相当于一个CloudHub了。
 
@@ -3482,7 +3501,7 @@ Can synchronize to: S3, EFS, FSx
 
 Move data from your NAS or file system via NFS or SMB
 
-在本地设置一个AWS DataSync Agent，与AWS DataSync Service endpoint用TLS连接，进行本地与云数据同步
+在本地设置一个AWS D**ataSync Agent**，与AWS DataSync **Service endpoint**用TLS连接，进行本地与云数据同步
 
 With AWS DataSync, you can transfer data from on-premises directly to Amazon S3 Glacier Deep Archive. 
 
@@ -3598,7 +3617,7 @@ StackSets: Create,update,or delete stacks across multople accounts and regions w
 
 ## 343 Step Functions & SWF
 
-Build serverless visual workflow to orchestrate your Lambda functions
+Build serverless visual **workflow** to orchestrate your Lambda functions
 
 Represent flow as a JSON **state machine**
 
@@ -3745,3 +3764,6 @@ You can use **Amazon Data Lifecycle Manager** (Amazon DLM) to automate the creat
 **Amazon Comprehend** is a natural language processing (NLP) service that uses machine learning to find meaning and insights in text.
 
 =>First, you'd have to create a transcription job using Amazon Transcribe to transform the recordings into text. Then, translate non-English calls to English using Amazon Translate. Finally, use Amazon Comprehend for sentiment analysis.
+
+An **Elastic Fabric Adapter (EFA)** is a network device that you can attach to your Amazon EC2 instance to accelerate High Performance Computing (HPC) and machine learning applications.
+
