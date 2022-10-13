@@ -6,7 +6,9 @@ B站课程地址: https://www.bilibili.com/video/BV1wR4y1F7YM?p=11&vd_source=cfe
 
 知乎分享：https://zhuanlan.zhihu.com/p/512791644
 
-刷题网站：https://www.examtopics.com/exams/amazon/aws-certified-solutions-architect-associate-saa-c02/view/
+刷题网站SAAC02：https://www.examtopics.com/exams/amazon/aws-certified-solutions-architect-associate-saa-c02/view/
+
+刷题网站SAAC03：https://www.examtopics.com/exams/amazon/aws-certified-solutions-architect-associate-saa-c03/view/
 
 Udemy试题：https://www.udemy.com/cart/success/821309364/
 
@@ -633,6 +635,17 @@ Operates at Layer 3 (Network Layer)-IP Packets
 
 从网上收集流量，先转发到第三方的3rd Party Secutiry Virtual Appliances分析，OK之后传回GWLB，GWLB再转发到Application. （网关嘛路由转发）
 
+> 例题
+>
+> A company has a three-tier web application that is deployed on AWS. The web servers are deployed in a public subnet in a VPC. The application servers and database servers are deployed in private subnets in the same VPC. The company has deployed a third-party virtual firewall appliance from AWS Marketplace in an inspection VPC. The appliance is configured with an IP interface that can accept IP packets.
+> A solutions architect needs to integrate the web application with the appliance to inspect all traffic to the application before the traffic reaches the web server.
+> Which solution will meet these requirements with the LEAST operational overhead?
+>
+> - A. Create a Network Load Balancer in the public subnet of the application's VPC to route the traffic to the appliance for packet inspection.
+> - B. Create an Application Load Balancer in the public subnet of the application's VPC to route the traffic to the appliance for packet inspection.
+> - C. Deploy a transit gateway in the inspection VPConfigure route tables to route the incoming packets through the transit gateway.
+> - D. Deploy a Gateway Load Balancer in the inspection VPC. Create a Gateway Load Balancer endpoint to receive the incoming packets and forward the packets to the appliance.
+
 ## 079 ELB-Sticky Sessions
 
 Operation order:EC2->Target groups->my-first-target-group->Edit attributes
@@ -796,6 +809,8 @@ RDS Read Replicas for read scalability
 For RDS Read Replicas within the same region, you don't pay that fee.
 => **Read Replica provides an asynchronous replication** instead of synchronous.
 
+=> it does not support automatic failover, need to manually promote as primary instance 
+
 (RDS 是托管服务)
 
 
@@ -807,6 +822,8 @@ RDS Muiti AZ (Disaster Recovery)
 ​	One DNS name-automatic app failover to standby
 
 ​	Not used for scaling
+
+=> you can't directly connect to the standby instance.
 
 Note: The Read Replicas can be setup as Multi AZ for Disaster Reconvery.
 
@@ -1417,6 +1434,8 @@ Do not set your loggin bucket to be the monitored bucket
 
 It will create a logging loop, and your bucket will grow in size exponentially.
 
+=>**AWS CloudTrail logs** provide a record of actions taken by a user, role, or an AWS service in Amazon S3, while **Amazon S3 server access logs** provide detailed records for the requests that are made to an S3 bucket.
+
 ## 147 S3 Replication(CRR&SRR)
 
 Must enable versioning in source and destination
@@ -1452,6 +1471,21 @@ For Delete oprations: can replicate delete markers from source to target(optiona
 
 
 > **Amazon S3 Transfer Acceleration** 是一项存储桶级别功能，可在您的客户端和 S3 Bucket 之间实现快速、轻松、安全的远距离文件传输。Transfer Acceleration 旨在优化从世界各地传入 S3 存储桶的传输速度。Transfer Acceleration 利用 Amazon CloudFront 中的全球分布式边缘站点。当数据到达某个边缘站点时，数据会被经过优化的网络路径路由至 Amazon S3。
+>
+> =>就跟CRR等无关
+
+
+
+> 例题
+>
+> A company collects data for temperature, humidity, and atmospheric pressure in cities across multiple continents. The average volume of data that the company collects from each site daily is 500 GB. Each site has a high-speed Internet connection.
+> The company wants to aggregate the data from all these global sites as quickly as possible in a single Amazon S3 bucket. The solution must minimize operational complexity.
+> Which solution meets these requirements?
+>
+> - **A.** Turn on S3 Transfer Acceleration on the destination S3 bucket. Use multipart uploads to directly upload site data to the destination S3 bucket.
+> - B. Upload the data from each site to an S3 bucket in the closest Region. Use S3 Cross-Region Replication to copy objects to the destination S3 bucket. Then remove the data from the origin S3 bucket.
+> - C. Schedule AWS Snowball Edge Storage Optimized device jobs daily to transfer data from each site to the closest Region. Use S3 Cross-Region Replication to copy objects to the destination S3 bucket.
+> - D. Upload the data from each site to an Amazon EC2 instance in the closest Region. Store the data in an Amazon Elastic Block Store (Amazon EBS) volume. At regular intervals, take an EBS snapshot and copy it to the Region that contains the destination S3 bucket. Restore the EBS volume in that Region.
 
 
 
@@ -1559,6 +1593,7 @@ With Requester Pays buckets, the requester instead of the bucket owner pays the 
 Helpful when you wang to share large datasets with other accounts
 
 =>You pay for all bandwidth into and out of Amazon S3, except for the following:
+
 - Data transferred in from the Internet.
 - Data transferred out to an Amazon EC2 instance, when the instance is in the same AWS Region as the S3 bucket (including to a different account in the same AWS region).
 - Data transferred out to Amazon CloudFront.
@@ -2033,6 +2068,8 @@ Exactly-once send capability(by removing duplicates)
 
 Messages are processed in order by consumer
 
+=>与 Standard Queue的杂乱无序和At-Least-Once Delivery相较，FIFO就不会出现Duplicates现象.
+
 ## 188 SQS + Auto Scaling Group
 
 SQS Queue => Auto Scaling Group => CloudWatch Custom Metric: Queue Lenth/Number of Instances => CloudWatch Alarm => Auto Scaling Group 
@@ -2265,7 +2302,7 @@ You can use Lambda to change CloudFront requests and responses
 
 You can also generate responses to viewers without ever sending the request to the origin.
 
-(Runs code in each CloudFront Edge, globally)
+(Runs code in each CloudFront Edge, **globally**) => run code closer to users of your application
 
 > 例题
 >
@@ -2522,7 +2559,7 @@ It's OLAP- online analytical processing
 
 =>用于市场决策参考
 
-Data is loaded from S3, DynamoDB, other DBs...
+Data is loaded **from S3**, DynamoDB, other DBs...
 
 可以通过Kinesis Data Firehose从S3 Loding data，也可以直接用copy command.
 
@@ -2838,6 +2875,8 @@ Service Control Policies(**SCP**): Whitelist or blacklist IAM actions
 > - C. Create a service control policy (SCP) the prohibits changes to CloudTrail, and attach it the developer accounts.
 > - D. Create a service-linked role for CloudTrail with a policy condition that allows changes only from an Amazon Resource Name (ARN) in the management account.
 
+=> Adding the aws **PrincipalOrgID** global condition key with a reference to the organization ID to the S3 bucket policy can prevent the members who don't belong to your organization to access the resource
+
 ## 259 IAM Adavanced
 
 IAM Conditions : 比如基于IP，区域等对访问进行限制，强制使用MFA
@@ -2864,7 +2903,9 @@ Share with any accout or **within your Organization**
 
 Centrally manage Single Sign-On to access multiple accounts and 3rd-party business applications.
 
-所谓的accounts是指比如同时登陆脸书，谷歌邮箱这种感觉。 
+~~所谓的accounts是指比如同时登陆脸书，谷歌邮箱这种感觉。~~ 
+
+=> 登录 SSO console, 就可直接click去登录multiple accounts.
 
 Intergrated with AWS Organizations
 
@@ -3427,6 +3468,8 @@ Allows you to capture and inspect network traffic in your VPC
 
 简而言之，复制一份到某个EC2的流浪route到一个分析架构上
 
+Use cases: content inspection, threat monitoring, troubleshooting =>没有提filtering
+
 ## 317 IPv6 for VPC
 
 IPv4 cannot be disabled for your VPC and subnets.
@@ -3623,7 +3666,7 @@ Represent flow as a JSON **state machine**
 
 用JSON组织Lambda？可以表示为流程图
 
-AWS SWF - Simple Workflow Service: 感觉像Step Function还不是serverless的老版本，即将被淘汰
+AWS SWF - **Simple Workflow Service**: 感觉像Step Function还不是serverless的老版本，即将被淘汰 => It ensures that a task is never duplicated and is assigned only once. 
 
 ## 344 Amazon EMR
 
@@ -3699,9 +3742,11 @@ Create custom reports that analyze cost and usage data.
 
 ## 351 Well Architected Framework Overview
 
-Well-Architected Tool
+**Well-Architected Tool**
 
 更像一个turiol，给你一份问卷，让你评估...
+
+=>You can also use the Well-Architected Tool to automatically monitor the status of your workloads across your AWS account, conduct architectural reviews and check for AWS best practices.
 
 ### Operational Excellence
 
@@ -3753,7 +3798,19 @@ You can use **Amazon Data Lifecycle Manager** (Amazon DLM) to automate the creat
 
 **AWS Network Firewall** is a stateful, managed network firewall and intrusion detection and prevention service for your virtual private cloud (VPC) that you created in Amazon Virtual Private Cloud (Amazon VPC). With Network Firewall, you can filter traffic at the perimeter of your VPC. This includes filtering traffic going to and coming from an internet gateway, NAT gateway, or over VPN or AWS Direct Connect. Network Firewall uses the open source intrusion prevention system (IPS), Suricata, for stateful inspection. Network Firewall supports Suricata compatible rules.
 
-**AWS Control Tower** provides a single location to easily set up your new well-architected multi-account environment and govern your AWS workloads with rules for security, operations, and internal compliance. 
+> 例题
+>
+> A company recently migrated to AWS and wants to implement a solution to protect the traffic that flows in and out of the production VPC. The company had an inspection server in its on-premises data center. The inspection server performed specific operations such as traffic flow inspection and traffic filtering. The company wants to have the same functionalities in the AWS Cloud.
+> Which solution will meet these requirements?
+>
+> - A. Use Amazon GuardDuty for traffic inspection and traffic filtering in the production VPC.
+> - B. Use Traffic Mirroring to mirror traffic from the production VPC for traffic inspection and filtering.
+> - C. Use AWS Network Firewall to create the required rules for traffic inspection and traffic filtering for the production VPC.
+> - D. Use AWS Firewall Manager to create the required rules for traffic inspection and traffic filtering for the production VPC.
+
+
+
+**AWS Control Tower** provides a single location to easily set up your new well-architected <u>multi-account environment</u> and govern your AWS workloads with rules for security, operations, and internal compliance. 
 
 **Amazon DocumentDB (with MongoDB compatibility)** is a fast, scalable, highly available, and fully managed document database service that supports MongoDB workloads.
 
@@ -3767,3 +3824,16 @@ You can use **Amazon Data Lifecycle Manager** (Amazon DLM) to automate the creat
 
 An **Elastic Fabric Adapter (EFA)** is a network device that you can attach to your Amazon EC2 instance to accelerate High Performance Computing (HPC) and machine learning applications.
 
+**Amazon QuickSight** is a cloud-scale business intelligence (BI) service that you can use to deliver easy-to-understand insights to the people who you work with, wherever they are. Amazon QuickSight connects to your data in the cloud and combines data from many different sources. In a single data dashboard, QuickSight can include AWS data, third-party data, big data, spreadsheet data, SaaS data, B2B data, and more.
+
+Here are some of the benefits of using Amazon QuickSight for analytics, data visualization, and reporting: ...
+
+> 例题
+>
+> A company hosts a data lake on AWS. The data lake consists of data in Amazon S3 and Amazon RDS for PostgreSQL. The company needs a reporting solution that provides data visualization and includes all the data sources within the data lake. Only the company's management team should have full access to all the visualizations. The rest of the company should have only limited access.
+> Which solution will meet these requirements?
+>
+> - A. Create an analysis in Amazon QuickSight. Connect all the data sources and create new datasets. Publish dashboards to visualize the data. Share the dashboards with the appropriate IAM roles.
+> - B. Create an analysis in Amazon QuickSight. Connect all the data sources and create new datasets. Publish dashboards to visualize the data. Share the dashboards with the appropriate users and groups.
+> - C. Create an AWS Glue table and crawler for the data in Amazon S3. Create an AWS Glue extract, transform, and load (ETL) job to produce reports. Publish the reports to Amazon S3. Use S3 bucket policies to limit access to the reports.
+> - D. Create an AWS Glue table and crawler for the data in Amazon S3. Use Amazon Athena Federated Query to access data within Amazon RDS for PostgreSQL. Generate reports by using Amazon Athena. Publish the reports to Amazon S3. Use S3 bucket policies to limit access to the reports.
