@@ -1587,6 +1587,19 @@ Less network transfer, less CPU cost client-side.
 
 Types: SNS, SQS, Lambda Function
 
+> 例题
+> 
+> A company's application integrates with multiple software-as-a-service (SaaS) sources for data collection. The company runs Amazon EC2 instances to receive the data > and to upload the data to an Amazon S3 bucket for analysis. The same EC2 instance that receives and uploads the data also sends a notification to the user when an upload is complete. The company has noticed slow application performance and wants to improve the performance as much as possible.
+> Which solution will meet these requirements with the LEAST operational overhead?
+> 
+> A. Create an Auto Scaling group so that EC2 instances can scale out. Configure an S3 event notification to send events to an Amazon Simple Notification Service (Amazon SNS) topic when the upload to the S3 bucket is complete.
+> 
+> B. Create an Amazon AppFlow flow to transfer data between each SaaS source and the S3 bucket. Configure an S3 event notification to send events to an Amazon Simple > Notification Service (Amazon SNS) topic when the upload to the S3 bucket is complete.
+> 
+> C. Create an Amazon EventBridge (Amazon CloudWatch Events) rule for each SaaS source to send output data. Configure the S3 bucket as the rule's target. Create a second EventBridge (Cloud Watch Events) rule to send events when the upload to the S3 bucket is complete. Configure an Amazon Simple Notification Service (Amazon  SNS) topic as the second rule's target.
+> 
+> D. Create a Docker container to use instead of an EC2 instance. Host the containerized application on Amazon Elastic Container Service (Amazon ECS). Configure Amazon CloudWatch Container Insights to send events to an Amazon Simple Notification Service (Amazon SNS) topic when the upload to the S3 bucket is complete.
+
 ## 160 S3 Requester pays
 
 In general ,bucket owners pay for all Amazon S3 storage and data transfer costs associated with their bucket
@@ -2962,6 +2975,8 @@ Coping Snapshots across regions: key跟region对应，跨区要重新加密
 
 AWS managed keys or Custom managed keys : 即便是后者也是调用KMS API来创建的。
 
+AWS KMS supports **multi-Region keys**, which are AWS KMS keys in different AWS Regions that can be used interchangeably – as though you had the same key in multiple Regions. 
+
 ## 268 KMS Key Rotation
 
 Only for Customer-managed CMK, if enable: automatic key rotation happens every 1 year.
@@ -3851,3 +3866,5 @@ Here are some of the benefits of using Amazon QuickSight for analytics, data vis
 
 **AWS Wavelength** combines the high bandwidth and ultralow latency of 5G networks with AWS compute and storage services so that developers can innovate and build a new class of applications.
 Wavelength Zones are AWS infrastructure deployments that embed AWS compute and storage services within telecommunications providers’ data centers at the edge of the 5G network, so application traffic can reach application servers running in Wavelength Zones without leaving the mobile providers’ network. => Relative to Availibility Zone
+
+**Amazon AppFlow** is a fully managed integration service that enables you to securely transfer data between Software-as-a-Service (SaaS) applications like Salesforce, SAP, Zendesk, Slack, and ServiceNow, and AWS services like Amazon S3 and Amazon Redshift, in just a few clicks. 
