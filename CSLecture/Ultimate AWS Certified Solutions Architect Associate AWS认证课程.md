@@ -93,6 +93,8 @@ Some AWS service will need to perform actions on your behalf
 
 To do so, we will assign permissions to AWS services with IAM Roles
 
+=>One IAM Role can be assigned to multiple EC2 instances in the different regions.
+
 ## 025 IAM Security Tools
 
 IAM Credentials Report(accout-level)
@@ -1435,6 +1437,7 @@ Do not set your loggin bucket to be the monitored bucket
 It will create a logging loop, and your bucket will grow in size exponentially.
 
 =>**AWS CloudTrail logs** provide a record of actions taken by a user, role, or an AWS service in Amazon S3, while **Amazon S3 server access logs** provide detailed records for the requests that are made to an S3 bucket.
+ELB has the feature of access logs =>Access logging is an optional feature of Elastic Load Balancing that is disabled by default. After you enable access logging for your load balancer, Elastic Load Balancing captures the logs and stores them in the Amazon S3 bucket that you specify as compressed files. You can disable access logging at any time.
 
 ## 147 S3 Replication(CRR&SRR)
 
@@ -2719,6 +2722,8 @@ CloudTrail Events:
 
 Retention:Events are stored for 90 days in CloudTrail, to keep events beyong this period, log them to S3 and use Athena
 
+By default, CloudTrail event log files are encrypted using Amazon S3 server-side encryption (SSE). 
+
 ## 251 AWS Config Overview 20220723
 
 > AWS Config 提供了与您的 AWS 账户关联的资源的详细视图，包括它们的配置方式、彼此关联的方式以及配置及其关系是如何随着时间变化的。
@@ -3724,6 +3729,10 @@ Offline data synchronization(Replaces Cognito Sync)
 
 Make use of GraphQL(mobile technology from Facebook)
 
+AWS AppSync is a **serverless** GraphQL and Pub/Sub API service that simplifies building modern web and mobile applications. It provides a robust, scalable GraphQL interface for application developers to combine data from multiple sources, including Amazon DynamoDB, AWS Lambda, and HTTP APIs.
+
+GraphQL is a data language to enable client apps to fetch, change and subscribe to data from servers. In a GraphQL query, the client specifies how the data is to be structured when it is returned by the server. This makes it possible for the client to query only for the data it needs, in the format that it needs it in.
+
 ## 348 Cost Explorer
 
 Visualize, understand, and manage your AWS costs and usage over time.
@@ -3822,7 +3831,8 @@ You can use **Amazon Data Lifecycle Manager** (Amazon DLM) to automate the creat
 
 =>First, you'd have to create a transcription job using Amazon Transcribe to transform the recordings into text. Then, translate non-English calls to English using Amazon Translate. Finally, use Amazon Comprehend for sentiment analysis.
 
-An **Elastic Fabric Adapter (EFA)** is a network device that you can attach to your Amazon EC2 instance to accelerate High Performance Computing (HPC) and machine learning applications.
+Amazon EC2 provides enhanced networking capabilities through the **Elastic Network Adapter (ENA)**. Enhanced networking provides higher bandwidth, higher packet per second (PPS) performance, and consistently lower inter-instance latencies.
+An **Elastic Fabric Adapter (EFA)** is a network device that you can attach to your Amazon EC2 instance to accelerate High Performance Computing (HPC) and machine learning applications. It provides all of the functionality of an ENA, with additional OS-bypass functionality. But the OS-bypass capabilities of EFAs are not supported on Windows instances. 
 
 **Amazon QuickSight** is a cloud-scale business intelligence (BI) service that you can use to deliver easy-to-understand insights to the people who you work with, wherever they are. Amazon QuickSight connects to your data in the cloud and combines data from many different sources. In a single data dashboard, QuickSight can include AWS data, third-party data, big data, spreadsheet data, SaaS data, B2B data, and more.
 
@@ -3837,3 +3847,7 @@ Here are some of the benefits of using Amazon QuickSight for analytics, data vis
 > - B. Create an analysis in Amazon QuickSight. Connect all the data sources and create new datasets. Publish dashboards to visualize the data. Share the dashboards with the appropriate users and groups.
 > - C. Create an AWS Glue table and crawler for the data in Amazon S3. Create an AWS Glue extract, transform, and load (ETL) job to produce reports. Publish the reports to Amazon S3. Use S3 bucket policies to limit access to the reports.
 > - D. Create an AWS Glue table and crawler for the data in Amazon S3. Use Amazon Athena Federated Query to access data within Amazon RDS for PostgreSQL. Generate reports by using Amazon Athena. Publish the reports to Amazon S3. Use S3 bucket policies to limit access to the reports.
+
+
+**AWS Wavelength** combines the high bandwidth and ultralow latency of 5G networks with AWS compute and storage services so that developers can innovate and build a new class of applications.
+Wavelength Zones are AWS infrastructure deployments that embed AWS compute and storage services within telecommunications providers’ data centers at the edge of the 5G network, so application traffic can reach application servers running in Wavelength Zones without leaving the mobile providers’ network. => Relative to Availibility Zone
