@@ -286,7 +286,17 @@ EC2 On Demand: pay for what you use
 
 EC2 Reserved Instance: Up to 75% discount compared to On-Demand, Recomended for database
 
-长期租用嘛，当然打折扣
+**长期租用**嘛，当然打折扣 => 一礼拜这样的就不行
+
+> 例题
+>
+> A company needs guaranteed Amazon EC2 capacity in three specific Availability Zones in a specific AWS Region for an upcoming event that will last 1 week.
+> What should the company do to guarantee the EC2 capacity?
+>
+> - A. Purchase Reserved Instances that specify the Region needed.
+> - B. Create an On-Demand Capacity Reservation that specifies the Region needed.
+> - C. Purchase Reserved Instances that specify the Region and three Availability Zones needed.
+> - D. Create an On-Demand Capacity Reservation that specifies the Region and three Availability Zones needed.
 
 Convertible Reserved instance: can change the EC2 instance type
 
@@ -442,7 +452,7 @@ Controls the EBS behaviour when an EC2 instance terminates
 
 ## 058 EBS Snapshots Overview
 
-Make a backup(snapshot) of your EBS volume at a point in time
+Make a backup(snapshot) of your EBS volume **at a point in time** =>备份某一时间点的状态，That mean the EBS volume can be used while the snapshot is in progress.
 
 Can copy snapshots across AZ or Region
 
@@ -503,6 +513,10 @@ io1/io2 with Multi-Attach: Attach the same EBS Volume to multiple EC2 instances 
 这个episode谈论了两种方式，一个未加密的snapshot，先复制为一个加密的snapshot，然后在这个加密的snapshot创造出一个volume，自动继承加密；一个未加密的snapshot，创造出volume时候加密，也成为一个加密的volume...(好无聊...)
 
 =>**Amazon EBS encryption** offers a simple encryption solution for your EBS volumes without the need to build, maintain, and secure your own key management infrastructure.
+
+Encryption and decryption are handled transparently(you have nothing to do)
+
+EBS Encryption leverages keys from KMS(AES-256)
 
 ## 066 EFS Overview
 
@@ -607,6 +621,8 @@ The application servers don't see the IP of the client directly, the true IP of 
 
 (security group中的source中添加另一个安全组号来控制流量不太懂...security group不是规则的集合吗？难道还能作为主机IP的集合？？它的意思是特定另一个security group出来的流量？)
 
+=>Today, we are announcing **weighted target groups** for application load balancers. It allows developers to control how to distribute traffic to multiple versions of their application.
+
 ## 076 Network Load Balancer(NLB)
 
 Network load balances(Layer 4) allow to:
@@ -707,9 +723,15 @@ Auto Scaling Group in AWS with Load Balancer
 
 **Scaling policies** can be on CPU,Network,even schedule
 
-1. Dynamic scaling policies => **target tracking policy**(比如CPU利用率)
+1. Dynamic scaling policies
+
+   1.1 **target tracking policy**(比如通过扩展收缩使CPU利用率稳定在40%)
+
+   1.2 Simple/Step Scaling: set up CloudWatch alarm(比如CPU到30%，增加一个，到70%增加两个...)
+
+   1.3 **Scheduled actions**
+
 2. **Predictive scaling policies**  => based on machine learning
-3. **Scheduled actions**
 
 > 例题
 >
@@ -3124,6 +3146,17 @@ AWS Inspector Agent must be installed on OS in EC2 instances
 用机器学习来分析搜索**在S3中的敏感数据**，such as personally identifiable information(PII)
 
 S3 => Macie => CloudWatch Events EventBridge => SNS, Lambda
+
+> 例题
+>
+> A company has an application that provides marketing services to stores. The services are based on previous purchases by store customers. The stores upload transaction data to the company through SFTP, and the data is processed and analyzed to generate new marketing offers. Some of the files can exceed 200 GB in size.
+> Recently, the company discovered that some of the stores have uploaded files that contain personally identifiable information (PII) that should not have been included. The company wants administrators to be alerted if PII is shared again. The company also wants to automate remediation.
+> What should a solutions architect do to meet these requirements with the LEAST development effort?
+>
+> - A. Use an Amazon S3 bucket as a secure transfer point. Use Amazon Inspector to scan the objects in the bucket. If objects contain PII, trigger an S3 Lifecycle policy to remove the objects that contain PII.
+> - B. Use an Amazon S3 bucket as a secure transfer point. Use Amazon Macie to scan the objects in the bucket. If objects contain PII, use Amazon Simple Notification Service (Amazon SNS) to trigger a notification to the administrators to remove the objects that contain PII.
+> - C. Implement custom scanning algorithms in an AWS Lambda function. Trigger the function when objects are loaded into the bucket. If objects contain PII, use Amazon Simple Notification Service (Amazon SNS) to trigger a notification to the administrators to remove the objects that contain PII.
+> - D. Implement custom scanning algorithms in an AWS Lambda function. Trigger the function when objects are loaded into the bucket. If objects contain PII, use Amazon Simple Email Service (Amazon SES) to trigger a notification to the administrators and trigger an S3 Lifecycle policy to remove the meats that contain PII.
 
 ## 285 VPC Overview 20220726
 
