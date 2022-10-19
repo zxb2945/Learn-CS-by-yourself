@@ -95,6 +95,8 @@ To do so, we will assign permissions to AWS services with IAM Roles
 
 =>One IAM Role can be assigned to multiple EC2 instances in the different regions.
 
+=>You can use an IAM role to delegate access to resources that are in different AWS accounts that you own. You share resources in one account with users in a different account. By setting up **cross-account access** in this way, you don't need to create individual IAM users in each account. In addition, users don't have to sign out of one account and sign into another in order to access resources that are in different AWS accounts.
+
 ## 025 IAM Security Tools
 
 IAM Credentials Report(accout-level)
@@ -516,7 +518,11 @@ io1/io2 with Multi-Attach: Attach the same EBS Volume to multiple EC2 instances 
 
 Encryption and decryption are handled transparently(you have nothing to do)
 
-EBS Encryption leverages keys from KMS(AES-256)
+
+
+EBS Encryption leverages keys from KMS(AES-256) =>Amazon EBS does not support asymmetric CMKs, 非对称key，有公钥私钥，不能访问KMS API
+
+**Encryption by default** is a Region-specific setting. If you enable it for a Region, you cannot disable it for individual volumes or snapshots in that Region.If you enabled encryption by default, Amazon EBS encrypts the resulting new volume or snapshot using your default key for EBS encryption. Even if you have not enabled encryption by default, you can enable encryption when you create an individual volume or snapshot.
 
 ## 066 EFS Overview
 
@@ -674,6 +680,10 @@ Operation order:EC2->Target groups->my-first-target-group->Edit attributes
 
 ELB必然也存在于一个特定的AZ，负载均衡时可以无视instance的AZ差异。只是对于ALB，默认开启且不能被关所以免费；对于NLB，默认关闭，启用收费；而CLB虽然默认关闭但启用不收费...
 
+=>With Application Load Balancers, **cross-zone load balancing** is always enabled.
+
+With Network Load Balancers and Gateway Load Balancers, cross-zone load balancing is disabled by default. After you create the load balancer, you can enable or disable cross-zone load balancing at any time.
+
 ## 081 ELB-SSL Certificates
 
 SSL: Secure Sockets Layer, used to encrypt connections (HTTPS)
@@ -693,10 +703,6 @@ SNI solves the problem of **loading mutiple SSL certificates onto one web server
 CA: Certificate Authorities, such as Comodo, Symantec, etc...
 
 ELB为不同instances上的instances去申请不同CA的能力
-
-SAA-03:
-If you got your certificate from a third-party CA, import the certificate into ACM(AWS Certificate Manager) or upload it to the IAM certificate store. 
-ACM lets you import third-party certificates from the ACM console, as well as programmatically. If ACM is not available in your region, use AWS CLI to upload your third-party certificate to the IAM certificate store.
 
 ## 082 Connection Draining
 
@@ -848,6 +854,8 @@ RDS Muiti AZ (Disaster Recovery)
 ​	Not used for scaling
 
 => you can't directly connect to the standby instance.
+
+=> Muiti AZ in the same region
 
 Note: The Read Replicas can be setup as Multi AZ for Disaster Reconvery.
 
@@ -2613,11 +2621,17 @@ Fully serverless service
 
 S3/RDS -> Glue ETL -> Redshift
 
+> AWS Glue 是一项无服务器数据集成服务，可让使用分析功能的用户轻松发现、准备、移动和集成来自多个来源的数据。您可以将其用于分析、机器学习和应用程序开发。它还包括用于编写、运行任务和实施业务工作流程的额外生产力和数据操作工具。
+>
+> 通过使用 AWS Glue，您可以发现并连接到 70 多个不同的数据来源，并在集中式数据目录中管理您的数据。您可以直观地创建、运行和监控“提取、转换、加载（ETL）”管道，以将数据加载到数据湖中。此外，您可以使用 Amazon Athena、Amazon EMR 和 Amazon Redshift Spectrum 立即搜索和查询已编目数据。
+
 ### Neptune
 
 Fully managed **graph** database
 
 比如说Wikipedia，一个页面有各种其它链接，形成一个Graphs
+
+> Amazon Neptune 是一项快速、可靠且完全托管的图形数据库服务，可帮助您轻松构建和运行使用高度互连数据集的应用程序。Neptune 的核心是一个专门打造的高性能图形数据库引擎，它经过优化，可存储数十亿个关系并能以毫秒级延迟进行图形查询。Neptune 支持常见的图形查询语言 Apache TinkerPop Gremlin 和 W3C SPARQL，可让您构建查询，高效地浏览高度互连数据集。Neptune 支持图形使用案例，如建议引擎、欺诈检测、知识图谱、药物开发和网络安全。
 
 ### ElasticSearch
 
@@ -2899,7 +2913,7 @@ Allows to manage multiple AWS accouts
 
 The main account is the master accout
 
-Consolidated Billing across all accouts- single payment method
+**Consolidated Billing** across all accouts- single payment method
 
 Organizational Units = OU: OU是高于Account的level
 
@@ -2958,6 +2972,8 @@ Intergration with on-premise Active Directory
 > SAML使用可扩展标记语言（XML）进行身份提供商和服务提供商之间的标准化通信。 SAML是用户身份验证和使用服务授权之间的链接。
 
 SSO vs AssumeRoleWithSAML: 后者就是需要第三方3rd IDP Login Protal与AWS侧的Broser Interface用SAML协议交互，然后Broser Interface去STS去取Token来登录AWS的资源；而前者就不需要这个第三方了，roser Interface直接登录SSO Login Poral，内置集成SAML，一次性可以访问多个账户。需要注意的是即便是AWS跨账户临时访问，其核心还是STS. => Although the AWS SSO service uses STS, it does not issue short-lived credentials by itself. AWS Single Sign-On (SSO) is a cloud SSO service that makes it easy to centrally manage SSO access to multiple AWS accounts and business applications.
+
+=>**AWS IAM Identity Center**  is the successor to AWS Single Sign-On
 
 ## 265 Encryption
 
@@ -3757,6 +3773,12 @@ AWS Opsworks = Managed Chef & Puppet
 
 Chef & Puppet have similarities with SSM/Beabstalk/Cloudformation, but ther're open-source tools that work cross-cloud
 
+> DevOps（Development和Operations的组合词）是一种重视“软件开发人员（Dev）”和“IT运维技术人员（Ops）”之间沟通合作的文化、运动或惯例。透过自动化“软件交付”和“架构变更”的流程，来使得构建、测试、发布软件能够更加地快捷、频繁和可靠。
+
+> Chef是用于配置管理的开源工具，其用户群侧重于开发人员。 Chef作为主客户端模型运行，需要一个单独的工作站来控制主服务器。 它基于Ruby，您编写的大多数元素都使用纯Ruby。 Chef的设计是透明的，并且要遵循给出的说明，这意味着您必须确保自己的说明清晰。
+>
+> Puppet是成熟的配置管理领域中长期存在的工具之一。 它是一个开源工具，但是考虑到它已经存在了多久，它已经过严格的审查，并已部署在某些最大和最苛刻的环境中。 Puppet基于Ruby，但是使用更接近JSON的自定义域脚本语言（DSL）来在其中工作。 它作为主客户端设置运行，并使用模型驱动的方法。 Puppet代码设计是一个依赖关系列表，根据您的设置，它可以使事情变得更容易或更混乱。
+
 ## 346 AWS WorkSpaces
 
 Managed,Secure Cloud Desktop
@@ -3841,17 +3863,25 @@ FAQ = Frequently asked questions
 
 ## 360 SAA-C03 topics 20220929
 
-**AWS Artifact**： is your go-to, central resource for compliance-related information that matters to you. 
+### Machine Learning
 
-**AWS Lake Formation** is a service that makes it easy to set up a secure data lake in days. A data lake is a centralized, curated, and secured repository that stores all your data, both in its original form and prepared for analysis. AWS Lake Formation is integrated with **AWS Glue** which you can use to create a data catalog that describes available datasets and their appropriate business applications.
+**Amazon Transcribe** 可以针对音频文件提供转录服务。它使用高级机器学习技术来识别语音并将其转换为文本。
 
-**RDS Proxy** helps you manage a large number of connections from Lambda to an RDS database by establishing a warm connection pool to the database. 
+**Amazon Translate** 是一种神经网络机器翻译服务，可将文本在各种支持的语言和英语之间进行互译。Amazon Translate 以深度学习技术为依托，可提供快速、高质量且经济实惠的语言翻译。该服务提供持续受训的托管解决方案，让您可以轻松翻译公司和用户撰写的内容，或构建需要多种语言支持的应用程序。机器翻译引擎已根据不同领域中的各种内容进行训练，以产生满足各个行业需求的高质量翻译。
 
-**AWS Proton** allows you to deploy any serverless or container-based application with increased efficiency, consistency, and control. You can define infrastructure standards and effective continuous delivery pipelines for your organization. Proton breaks down the infrastructure into environment and service (“infrastructure as code” templates).
+**Amazon Comprehend** 使用自然语言处理 (NLP) 提取有关文档内容的见解，无需任何特殊处理。Amazon Comprehend 以 UTF-8 格式处理任何文本文件。它可以通过识别文档中的实体、关键短语、语言、情绪和其他常见元素生成见解。使用 Amazon Comprehend 基于对文档结构的理解创建新产品。借助 Amazon Comprehend，您可以搜索提及相关产品的社交网络信息流、扫描整个文档存储库的关键短语，或确定一组文档中包含的主题。
 
-**Amazon Rekognition** is simply a service that can identify the objects, people, text, scenes, and activities on your images or videos, as well as detect any inappropriate content.
+=>First, you'd have to create a transcription job using Amazon Transcribe to transform the recordings into text. Then, translate non-English calls to English using Amazon Translate. Finally, use Amazon Comprehend for sentiment analysis.
 
-You can use **Amazon Data Lifecycle Manager** (Amazon DLM) to automate the creation, retention, and deletion of snapshots taken to back up your Amazon EBS volumes.
+
+
+**Amazon Lex** 是一项 AWS 服务，可用于为使用语音和文本的应用程序构建对话接口。借助 Amazon Lex，为 Amazon Alexa 提供技术支持的同一对话引擎现可供任何开发人员使用，从而使您能够在新的和现有的应用程序中构建高级的自然语言聊天自动程序。Amazon Lex 具备自然语言理解 (NLU) 和自动语音识别 (ASR) 的深度功能性和灵活性。Amazon Lex 提供了与 AWS Lambda 的预构建集成=>With Amazon Lex, you can build conversational <u>chatbots</u> quickly. 
+
+**Amazon Rekognition** 让您可以向应用程序轻松添加图像和视频分析功能。您只需向 Amazon Rekognition API 提供图像或视频，该服务即会识别物体、人员、文本、场景和活动。它还可以检测任何不合适的内容。Amazon Rekognition 还可以提供高度准确的面孔分析和面孔识别功能。使用 Amazon Rekognion 自定义标注，您可以创建一个机器学习模型，以查找特定于您的业务需求的物体、场景和概念。
+
+### Security, Identity, & Compliance
+
+**AWS Artifact** 是一种 Web 服务，让您能够下载 AWS 安全性与合规性文档，如 ISO 认证和 SOC 报告。AWS Artifact提供按需下载。AWS 会向您提供安全和合规性文档，例如 AWS ISO 认证、支付卡行业 (PCI) 和服务组织控制 (SOC) 报告等。您可以将安全性和合规性文档（也称为*审核项目*）提交给您的审计人员或监管人员，以证明您所使用的 AWS 基础设施和服务的安全性和合规性。您还可以使用这些文档作为准则，来评估您自己的云架构以及您公司的内部控制有效性。AWS Artifact 仅提供有关 AWS 的文档。AWS 客户负责制定或获取文档来证明自己公司的安全性和合规性。
 
 **AWS Network Firewall** is a stateful, managed network firewall and intrusion detection and prevention service for your virtual private cloud (VPC) that you created in Amazon Virtual Private Cloud (Amazon VPC). With Network Firewall, you can filter traffic at the perimeter of your VPC. This includes filtering traffic going to and coming from an internet gateway, NAT gateway, or over VPN or AWS Direct Connect. Network Firewall uses the open source intrusion prevention system (IPS), Suricata, for stateful inspection. Network Firewall supports Suricata compatible rules.
 
@@ -3865,26 +3895,72 @@ You can use **Amazon Data Lifecycle Manager** (Amazon DLM) to automate the creat
 > - C. Use AWS Network Firewall to create the required rules for traffic inspection and traffic filtering for the production VPC.
 > - D. Use AWS Firewall Manager to create the required rules for traffic inspection and traffic filtering for the production VPC.
 
+**AWS IAM Identity Center** (successor to AWS Single Sign-On) expands the capabilities of AWS Identity and Access Management (IAM) to provide a central place that brings together administration of users and their access to AWS accounts and cloud applications. Although the service name AWS Single Sign-On has been retired, the term *single sign-on* is still used throughout this guide to describe the authentication scheme that allows users to sign in one time to access multiple applications and websites.
 
+### Database
 
-**AWS Control Tower** provides a single location to easily set up your new well-architected <u>multi-account environment</u> and govern your AWS workloads with rules for security, operations, and internal compliance. 
+**Amazon DocumentDB**（兼容 MongoDB）是一项快速、可靠的完全托管数据库服务，使您能够轻松设置、操作和扩展 MongoDB 兼容的数据库。
 
-**Amazon DocumentDB (with MongoDB compatibility)** is a fast, scalable, highly available, and fully managed document database service that supports MongoDB workloads.
+### Cryptography & PKI
 
-**Amazon Transcribe** is an AWS service that makes it easy for customers to convert speech-to-text. Using Automatic Speech Recognition (ASR) technology, customers can choose to use Amazon Transcribe for a variety of business applications, including transcription of voice-based customer service calls, generation of subtitles on audio/video content, and conduct (text-based) content analysis on audio/video content.
+**AWS Certificate Manager** (ACM) 处理创建、存储和续订公有及私有 SSL/TLS X.509 证书和密钥的复杂操作，这些证书和密钥可保护您的AWS网站和应用程序。您可以直接通过 ACM 签发证书，或者通过将第三方证书导入ACM 管理系统中，为集成AWS服务提供证书。ACM 证书可以保护单一域名、多个特定域名、通配符域或这些域的组合。ACM 通配符证书可以保护无限数量的子域。您还可以导出由 ACM Private CA 签名的 ACM 证书，以便在内部 PKI 中的任何位置使用。
+=>If you got your certificate from a third-party CA, import the certificate into ACM(AWS Certificate Manager) or upload it to the IAM certificate store. 
+ACM lets you import third-party certificates from the ACM console, as well as programmatically. If ACM is not available in your region, use AWS CLI to upload your third-party certificate to the IAM certificate store.
 
-**Amazon Translate** is a Neural Machine Translation (MT) service for translating text between supported languages.
+### Compute
 
-**Amazon Comprehend** is a natural language processing (NLP) service that uses machine learning to find meaning and insights in text.
+**AWS Wavelength** combines the high bandwidth and ultralow latency of 5G networks with AWS compute and storage services so that developers can innovate and build a new class of applications.
+Wavelength Zones are AWS infrastructure deployments that embed AWS compute and storage services within telecommunications providers’ data centers at the edge of the 5G network, so application traffic can reach application servers running in <u>Wavelength Zones</u> without leaving the mobile providers’ network. => Relative to Availibility Zone
 
-=>First, you'd have to create a transcription job using Amazon Transcribe to transform the recordings into text. Then, translate non-English calls to English using Amazon Translate. Finally, use Amazon Comprehend for sentiment analysis.
+### Management & Governance
 
-Amazon EC2 provides enhanced networking capabilities through the **Elastic Network Adapter (ENA)**. Enhanced networking provides higher bandwidth, higher packet per second (PPS) performance, and consistently lower inter-instance latencies.
-An **Elastic Fabric Adapter (EFA)** is a network device that you can attach to your Amazon EC2 instance to accelerate High Performance Computing (HPC) and machine learning applications. It provides all of the functionality of an ENA, with additional OS-bypass functionality. But the OS-bypass capabilities of EFAs are not supported on Windows instances. 
+**AWS Control Tower** 是一项服务，使您能够在 AWS Cloud 中的所有组织和账户中大规模实施和管理涉及安全性、操作和合规性的监管规则。
 
-**Amazon QuickSight** is a cloud-scale business intelligence (BI) service that you can use to deliver easy-to-understand insights to the people who you work with, wherever they are. Amazon QuickSight connects to your data in the cloud and combines data from many different sources. In a single data dashboard, QuickSight can include AWS data, third-party data, big data, spreadsheet data, SaaS data, B2B data, and more.
+<u>AWS Control Tower orchestration extends the capabilities of AWS Organizations.</u> To help keep your organizations and accounts from *drift*, which is divergence from best practices, AWS Control Tower applies preventive and detective controls (guardrails). For example, you can use guardrails to help ensure that security logs and necessary cross-account access permissions are created, and not altered.
 
-Here are some of the benefits of using Amazon QuickSight for analytics, data visualization, and reporting: ...
+使用 AWS Control Tower，您的中央云管理员可以监控所有账户是否符合既定的全公司合规政策，您可以更轻松地遵守公司标准、满足监管要求和遵循最佳实践。
+
+**Amazon Data Lifecycle Manager**: 您可以使用 Amazon Data Lifecycle Manager 来自动创建、保留和删除 <u>EBS 快照</u>和 EBS 支持的 <u>AMI</u>。当您执行自动快照和 AMI 管理时，它可以帮助您：
+
+- 通过实施定期备份计划来保护重要数据。
+- 创建可定期刷新的标准化 AMI。
+- 按照审核员的要求或内部合规性保留备份。
+- 通过删除过时的备份来降低存储成本。
+- 创建将数据备份到隔离账户的灾难恢复备份策略。
+
+**AWS Proton** allows you to deploy any <u>serverless or container-based application</u> with increased efficiency, consistency, and control. You can define infrastructure standards and effective continuous delivery pipelines for your organization. Proton breaks down the infrastructure into environment and service (“infrastructure as code” templates).  =>severless 和 container版本的Cloudformation？
+
+1. Automated infrastructure as code provisioning and deployment of serverless and container-based applications
+2. Standardized infrastructure
+3. Deployments integrated with CI/CD
+
+> CI/CD 是一种通过在应用开发阶段引入自动化来频繁向客户交付应用的方法。CI/CD 的核心概念是持续集成、持续交付和持续部署。作为一个面向开发和运营团队的解决方案，CI/CD 主要针对在集成新代码时所引发的问题。
+>
+> =>最初是**瀑布模型**，后来是**敏捷开发**，现在是**DevOps**，这是现代开发人员构建出色的产品的技术路线。随着DevOps的兴起，出现了**持续集成（Continuous Integration）**、**持续交付（Continuous Delivery）** 、**持续部署（Continuous Deployment）** 的新方法。传统的软件开发和交付方法正在迅速变得过时。从历史上看，在敏捷时代，大多数公司会每月，每季度，每两年甚至每年发布部署/发布软件。然而，现在，在DevOps时代，每周，每天，甚至每天多次是常态。当SaaS正在占领世界时，尤其如此，您可以轻松地动态更新应用程序，而无需强迫客户下载新组件。很多时候，他们甚至都不会意识到正在发生变化。开发团队通过软件交付流水线（Pipeline）实现自动化，以缩短交付周期，大多数团队都有自动化流程来检查代码并部署到新环境。
+
+**AWS Health** 提供与可能影响 AWS 基础设施的活动相关的个性化信息，指导您逐步进行有计划的更改，并加快排查影响 AWS 资源和账户的问题。
+
+=>AWS Certificate Manager automatically generates AWS Health events. 
+
+### Developer Tools
+
+**AWS X-Ray**是一项服务，收集您应用程序所服务的请求的相关数据，并提供用于查看、筛选和获取数据洞察力的工具，以确定您应用程序所服务的请求的相关数据，并发现优化的机会。对于任何被跟踪的向您应用程序发出的请求，您不仅可以查看请求和响应的详细信息，还可以查看您的应用程序对下游进行的调用的详细信息AWS资源、微服务、数据库和 Web API。
+
+当用户请求通过 Amazon API Gateway API 传输到底层服务时，您可以使用 X-Ray 对用户请求进行跟踪和分析。API Gateway 支持所有 API Gateway 终端节点类型的 X-Ray 跟踪 区域、边缘优化的和私有的。您可以在提供 X-Ray 的所有AWS区域中将 X-Ray 与 Amazon API Gateway 结合使用。=>（Not only API Gateway, 几乎与所有服务都能集成，SNS，SQS，S3，EC2，Config... ）
+
+### Analytics
+
+**Amazon AppFlow** 是一项完全托管式 API 集成服务，您可利用它将<u>软件即服务 (SaaS)</u> 应用程序连接到 AWS 服务，并安全地传输数据。使用 Amazon AppFlow 流可以管理数据传输并实现传输的自动化，而不需要编写代码。=>Saas -> Redshift,S3
+
+**AWS Lake Formation** 是一种完全托管服务，它让用户能够轻松地构建、保护和管理数据湖。Lake Formation 简化并自动化了创建数据湖通常所需的许多复杂的手动步骤。这些步骤包括收集、清理、移动和编目数据，以及安全地将这些数据用于分析和机器学习您可以使用 Lake Formation 来保护和提取 Amazon Simple Storage Service (Amazon S3) 数据湖中的数据。
+
+Lake Formation 可以打破数据孤岛，将不同类型的结构化和非结构化数据合并到一个集中式存储库中。首先，找出存储在 Amazon S3 或关系数据库和 NoSQL 数据库中的现有数据，然后将数据移动到您的数据湖中。然后对数据进行抓取、编目和准备以供分析。接下来，通过用户选择的分析服务，为他们提供安全的自助数据访问权限。
+
+**Amazon QuickSight**是一项云级商业智能 (BI) 服务，可用于交付easy-to-understand深入了解与你一起工作的人，无论他们身在何处。亚马逊QuickSight连接到云中的数据并组合来自许多不同来源的数据。在单个数据仪表板中，QuickSight可以包括 AWS 数据、第三方数据、大数据、电子表格数据、SaaS 数据、B2B 数据等。作为一项完全托管的云服务，亚马逊QuickSight提供企业级安全性、全球可用性和内置冗余。
+
+组织中的人员每天都会做出影响业务的决策。当他们在正确的时间获得正确的信息时，他们可以做出选择，推动您的公司朝着正确的方向发展。
+
+Here are some of the benefits of using Amazon QuickSight for <u>analytics, data visualization, and reporting</u>: ...
 
 > 例题
 >
@@ -3896,8 +3972,10 @@ Here are some of the benefits of using Amazon QuickSight for analytics, data vis
 > - C. Create an AWS Glue table and crawler for the data in Amazon S3. Create an AWS Glue extract, transform, and load (ETL) job to produce reports. Publish the reports to Amazon S3. Use S3 bucket policies to limit access to the reports.
 > - D. Create an AWS Glue table and crawler for the data in Amazon S3. Use Amazon Athena Federated Query to access data within Amazon RDS for PostgreSQL. Generate reports by using Amazon Athena. Publish the reports to Amazon S3. Use S3 bucket policies to limit access to the reports.
 
+### Others
 
-**AWS Wavelength** combines the high bandwidth and ultralow latency of 5G networks with AWS compute and storage services so that developers can innovate and build a new class of applications.
-Wavelength Zones are AWS infrastructure deployments that embed AWS compute and storage services within telecommunications providers’ data centers at the edge of the 5G network, so application traffic can reach application servers running in Wavelength Zones without leaving the mobile providers’ network. => Relative to Availibility Zone
+**RDS Proxy** helps you manage a large number of connections from Lambda to an RDS database by establishing a warm connection pool to the database. 
 
-**Amazon AppFlow** is a fully managed integration service that enables you to securely transfer data between Software-as-a-Service (SaaS) applications like Salesforce, SAP, Zendesk, Slack, and ServiceNow, and AWS services like Amazon S3 and Amazon Redshift, in just a few clicks. 
+Amazon EC2 provides enhanced networking capabilities through the **Elastic Network Adapter (ENA)**. Enhanced networking provides higher bandwidth, higher packet per second (PPS) performance, and consistently lower inter-instance latencies.
+An **Elastic Fabric Adapter (EFA)** is a network device that you can attach to your Amazon EC2 instance to accelerate High Performance Computing (HPC) and machine learning applications. It provides all of the functionality of an ENA, with additional OS-bypass functionality. But the OS-bypass capabilities of EFAs are not supported on Windows instances. 
+
