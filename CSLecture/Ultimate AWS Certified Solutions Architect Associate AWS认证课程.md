@@ -53,11 +53,15 @@ Virtual MFA device => Google Authenticator( only for mobile)
 
 ## 017 AWS Access Keys, CLI and SDK
 
-CLI: AWS Command Line Interface
+To access AWS, you have three options:
 
-SDK: AWS Softeware Developer Kit
+1. AWS Management Console(protected by password + MFA)
+2. AWS Command Line Interface(CLI): protected by **access keys** =>Direct access to the public APIs of AWS services
+3. AWS Softeware Developer Kit(SDK)-**for code**: protected by access keys
 
 Access Keys are secret, just like a password
+
+=>When you use the AWS Management Console to create a user, you must choose to include at least a console password or access keys. By default, a brand new IAM user created using the AWS CLI or AWS API has no credentials of any kind.
 
 CLI 可以安装到Windows or Linux
 
@@ -435,7 +439,7 @@ Understanding vCPU:
 
 这个vCPU指核心级线程吗？这样的话所谓的一个vCPU甚至没法运行一个多线程的进程...这样太弱了吧...
 
-Capacity Reservations: ensure you have EC2 Capacity when need.
+**Capacity Reservations**: ensure you have EC2 Capacity when need.
 
 ## 056 EBS Overview 20220703
 
@@ -1256,12 +1260,12 @@ Elastic Beanstalk is a developer centric view of deploying an application on AWS
 
 Managed service:
 
-1. Automatically handles capacity provisioning, load balancing, scaling, application health monitoring, instance configuration...
+1. **Automatically handles capacity provisioning, load balancing, scaling,** application health monitoring, instance configuration...
 2. Just the application code is the responsibility of the developer.
 
 We still have full control over the configuration.
 
-=>Elastic Beanstalk environments have limited resources; for example, Elastic Beanstalk does not create a VPC for you. CloudFormation on the other hand is more of a low-level service that you can use to model the entirety of your AWS environment. In fact, Elastic Beanstalk uses CloudFormation under the hood to create resources.
+=>Elastic Beanstalk environments have limited resources; for example, Elastic Beanstalk does not create a VPC for you. CloudFormation on the other hand is more of a low-level service that you can use to model the entirety of your AWS environment. In fact, Elastic Beanstalk uses CloudFormation under the hood to create resources. =>Beanstalk 偏向**quickly deploy and manage applications**， 而CloudFormation偏向an easy way to create a **collection of related AWS resources** .
 
 ## 126 S3 Buckets and Objects
 
@@ -1471,7 +1475,7 @@ ELB has the feature of access logs =>Access logging is an optional feature of El
 
 ## 147 S3 Replication(CRR&SRR)
 
-Must enable versioning in source and destination
+Must enable **versioning** in source and destination
 
 CRR:Cross Region Repilication
 
@@ -1763,13 +1767,11 @@ CloudFront Signed URL vs S3 Pre-Signed URl, 差不多，非要说就是是否直
 
 ## 167 CloudFront Advanced Concepts
 
-CloudFront Edge  locations are all around the world
+CloudFront Edge  locations are all around the world. The cost of data out per edge location varies  => Price Classes
 
-The cost of data out per edge location varies
+Multi-Origin: To route to different kind of origins based on the context type
 
-Multi-Origin
-
-Origin Groups: High availibilty
+**Origin Groups:** High availibilty and do failover, If the primary origin fails, the second one is used.
 
 **Field Level Encryption**: Sensitive information encrypted at the edge close to user
 
@@ -3972,6 +3974,8 @@ Here are some of the benefits of using Amazon QuickSight for <u>analytics, data 
 > - C. Create an AWS Glue table and crawler for the data in Amazon S3. Create an AWS Glue extract, transform, and load (ETL) job to produce reports. Publish the reports to Amazon S3. Use S3 bucket policies to limit access to the reports.
 > - D. Create an AWS Glue table and crawler for the data in Amazon S3. Use Amazon Athena Federated Query to access data within Amazon RDS for PostgreSQL. Generate reports by using Amazon Athena. Publish the reports to Amazon S3. Use S3 bucket policies to limit access to the reports.
 
+**Amazon OpenSearch Service** 是一项托管式服务，可用于轻松地部署、操作和扩展 OpenSearch（一个常用的开源搜索和分析引擎）。OpenSearch Service 还提供安全性选项、高可用性、数据持久性以及对 OpenSearch 的直接访问。
+
 ### Others
 
 **RDS Proxy** helps you manage a large number of connections from Lambda to an RDS database by establishing a warm connection pool to the database. 
@@ -3979,3 +3983,4 @@ Here are some of the benefits of using Amazon QuickSight for <u>analytics, data 
 Amazon EC2 provides enhanced networking capabilities through the **Elastic Network Adapter (ENA)**. Enhanced networking provides higher bandwidth, higher packet per second (PPS) performance, and consistently lower inter-instance latencies.
 An **Elastic Fabric Adapter (EFA)** is a network device that you can attach to your Amazon EC2 instance to accelerate High Performance Computing (HPC) and machine learning applications. It provides all of the functionality of an ENA, with additional OS-bypass functionality. But the OS-bypass capabilities of EFAs are not supported on Windows instances. 
 
+**Amazon Pinpoint** 可帮助您通过发送电子邮件、SMS 和语音消息以及推送通知来与客户接洽。您可以使用 Amazon Pinpoint 发送针对性消息（如促销和客户保留活动），以及交易消息（如订单确认和密码重置消息）。
