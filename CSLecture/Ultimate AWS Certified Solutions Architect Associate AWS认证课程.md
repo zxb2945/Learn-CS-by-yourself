@@ -815,6 +815,8 @@ It allows you to create databases in the cloud that are managed by AWS
 
 ​	PostgreSQL,MySQL,MariaDB,Oracle,Microsoft SQL Server,Aurora
 
+=> Amazon Relational Database Service (Amazon RDS) 是一种 Web 服务，可让用户更轻松地在云中设置、操作和扩展关系数据库。它可以为行业标准关系数据库提供经济高效且可以调节大小的容量，并管理常见数据库管理任务。Amazon Aurora 是一款完全托管式关系数据库引擎，专为云端打造，与 MySQL 和 PostgreSQL 兼容。**Amazon Aurora 是 Amazon RDS 的一部分。**
+
 But you can't SSH into your instances.
 
 
@@ -2106,6 +2108,19 @@ If a mesage is not processed within the visibility timeout, it will be processed
 
 A consumer could call the ChangeMessageVisibility API to get more time(demo 没有展示，大概是关于编程层面了)
 
+> 例题
+> 
+> A company hosts an application on multiple Amazon EC2 instances. The application processes messages from an Amazon SQS queue, writes to an Amazon RDS table, and deletes the message from the queue. Occasional duplicate records are found in the RDS table. The SQS queue does not contain any duplicate messages.
+What should a solutions architect do to ensure messages are being processed once only?
+> 
+>  A. Use the CreateQueue API call to create a new queue. 
+>  
+>  B. Use the AddPermission API call to add appropriate permissions.
+>  
+>  C. Use the ReceiveMessage API call to set an appropriate wait time.
+>  
+> D. Use the ChangeMessageVisibility API call to increase the visibility timeout.
+
 ## 184 SQS - Dead Letter Queue
 
 If a cosumer fails to process a message within the Visibility Timeout...the message goes back to the queue!
@@ -2479,6 +2494,23 @@ DAX vs ElatiCache: 前者适应于DynamoDB的Query & Scan cache, 而后者比如
 > because 1. RTO is comparable for both Global database and global table but 2. Aurora has one primary region for Read and Write and other regions can only do read which means order update/write in other regions wont be possible except primary region but with DynamoDb global table Instead of writing your own code, you could create a global table consisting of your three Region-specific CustomerProfiles tables. DynamoDB would then automatically replicate data changes among those tables so that changes to CustomerProfiles data in one Region would seamlessly propagate to the other Regions. In addition, if one of the AWS Regions were to become temporarily unavailable, your customers could still access the same CustomerProfiles data in the other Regions. https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GlobalTables.html 
 >
 > So Dynamodb Global Table is true answer here
+
+
+=>You can create on-demand backups of your Amazon DynamoDB tables, or you can enable continuous backups using **point-in-time recovery**. Point-in-time recovery helps protect your DynamoDB tables from accidental write or delete operations. With point-in-time recovery, you don't have to worry about creating, maintaining, or scheduling on-demand backups. For example, suppose that a test script writes accidentally to a production DynamoDB table. With point-in-time recovery, you can restore that table to any point in time during the last 35 days. DynamoDB maintains incremental backups of your table.
+
+> 例题
+> 
+> A company runs a shopping application that uses Amazon DynamoDB to store customer information. In case of data corruption, a solutions architect needs to design a solution that meets a recovery point objective (RPO) of 15 minutes and a recovery time objective (RTO) of 1 hour.
+What should the solutions architect recommend to meet these requirements?
+> 
+>  A. Configure DynamoDB global tables. For RPO recovery, point the application to a different AWS Region.
+>  
+>  B. Configure DynamoDB point-in-time recovery. For RPO recovery, restore to the desired point in time.
+>  
+>  C. Export the DynamoDB data to Amazon S3 Glacier on a daily basis. For RPO recovery, import the data from S3 Glacier to DynamoDB.
+>  
+>  D. Schedule Amazon Elastic Block Store (Amazon EBS) snapshots for the DynamoDB table every 15 minutes. For RPO recovery, restore the DynamoDB table by using the EBS snapshot.
+
 
 **TTL**: Automatically delete items after an expiry timestamp
 
@@ -4098,6 +4130,21 @@ Here are some of the benefits of using Amazon QuickSight for <u>analytics, data 
 ### Others
 
 **RDS Proxy** helps you manage a large number of connections from Lambda to an RDS database by establishing a warm connection pool to the database. 
+
+> 例题
+> 
+> A company is running a business-critical web application on Amazon EC2 instances behind an Application Load Balancer. The EC2 instances are in an Auto Scaling group. The application uses an Amazon Aurora PostgreSQL database that is deployed in a single Availability Zone. The company wants the application to be highly available with minimum downtime and minimum loss of data.
+Which solution will meet these requirements with the LEAST operational effort?
+> 
+>  A. Place the EC2 instances in different AWS Regions. Use Amazon Route 53 health checks to redirect traffic. Use Aurora PostgreSQL Cross-Region Replication.
+>  
+>  B. Configure the Auto Scaling group to use multiple Availability Zones. Configure the database as Multi-AZ. Configure an Amazon RDS Proxy instance for the database.
+>  
+>  C. Configure the Auto Scaling group to use one Availability Zone. Generate hourly snapshots of the database. Recover the database from the snapshots in the event of a failure.
+>  
+>  D. Configure the Auto Scaling group to use multiple AWS Regions. Write the data from the application to Amazon S3. Use S3 Event Notifications to launch an AWS Lambda function to write the data to the database.
+>  
+>  Explantion: Amazon Aurora is part of Amazon RDS. So it can also use Amazon RDS Proxy.
 
 Amazon EC2 provides enhanced networking capabilities through the **Elastic Network Adapter (ENA)**. Enhanced networking provides higher bandwidth, higher packet per second (PPS) performance, and consistently lower inter-instance latencies.
 An **Elastic Fabric Adapter (EFA)** is a network device that you can attach to your Amazon EC2 instance to accelerate High Performance Computing (HPC) and machine learning applications. It provides all of the functionality of an ENA, with additional OS-bypass functionality. But the OS-bypass capabilities of EFAs are not supported on Windows instances. 
