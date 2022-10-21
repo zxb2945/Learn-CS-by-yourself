@@ -3944,6 +3944,8 @@ Wavelength Zones are AWS infrastructure deployments that embed AWS compute and s
 
 =>AWS Certificate Manager automatically generates AWS Health events. 
 
+**AWS Systems Manager** 让您能够查看和控制 AWS 上的基础设施。Systems Manager 提供一个统一的用户界面，因此您可以查看多种 AWS 服务的操作数据，并跨 AWS 资源自动执行操作任务。**Patch Manager**, a capability of AWS Systems Manager, uses the appropriate built-in mechanism for an operating system type to install updates on a managed node. For example, on Windows Server, the Windows Update API is used, and on Amazon Linux the `yum` package manager is used.
+
 ### Developer Tools
 
 **AWS X-Ray**是一项服务，收集您应用程序所服务的请求的相关数据，并提供用于查看、筛选和获取数据洞察力的工具，以确定您应用程序所服务的请求的相关数据，并发现优化的机会。对于任何被跟踪的向您应用程序发出的请求，您不仅可以查看请求和响应的详细信息，还可以查看您的应用程序对下游进行的调用的详细信息AWS资源、微服务、数据库和 Web API。
