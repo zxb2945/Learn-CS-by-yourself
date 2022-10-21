@@ -625,6 +625,21 @@ Load balancing to multiple HTTP applications on the same machine
 
 Support redirects(from HTTP to HTTPS for example)=>has a port mapping feature to redirect to a dynamic port in ECS
 
+=>A **listener** is a process that checks for connection requests. You define a listener when you create your load balancer, and you can add listeners to your load balancer at any time.You can redirect HTTP requests to HTTPS creating a listener rule.
+
+> 例题
+> 
+> A company has a website hosted on AWS. The website is behind an Application Load Balancer (ALB) that is configured to handle HTTP and HTTPS separately. The company wants to forward all requests to the website so that the requests will use HTTPS.
+What should a solutions architect do to meet this requirement?
+> 
+>  A. Update the ALB's network ACL to accept only HTTPS traffic. 
+>  
+>  B. Create a rule that replaces the HTTP in the URL with HTTPS.
+>  
+>  C. Create a listener rule on the ALB to redirect HTTP traffic to HTTPS.
+>  
+>  D. Replace the ALB with a Network Load Balancer configured to use Server Name Indication (SNI).
+
 ALB routing tables to different target groups based on HTTP(layer 7, URL), a great fit for micro sevices & container-based application(example:Docker &Amazon ECS)
 
 The application servers don't see the IP of the client directly, the true IP of the client is inserted in the header X-Forwarded-For
@@ -1725,6 +1740,21 @@ Adopt a WORM(Write Once Read Many) model
 Block an object version deletion for a specified amount of time
 
 
+> 例题
+> 
+> A company needs to store its accounting records in Amazon S3. The records must be immediately accessible for 1 year and then must be archived for an additional 9 years. No one at the company, including administrative users and root users, can be able to delete the records during the entire 10-year period. The records must be stored with maximum resiliency.
+Which solution will meet these requirements?
+> 
+> A. Store the records in S3 Glacier for the entire 10-year period. Use an access control policy to deny deletion of the records for a period of 10 years.
+> 
+> B. Store the records by using S3 Intelligent-Tiering. Use an IAM policy to deny deletion of the records. After 10 years, change the IAM policy to allow deletion.
+> 
+> C. Use an S3 Lifecycle policy to transition the records from S3 Standard to S3 Glacier Deep Archive after 1 year. Use S3 Object Lock in compliance mode for a period of 10 years.
+> 
+> D. Use an S3 Lifecycle policy to transition the records from S3 Standard to S3 One Zone-Infrequent Access (S3 One Zone-IA) after 1 year. Use S3 Object Lock in governance mode for a period of 10 years.
+
+
+
 
 没有hands on, 没有印象...
 
@@ -1894,6 +1924,34 @@ AWS Storage Gateway: **Bridge** between **on -premises** data(本地？) and clo
 >
 > it should be A. **For SG volume gateway, you cannot directly access the backups using Amazon S3 API**. Q: When I look in Amazon S3 why can’t I see my volume data? A: Your volumes are stored in an Amazon S3 bucket maintained by the AWS Storage Gateway service. Your volumes are accessible for I/O operations through AWS Storage Gateway. You cannot directly access them using Amazon S3 API actions. You can take point-in-time snapshots of gateway volumes that are made available in the form of Amazon EBS snapshots, which can be turned into either Storage Gateway Volumes or EBS Volumes. Use the File Gateway to work with your data natively in S3.
 
+
+=> New Declaration 2022.10.21
+
+**AWS Storage Gateway** is a service that connects an on-premises software appliance with cloud-based storage to provide seamless and secure integration between your on-premises IT environment and the AWS storage infrastructure in the AWS Cloud.
+
+AWS Storage Gateway offers file-based File Gateways (Amazon S3 File and Amazon FSx File), volume-based (Cached and Stored), and tape-based storage solutions.
+
+  1.Amazon S3 File Gateway
+  
+  2.Amazon FSx File Gateway:Amazon FSx File Gateway (FSx File Gateway) is a new File Gateway type that provides low latency and efficient access to in-cloud FSx for Windows File Server file shares from your on-premises facility. 
+  
+  3.Volume Gateway: Cached volumes + Stored volumes
+  
+  4.Tape Gateway:With a Tape Gateway, you can cost-effectively and durably archive **backup data** in S3 Glacier Flexible Retrieval or S3 Glacier Deep Archive.
+
+> 例题
+> 
+> A company has more than 5 TB of file data on Windows file servers that run on premises. Users and applications interact with the data each day.
+The company is moving its Windows workloads to AWS. As the company continues this process, the company requires access to AWS and on-premises file storage with minimum latency. The company needs a solution that minimizes operational overhead and requires no significant changes to the existing file access patterns. The company uses an AWS Site-to-Site VPN connection for connectivity to AWS.
+What should a solutions architect do to meet these requirements?
+> 
+>  A. Deploy and configure Amazon FSx for Windows File Server on AWS. Move the on-premises file data to FSx for Windows File Server. Reconfigure the workloads to use FSx for Windows File Server on AWS.
+>  
+>  B. Deploy and configure an Amazon S3 File Gateway on premises. Move the on-premises file data to the S3 File Gateway. Reconfigure the on-premises workloads and the cloud workloads to use the S3 File Gateway.
+>  
+>  C. Deploy and configure an Amazon S3 File Gateway on premises. Move the on-premises file data to Amazon S3. Reconfigure the workloads to use either Amazon S3 directly or the S3 File Gateway. depending on each workload's location.
+>  
+>  D. Deploy and configure Amazon FSx for Windows File Server on AWS. Deploy and configure an Amazon FSx File Gateway on premises. Move the on-premises file data to the FSx File Gateway. Configure the cloud workloads to use FSx for Windows File Server on AWS. Configure the on-premises workloads to use the FSx File Gateway.
 
 
 ## 175 Amazon FSx Overview
@@ -2484,6 +2542,24 @@ API Gateway can invoke Lambda function, easy way to expose REST API backed by AW
 > "RESTful services" -> API gateway to be used
 
 You can use **AWS X-Ray** to trace and analyze user requests as they travel through your Amazon API Gateway APIs to the underlying services. 
+
+You can create a custom domain name for a Regional API endpoint (for an AWS Region). To create a custom domain name, you must provide a Region-specific ACM certificate. 
+
+> 例题
+> 
+> A company has registered its domain name with Amazon Route 53. The company uses Amazon API Gateway in the ca-central-1 Region as a public interface for its backend microservice APIs. Third-party services consume the APIs securely. The company wants to design its API Gateway URL with the company's domain name and corresponding certificate so that the third-party services can use HTTPS.
+Which solution will meet these requirements?
+> 
+> A. Create stage variables in API Gateway with Name="Endpoint-URL" and Value="Company Domain Name" to overwrite the default URL. Import the public certificate associated with the company's domain name into AWS Certificate Manager (ACM).
+> 
+>  B. Create Route 53 DNS records with the company's domain name. Point the alias record to the Regional API Gateway stage endpoint. Import the public certificate associated with the company's domain name into AWS Certificate Manager (ACM) in the us-east-1 Region.
+>  
+>  C. Create a Regional API Gateway endpoint. Associate the API Gateway endpoint with the company's domain name. Import the public certificate associated with the company's domain name into AWS Certificate Manager (ACM) in the same Region. Attach the certificate to the API Gateway endpoint. Configure Route 53 to route traffic to the API Gateway endpoint.
+>  
+>  D. Create a Regional API Gateway endpoint. Associate the API Gateway endpoint with the company's domain name. Import the public certificate associated with the company's domain name into AWS Certificate Manager (ACM) in the us-east-1 Region. Attach the certificate to the API Gateway APIs. Create Route 53 DNS records with the company's domain name. Point an A record to the company's domain name.
+>  
+> Explanation:
+> https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-regional-api-custom-domain-create.html
 
 ## 216 API Gateway Security
 
@@ -3875,11 +3951,37 @@ FAQ = Frequently asked questions
 
 =>First, you'd have to create a transcription job using Amazon Transcribe to transform the recordings into text. Then, translate non-English calls to English using Amazon Translate. Finally, use Amazon Comprehend for sentiment analysis.
 
+**Amazon Textract** enables you to add document text detection and analysis to your applications. You provide a document image to the Amazon Textract API, and the service detects the document text. Amazon Textract works with formatted text and can detect words and lines of words that are located close to each other. It can also analyze a document for items such as related text, tables, key-value pairs, and selection elements.
 
+> 例题
+> 
+> A hospital recently deployed a RESTful API with Amazon API Gateway and AWS Lambda. The hospital uses API Gateway and Lambda to upload reports that are in PDF format and JPEG format. The hospital needs to modify the Lambda code to identify protected health information (PHI) in the reports.
+Which solution will meet these requirements with the LEAST operational overhead?
+> 
+>  A. Use existing Python libraries to extract the text from the reports and to identify the PHI from the extracted text.
+>  
+>  B. Use Amazon Textract to extract the text from the reports. Use Amazon SageMaker to identify the PHI from the extracted text.
+>  
+>  C. Use Amazon Textract to extract the text from the reports. Use Amazon Comprehend Medical to identify the PHI from the extracted text.
+>  
+>  D. Use Amazon Rekognition to extract the text from the reports. Use Amazon Comprehend Medical to identify the PHI from the extracted text.
 
 **Amazon Lex** 是一项 AWS 服务，可用于为使用语音和文本的应用程序构建对话接口。借助 Amazon Lex，为 Amazon Alexa 提供技术支持的同一对话引擎现可供任何开发人员使用，从而使您能够在新的和现有的应用程序中构建高级的自然语言聊天自动程序。Amazon Lex 具备自然语言理解 (NLU) 和自动语音识别 (ASR) 的深度功能性和灵活性。Amazon Lex 提供了与 AWS Lambda 的预构建集成=>With Amazon Lex, you can build conversational <u>chatbots</u> quickly. 
 
 **Amazon Rekognition** 让您可以向应用程序轻松添加图像和视频分析功能。您只需向 Amazon Rekognition API 提供图像或视频，该服务即会识别物体、人员、文本、场景和活动。它还可以检测任何不合适的内容。Amazon Rekognition 还可以提供高度准确的面孔分析和面孔识别功能。使用 Amazon Rekognion 自定义标注，您可以创建一个机器学习模型，以查找特定于您的业务需求的物体、场景和概念。
+
+> 例题
+> 
+> A company is running a popular social media website. The website gives users the ability to upload images to share with other users. The company wants to make sure that the images do not contain inappropriate content. The company needs a solution that minimizes development effort.
+What should a solutions architect do to meet these requirements?
+>
+> A. Use Amazon Comprehend to detect inappropriate content. Use human review for low-confidence predictions.
+> 
+> B. Use Amazon Rekognition to detect inappropriate content. Use human review for low-confidence predictions.
+> 
+> C. Use Amazon SageMaker to detect inappropriate content. Use ground truth to label low-confidence predictions.
+> 
+> D. Use AWS Fargate to deploy a custom machine learning model to detect inappropriate content. Use ground truth to label low-confidence predictions.
 
 ### Security, Identity, & Compliance
 
@@ -3908,6 +4010,21 @@ FAQ = Frequently asked questions
 **AWS Certificate Manager** (ACM) 处理创建、存储和续订公有及私有 SSL/TLS X.509 证书和密钥的复杂操作，这些证书和密钥可保护您的AWS网站和应用程序。您可以直接通过 ACM 签发证书，或者通过将第三方证书导入ACM 管理系统中，为集成AWS服务提供证书。ACM 证书可以保护单一域名、多个特定域名、通配符域或这些域的组合。ACM 通配符证书可以保护无限数量的子域。您还可以导出由 ACM Private CA 签名的 ACM 证书，以便在内部 PKI 中的任何位置使用。
 =>If you got your certificate from a third-party CA, import the certificate into ACM(AWS Certificate Manager) or upload it to the IAM certificate store. 
 ACM lets you import third-party certificates from the ACM console, as well as programmatically. If ACM is not available in your region, use AWS CLI to upload your third-party certificate to the IAM certificate store.
+=> ACM provides managed renewal for your Amazon-issued SSL/TLS certificates. This means that ACM will either renew your certificates automatically (if you are using DNS validation), or it will send you email notices when expiration is approaching. These services are provided for both public and private ACM certificates.
+
+> 例题
+> 
+> A company is deploying a new public web application to AWS. The application will run behind an Application Load Balancer (ALB). The application needs to be encrypted at the edge with an SSL/TLS certificate that is issued by an external certificate authority (CA). The certificate must be rotated each year before the certificate expires.
+What should a solutions architect do to meet these requirements?
+> 
+>  A. Use AWS Certificate Manager (ACM) to issue an SSL/TLS certificate. Apply the certificate to the ALB. Use the managed renewal feature to automatically rotate the certificate.
+>  
+>  B. Use AWS Certificate Manager (ACM) to issue an SSL/TLS certificate. Import the key material from the certificate. Apply the certificate to the ALUse the managed renewal feature to automatically rotate the certificate.
+>  
+>  C. Use AWS Certificate Manager (ACM) Private Certificate Authority to issue an SSL/TLS certificate from the root CA. Apply the certificate to the ALB. Use the managed renewal feature to automatically rotate the certificate.
+>  
+>  D. Use AWS Certificate Manager (ACM) to import an SSL/TLS certificate. Apply the certificate to the ALB. Use Amazon EventBridge (Amazon CloudWatch Events) to send a notification when the certificate is nearing expiration. Rotate the certificate manually.
+>  
 
 ### Compute
 
