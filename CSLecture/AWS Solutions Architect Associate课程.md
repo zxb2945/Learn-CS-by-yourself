@@ -1012,7 +1012,7 @@ Aurora Serverless: Automated database instantiation and auto-scaling based on ac
 
 Aurora Multi-Master: Every node does R/W => an immediate failover for writer
 
-Global Aurora: 1 Primary Region(r/w); Up to 5 secondary(read-only) region.
+Global Aurora: 1 Primary Region(r/w); Up to 5 secondary(**read-only**) region.
 
 Aurora Machine Learning: Simple ,optimized, and secure intergration between Aurora and AWS ML sevices(Amazon SageMaker, Amazon Conprehend)
 
@@ -1785,6 +1785,12 @@ Client<=> Edge Location <=> Origin:S3 or HTTP(Globally)
 
 你在美国去澳大利亚读取内容，次数多了，澳大利亚的内容就被缓存到美国边缘节点，与S3 Cross Region Replication 比多为static content而不是dynamic content.
 
+
+
+CloudFront Geo Restriction: You can restrict who can acess your distribution.
+
+Use Case: Copyright Laws to control access to content.
+
 ## 166 CloudFront Signed URL/Cookies
 
 You want to distribute paid shared content to premium users over the world.
@@ -1934,11 +1940,11 @@ AWS Storage Gateway: **Bridge** between **on -premises** data(本地？) and clo
 AWS Storage Gateway offers file-based File Gateways (Amazon S3 File and Amazon FSx File), volume-based (Cached and Stored), and tape-based storage solutions.
 
   1.Amazon S3 File Gateway
-  
+
   2.Amazon FSx File Gateway:Amazon FSx File Gateway (FSx File Gateway) is a new File Gateway type that provides low latency and efficient access to in-cloud FSx for Windows File Server file shares from your on-premises facility. 
-  
+
   3.Volume Gateway: Cached volumes + Stored volumes
-  
+
   4.Tape Gateway:With a Tape Gateway, you can cost-effectively and durably archive **backup data** in S3 Glacier Flexible Retrieval or S3 Glacier Deep Archive.
 
 > 例题
@@ -2403,7 +2409,7 @@ Initially...Serverless was pioneered by AWS Lambda but now also includes anythin
 Execution:
 
 1. Memeory allocation: 128MB-10GB
-2. Maximum execution time: 15min
+2. Maximum execution time: **15min**
 3. Environment Variables: 4KB
 4. Disk capacity in the function container(in /tmp): 512MB
 5. Concurrency executions: 1000
@@ -2462,7 +2468,7 @@ Read/Write Capacity Models:
 > - C. Amazon DynamoDB with DynamoDB Streams enabled
 > - D. Amazon SQS and Amazon Aurora PostgreSQL
 
-## 213 DynamoDB Advanced Fratures
+## 213 DynamoDB Advanced Features
 
 **DynamoDB Accelerator(DAX)**: Help solve read congestion by caching.
 
@@ -2494,7 +2500,6 @@ DAX vs ElatiCache: 前者适应于DynamoDB的Query & Scan cache, 而后者比如
 > because 1. RTO is comparable for both Global database and global table but 2. Aurora has one primary region for Read and Write and other regions can only do read which means order update/write in other regions wont be possible except primary region but with DynamoDb global table Instead of writing your own code, you could create a global table consisting of your three Region-specific CustomerProfiles tables. DynamoDB would then automatically replicate data changes among those tables so that changes to CustomerProfiles data in one Region would seamlessly propagate to the other Regions. In addition, if one of the AWS Regions were to become temporarily unavailable, your customers could still access the same CustomerProfiles data in the other Regions. https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GlobalTables.html 
 >
 > So Dynamodb Global Table is true answer here
-
 
 =>You can create on-demand backups of your Amazon DynamoDB tables, or you can enable continuous backups using **point-in-time recovery**. Point-in-time recovery helps protect your DynamoDB tables from accidental write or delete operations. With point-in-time recovery, you don't have to worry about creating, maintaining, or scheduling on-demand backups. For example, suppose that a test script writes accidentally to a production DynamoDB table. With point-in-time recovery, you can restore that table to any point in time during the last 35 days. DynamoDB maintains incremental backups of your table.
 
