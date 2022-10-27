@@ -3148,7 +3148,7 @@ Serverless
 
 Newer service, meant for storing secrets （newer to SSM Parameter Store）
 
-Capability to force rotation of scerets every X days
+Capability **to force rotation** of scerets every X days
 
 Intergraion with Amazon RDS(Mostly meant for RDS integration)
 
@@ -3381,7 +3381,7 @@ Can't be used by EC2 instance in the same subnet(only from other subnets)?=>NAT 
 > - C. Deploy two NAT instances inside the public subnet for each Availability Zone and associate them with Elastic IP addresses. Update the routing table of the private subnet to use it as the default route.
 > - D. Deploy two NAT instances inside the private subnet for each Availability Zone and associate them with Elastic IP addresses. Update the routing table of the private subnet to use it as the default route.
 
-## 297 DNS Resolution Options & Route 53 Praivate zones
+## 297 DNS Resolution Options & Route 53 Private zones
 
 DNS Resolution 可以利用Amazon提供的 Route 53，也可以Custome DNS Server.
 
@@ -3615,7 +3615,7 @@ Has been deprecated
 
 ## 315 Transit Gateway
 
-背景：如果有很多VPC各自Peering Connection，与Customer Gateway进行VPN Connetion等，网络拓扑图十分复杂，全部接到Transit Gateway就清晰明了了。
+背景：如果有很多VPC各自**Peering Connection**，与Customer Gateway进行**VPN Connetion**等，网络拓扑图十分复杂，全部接到Transit Gateway就清晰明了了。
 
 For having transitive peering between thousands of VPC and on-premises, hub-and-spoke connection
 
