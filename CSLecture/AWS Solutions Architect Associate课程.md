@@ -849,6 +849,27 @@ RDS backups and **scales automatically** for you.
 Enhanced Monitoring is a feature of Amazon RDS.=>好像可以用来监测线程
 =>Enhanced Monitoring metrics are useful when you want to see how different processes or threads on a DB instance use the CPU.
 
+
+
+**RDS Proxy** helps you manage a large number of connections from Lambda to an RDS database by establishing a warm connection pool to the database. 
+
+> 例题
+>
+> A company is running a business-critical web application on Amazon EC2 instances behind an Application Load Balancer. The EC2 instances are in an Auto Scaling group. The application uses an Amazon Aurora PostgreSQL database that is deployed in a single Availability Zone. The company wants the application to be highly available with minimum downtime and minimum loss of data.
+> Which solution will meet these requirements with the LEAST operational effort?
+>
+> A. Place the EC2 instances in different AWS Regions. Use Amazon Route 53 health checks to redirect traffic. Use Aurora PostgreSQL Cross-Region Replication.
+>
+> B. Configure the Auto Scaling group to use multiple Availability Zones. Configure the database as Multi-AZ. Configure an Amazon RDS Proxy instance for the database.
+>
+> C. Configure the Auto Scaling group to use one Availability Zone. Generate hourly snapshots of the database. Recover the database from the snapshots in the event of a failure.
+>
+> D. Configure the Auto Scaling group to use multiple AWS Regions. Write the data from the application to Amazon S3. Use S3 Event Notifications to launch an AWS Lambda function to write the data to the database.
+>
+> Explantion: Amazon Aurora is part of Amazon RDS. So it can also use Amazon RDS Proxy.
+
+
+
 ## 089 RDS Read Replicas vs Multi AZ
 
 RDS Read Replicas for read scalability
@@ -3786,9 +3807,12 @@ NACL，Security group(虽然没有deny rule，但allow rule反过来就是deny)�
 
 Data Management & Transfer: AWS Direct Connect, Snowball & Snowmobile, AWS DataSync
 
-Computing and Networking: EC2, EC2 Placement Group， EC2 Enhanced Networking=>ENA(Elatic Network Adapter), Elastic Fabric Adapter(EFA)=>only for Linux,
+Computing and Networking: EC2, EC2 Placement Group， EC2 Enhanced Networking=>ENA(Elatic Network Adapter), Elastic Fabric Adapter(EFA)=><u>only for Linux,</u>
 
-Storage: EBS, S3, EFS, FSx,
+=>Amazon EC2 provides enhanced networking capabilities through the **Elastic Network Adapter (ENA)**. Enhanced networking provides higher bandwidth, higher packet per second (PPS) performance, and consistently lower inter-instance latencies.
+=>An **Elastic Fabric Adapter (EFA)** is a network device that you can attach to your Amazon EC2 instance to accelerate High Performance Computing (HPC) and machine learning applications. It provides all of the functionality of an ENA, with additional OS-bypass functionality. But the OS-bypass capabilities of EFAs are not supported on Windows instances. 
+
+Storage: EBS, S3, EFS, FSx for Lustre
 
 Automation and Orchestration: AWS Batch, AWS ParallelCluster
 
@@ -3984,11 +4008,11 @@ FAQ = Frequently asked questions
 
 **Amazon Translate** 是一种神经网络机器翻译服务，可将文本在各种支持的语言和英语之间进行互译。Amazon Translate 以深度学习技术为依托，可提供快速、高质量且经济实惠的语言翻译。该服务提供持续受训的托管解决方案，让您可以轻松翻译公司和用户撰写的内容，或构建需要多种语言支持的应用程序。机器翻译引擎已根据不同领域中的各种内容进行训练，以产生满足各个行业需求的高质量翻译。
 
-**Amazon Comprehend** 使用自然语言处理 (NLP) 提取有关文档内容的见解，无需任何特殊处理。Amazon Comprehend 以 UTF-8 格式处理任何文本文件。它可以通过识别文档中的实体、关键短语、语言、情绪和其他常见元素生成见解。使用 Amazon Comprehend 基于对文档结构的理解创建新产品。借助 Amazon Comprehend，您可以搜索提及相关产品的社交网络信息流、扫描整个文档存储库的关键短语，或确定一组文档中包含的主题。
+**Amazon Comprehend** 使用自然语言处理 (NLP) 提取有关文档内容的见解，无需任何特殊处理。Amazon Comprehend 以 <u>UTF-8 格式处理任何文本文件</u>。它可以通过识别文档中的实体、关键短语、语言、情绪和其他常见元素生成见解。使用 Amazon Comprehend 基于对文档结构的理解创建新产品。借助 Amazon Comprehend，您可以搜索提及相关产品的社交网络信息流、扫描整个文档存储库的关键短语，或确定一组文档中包含的主题。
 
 =>First, you'd have to create a transcription job using Amazon Transcribe to transform the recordings into text. Then, translate non-English calls to English using Amazon Translate. Finally, use Amazon Comprehend for sentiment analysis.
 
-**Amazon Textract** enables you to add document text detection and analysis to your applications. You provide a document image to the Amazon Textract API, and the service detects the document text. Amazon Textract works with formatted text and can detect words and lines of words that are located close to each other. It can also analyze a document for items such as related text, tables, key-value pairs, and selection elements.
+**Amazon Textract** enables you to add document text detection and analysis to your applications. You provide a <u>document image</u> to the Amazon Textract API, and the service detects the document text. Amazon Textract works with formatted text and can detect words and lines of words that are located close to each other. It can also analyze a document for items such as related text, tables, key-value pairs, and selection elements.
 
 > 例题
 > 
@@ -4005,7 +4029,7 @@ Which solution will meet these requirements with the LEAST operational overhead?
 
 **Amazon Lex** 是一项 AWS 服务，可用于为使用语音和文本的应用程序构建对话接口。借助 Amazon Lex，为 Amazon Alexa 提供技术支持的同一对话引擎现可供任何开发人员使用，从而使您能够在新的和现有的应用程序中构建高级的自然语言聊天自动程序。Amazon Lex 具备自然语言理解 (NLU) 和自动语音识别 (ASR) 的深度功能性和灵活性。Amazon Lex 提供了与 AWS Lambda 的预构建集成=>With Amazon Lex, you can build conversational <u>chatbots</u> quickly. 
 
-**Amazon Rekognition** 让您可以向应用程序轻松添加图像和视频分析功能。您只需向 Amazon Rekognition API 提供图像或视频，该服务即会识别物体、人员、文本、场景和活动。它还可以检测任何不合适的内容。Amazon Rekognition 还可以提供高度准确的面孔分析和面孔识别功能。使用 Amazon Rekognion 自定义标注，您可以创建一个机器学习模型，以查找特定于您的业务需求的物体、场景和概念。
+**Amazon Rekognition** 让您可以向应用程序轻松添加图像和视频分析功能。您只需向 Amazon Rekognition API 提供<u>图像或视频</u>，该服务即会识别<u>物体、人员</u>、文本、场景和活动。它还<u>可以检测任何不合适的内容</u>。Amazon Rekognition 还可以提供高度准确的面孔分析和面孔识别功能。使用 Amazon Rekognion 自定义标注，您可以创建一个机器学习模型，以查找特定于您的业务需求的物体、场景和概念。
 
 > 例题
 > 
@@ -4024,7 +4048,7 @@ What should a solutions architect do to meet these requirements?
 
 **AWS Artifact** 是一种 Web 服务，让您能够下载 AWS 安全性与合规性文档，如 ISO 认证和 SOC 报告。AWS Artifact提供按需下载。AWS 会向您提供安全和合规性文档，例如 AWS ISO 认证、支付卡行业 (PCI) 和服务组织控制 (SOC) 报告等。您可以将安全性和合规性文档（也称为*审核项目*）提交给您的审计人员或监管人员，以证明您所使用的 AWS 基础设施和服务的安全性和合规性。您还可以使用这些文档作为准则，来评估您自己的云架构以及您公司的内部控制有效性。AWS Artifact 仅提供有关 AWS 的文档。AWS 客户负责制定或获取文档来证明自己公司的安全性和合规性。
 
-**AWS Network Firewall** is a stateful, managed network firewall and intrusion detection and prevention service for your virtual private cloud (VPC) that you created in Amazon Virtual Private Cloud (Amazon VPC). With Network Firewall, you can filter traffic at the perimeter of your VPC. This includes filtering traffic going to and coming from an internet gateway, NAT gateway, or over VPN or AWS Direct Connect. Network Firewall uses the open source intrusion prevention system (IPS), Suricata, for stateful inspection. Network Firewall supports Suricata compatible rules.
+**AWS Network Firewall** is a stateful, managed network firewall and intrusion detection and prevention service <u>for</u> your virtual private cloud (<u>VPC</u>) that you created in Amazon Virtual Private Cloud (Amazon VPC). With Network Firewall, you can <u>filter traffic</u> at the perimeter of your VPC. This includes filtering traffic going to and coming from an internet gateway, NAT gateway, or over VPN or AWS Direct Connect. Network Firewall uses the open source intrusion prevention system (IPS), Suricata, for stateful inspection. Network Firewall supports Suricata compatible rules.
 
 > 例题
 >
@@ -4045,9 +4069,9 @@ What should a solutions architect do to meet these requirements?
 ### Cryptography & PKI
 
 **AWS Certificate Manager** (ACM) 处理创建、存储和续订公有及私有 SSL/TLS X.509 证书和密钥的复杂操作，这些证书和密钥可保护您的AWS网站和应用程序。您可以直接通过 ACM 签发证书，或者通过将第三方证书导入ACM 管理系统中，为集成AWS服务提供证书。ACM 证书可以保护单一域名、多个特定域名、通配符域或这些域的组合。ACM 通配符证书可以保护无限数量的子域。您还可以导出由 ACM Private CA 签名的 ACM 证书，以便在内部 PKI 中的任何位置使用。
-=>If you got your certificate from a third-party CA, import the certificate into ACM(AWS Certificate Manager) or upload it to the IAM certificate store. 
+=>If you got your certificate from <u>a third-party CA</u>, import the certificate into ACM(AWS Certificate Manager) or upload it to the IAM certificate store. 
 ACM lets you import third-party certificates from the ACM console, as well as programmatically. If ACM is not available in your region, use AWS CLI to upload your third-party certificate to the IAM certificate store.
-=> ACM provides managed renewal for your Amazon-issued SSL/TLS certificates. This means that ACM will either renew your certificates automatically (if you are using DNS validation), or it will send you email notices when expiration is approaching. These services are provided for both public and private ACM certificates.
+=> ACM provides managed renewal for your Amazon-issued SSL/TLS certificates. This means that ACM will either <u>renew your certificates automatically</u> (if you are using DNS validation), or it will send you email notices when expiration is approaching. These services are provided for both public and private ACM certificates.
 
 > 例题
 > 
@@ -4132,26 +4156,6 @@ Here are some of the benefits of using Amazon QuickSight for <u>analytics, data 
 
 **Amazon OpenSearch Service** 是一项托管式服务，可用于轻松地部署、操作和扩展 OpenSearch（一个常用的开源搜索和分析引擎）。OpenSearch Service 还提供安全性选项、高可用性、数据持久性以及对 OpenSearch 的直接访问。
 
-### Others
-
-**RDS Proxy** helps you manage a large number of connections from Lambda to an RDS database by establishing a warm connection pool to the database. 
-
-> 例题
-> 
-> A company is running a business-critical web application on Amazon EC2 instances behind an Application Load Balancer. The EC2 instances are in an Auto Scaling group. The application uses an Amazon Aurora PostgreSQL database that is deployed in a single Availability Zone. The company wants the application to be highly available with minimum downtime and minimum loss of data.
-Which solution will meet these requirements with the LEAST operational effort?
-> 
->  A. Place the EC2 instances in different AWS Regions. Use Amazon Route 53 health checks to redirect traffic. Use Aurora PostgreSQL Cross-Region Replication.
->  
->  B. Configure the Auto Scaling group to use multiple Availability Zones. Configure the database as Multi-AZ. Configure an Amazon RDS Proxy instance for the database.
->  
->  C. Configure the Auto Scaling group to use one Availability Zone. Generate hourly snapshots of the database. Recover the database from the snapshots in the event of a failure.
->  
->  D. Configure the Auto Scaling group to use multiple AWS Regions. Write the data from the application to Amazon S3. Use S3 Event Notifications to launch an AWS Lambda function to write the data to the database.
->  
->  Explantion: Amazon Aurora is part of Amazon RDS. So it can also use Amazon RDS Proxy.
-
-Amazon EC2 provides enhanced networking capabilities through the **Elastic Network Adapter (ENA)**. Enhanced networking provides higher bandwidth, higher packet per second (PPS) performance, and consistently lower inter-instance latencies.
-An **Elastic Fabric Adapter (EFA)** is a network device that you can attach to your Amazon EC2 instance to accelerate High Performance Computing (HPC) and machine learning applications. It provides all of the functionality of an ENA, with additional OS-bypass functionality. But the OS-bypass capabilities of EFAs are not supported on Windows instances. 
+### Business Applications
 
 **Amazon Pinpoint** 可帮助您通过发送电子邮件、SMS 和语音消息以及推送通知来与客户接洽。您可以使用 Amazon Pinpoint 发送针对性消息（如促销和客户保留活动），以及交易消息（如订单确认和密码重置消息）。
