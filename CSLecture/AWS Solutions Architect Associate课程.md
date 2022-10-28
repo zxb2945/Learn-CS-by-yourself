@@ -466,6 +466,21 @@ Can copy snapshots across AZ or Region
 
 Action中Manage Fast Snapshot Restore  干嘛用的？？
 
+> 例题
+> 
+> A company wants to improve its ability to clone large amounts of production data into a test environment in the same AWS Region. The data is stored in Amazon EC2 instances on Amazon Elastic Block Store (Amazon EBS) volumes. Modifications to the cloned data must not affect the production environment. The software that accesses this data requires consistently high I/O performance.
+A solutions architect needs to minimize the time that is required to clone the production data into the test environment.
+Which solution will meet these requirements?
+> 
+> 
+> A. Take EBS snapshots of the production EBS volumes. Restore the snapshots onto EC2 instance store volumes in the test environment.
+> 
+> B. Configure the production EBS volumes to use the EBS Multi-Attach feature. Take EBS snapshots of the production EBS volumes. Attach the production EBS volumes to the EC2 instances in the test environment.
+> 
+> C. Take EBS snapshots of the production EBS volumes. Create and initialize new EBS volumes. Attach the new EBS volumes to EC2 instances in the test environment before restoring the volumes from the production EBS snapshots.
+> 
+> D. Take EBS snapshots of the production EBS volumes. Turn on the EBS fast snapshot restore feature on the EBS snapshots. Restore the snapshots into new EBS volumes. Attach the new EBS volumes to EC2 instances in the test environment. Most Voted
+
 ## 060 AMI Overview
 
 AMI: Amazon Machine Lmage
@@ -513,6 +528,22 @@ Only gp/iol can be used as boot volumes（用于操作系统启动，HDD也可�
 
 
 io1/io2 with Multi-Attach: Attach the same EBS Volume to multiple EC2 instances in the same AZ. Application must manage concurrent write operations. (**only io1/io2** can multi-attcach)
+
+> 例题
+> 
+> A development team runs monthly resource-intensive tests on its general purpose Amazon RDS for MySQL DB instance with Performance Insights enabled. The testing lasts for 48 hours once a month and is the only process that uses the database. The team wants to reduce the cost of running the tests without reducing the compute and memory attributes of the DB instance.
+Which solution meets these requirements MOST cost-effectively?
+> 
+>  A. Stop the DB instance when tests are completed. Restart the DB instance when required.
+>  
+>  B. Use an Auto Scaling policy with the DB instance to automatically scale when tests are completed.
+>  
+>  C. Create a snapshot when tests are completed. Terminate the DB instance and restore the snapshot when required. Most Voted
+>  
+>  D. Modify the DB instance to a low-capacity instance when tests are completed. Modify the DB instance again when required.
+>  
+>  Explanation: It's a DB instance, not an EC2 instance. If the DB instance is stopped, you are still paying for the storage.
+
 
 ## 065 EBS Encryption
 
@@ -1860,6 +1891,16 @@ Work with Elastic IP, EC2 instances, **ALB**, NLB, public or private
 
 Security：only 2 external IP to be whitelisted?=>私网的两个端点IP...不太懂
 
+> 例题
+>
+> A company that develops web applications has launched hundreds of Application Load Balancers (ALBs) in multiple Regions. The company wants to create an allow list for the IPs of all the load balancers on its firewall device. A solutions architect is looking for a one-time, highly available solution to address this request, which will also help reduce the number of IPs that need to be allowed by the firewall.
+> What should the solutions architect recommend to meet these requirements?
+>
+> - A. Create a AWS Lambda function to keep track of the IPs for all the ALBs in different Regions. Keep refreshing this list.
+> - B. Set up a Network Load Balancer (NLB) with Elastic IPs. Register the private IPs of all the ALBs as targets to this NLB. **（B is wrong, because IP of ALB is always changing.）**
+> - C. Launch AWS Global Accelerator and create endpoints for all the Regions. Register all the ALBs in different Regions to the corresponding endpoints. （**assist lower the number of IPs that the firewall must accept or AnyCast IP -> Usually associated with Global Accelator**）
+> - D. Set up an Amazon EC2 instance, assign an Elastic IP to this EC2 instance, and configure the instance as a proxy to forward traffic to all the ALBs.
+
 AWS Global Acceleraor vs CloudFront:
 
 **They both use the AWS global network and its edge locations around the world**
@@ -1870,15 +1911,23 @@ Both services integrate with AWS Shield for DDos protection.
 
 因为AWS Global Acceleraor更多是Proxy，而不是缓存，所以我觉得更安全
 
+=>AWS Global Accelerator and Amazon CloudFront are separate services that use the AWS global network and its edge locations around the world. CloudFront improves performance for both cacheable content (such as images and videos) and dynamic content (such as API acceleration and dynamic site delivery). Global Accelerator improves performance for a wide range of applications over TCP or UDP by proxying packets at the edge to applications running in one or more AWS Regions. **Global Accelerator is a good fit for non-HTTP use cases, such as gaming (UDP), IoT (MQTT), or Voice over IP**, as well as for HTTP use cases that specifically require static IP addresses or deterministic, **fast regional failover**. Both services integrate with AWS Shield for DDoS protection.
+
+
 > 例题
 >
-> A company that develops web applications has launched hundreds of Application Load Balancers (ALBs) in multiple Regions. The company wants to create an allow list for the IPs of all the load balancers on its firewall device. A solutions architect is looking for a one-time, highly available solution to address this request, which will also help reduce the number of IPs that need to be allowed by the firewall.
-> What should the solutions architect recommend to meet these requirements?
->
-> - A. Create a AWS Lambda function to keep track of the IPs for all the ALBs in different Regions. Keep refreshing this list.
-> - B. Set up a Network Load Balancer (NLB) with Elastic IPs. Register the private IPs of all the ALBs as targets to this NLB. **（B is wrong, because IP of ALB is always changing.）**
-> - C. Launch AWS Global Accelerator and create endpoints for all the Regions. Register all the ALBs in different Regions to the corresponding endpoints. （**assist lower the number of IPs that the firewall must accept or AnyCast IP -> Usually associated with Global Accelator**）
-> - D. Set up an Amazon EC2 instance, assign an Elastic IP to this EC2 instance, and configure the instance as a proxy to forward traffic to all the ALBs.
+> A company provides a Voice over Internet Protocol (VoIP) service that uses UDP connections. The service consists of Amazon EC2 instances that run in an Auto Scaling group. The company has deployments across multiple AWS Regions.
+The company needs to route users to the Region with the lowest latency. The company also needs automated failover between Regions.
+Which solution will meet these requirements?
+> 
+>  A. Deploy a Network Load Balancer (NLB) and an associated target group. Associate the target group with the Auto Scaling group. Use the NLB as an AWS Global Accelerator endpoint in each Region. Most Voted
+>  
+>  B. Deploy an Application Load Balancer (ALB) and an associated target group. Associate the target group with the Auto Scaling group. Use the ALB as an AWS Global Accelerator endpoint in each Region.
+>  
+>  C. Deploy a Network Load Balancer (NLB) and an associated target group. Associate the target group with the Auto Scaling group. Create an Amazon Route 53 latency record that points to aliases for each NLB. Create an Amazon CloudFront distribution that uses the latency record as an origin.
+>  
+>  D. Deploy an Application Load Balancer (ALB) and an associated target group. Associate the target group with the Auto Scaling group. Create an Amazon Route 53 weighted record that points to aliases for each ALB. Deploy an Amazon CloudFront distribution that uses the weighted record as an origin.
+
 
 ## 170 AWS Snow Family Overview
 
@@ -2800,6 +2849,21 @@ Use API call Put MetricData
 
 自定义Dashboards布局
 
+=>You can share your CloudWatch dashboards with people who do not have direct access to your AWS account. This enables you to share dashboards across teams, with stakeholders, and with people external to your organization. You can even display dashboards on big screens in team areas, or embed them in Wikis and other webpages.
+
+> 例题
+> 
+> A company is launching a new application and will display application metrics on an Amazon CloudWatch dashboard. The company's product manager needs to access this dashboard periodically. The product manager does not have an AWS account. A solutions architect must provide access to the product manager by following the principle of least privilege.
+Which solution will meet these requirements?
+> 
+>  A. Share the dashboard from the CloudWatch console. Enter the product manager's email address, and complete the sharing steps. Provide a shareable link for the dashboard to the product manager. Most Voted
+>  
+>  B. Create an IAM user specifically for the product manager. Attach the CloudWatchReadOnlyAccess AWS managed policy to the user. Share the new login credentials with the product manager. Share the browser URL of the correct dashboard with the product manager.
+>  
+>  C. Create an IAM user for the company's employees. Attach the ViewOnlyAccess AWS managed policy to the IAM user. Share the new login credentials with the product manager. Ask the product manager to navigate to the CloudWatch console and locate the dashboard by name in the Dashboards section.
+>  
+>  D. Deploy a bastion server in a public subnet. When the product manager requires access to the dashboard, start the server and share the RDP credentials. On the bastion server, ensure that the browser is configured to open the dashboard URL with cached AWS credentials that have appropriate permissions to view the dashboard.
+
 ## 241 AWS CloudWatch Logs
 
 Application can send logs to CloudWatch using the SDK
@@ -3150,6 +3214,19 @@ Coping Snapshots across regions: key跟region对应，跨区要重新加密
 AWS managed keys or Custom managed keys : 即便是后者也是调用KMS API来创建的。
 
 AWS KMS supports **multi-Region keys**, which are AWS KMS keys in different AWS Regions that can be used interchangeably – as though you had the same key in multiple Regions. 
+
+> 例题
+> 
+> A company is building an application in the AWS Cloud. The application will store data in Amazon S3 buckets in two AWS Regions. The company must use an AWS Key Management Service (AWS KMS) customer managed key to encrypt all data that is stored in the S3 buckets. The data in both S3 buckets must be encrypted and decrypted with the same KMS key. The data and the key must be stored in each of the two Regions.
+Which solution will meet these requirements with the LEAST operational overhead?
+> 
+>  A. Create an S3 bucket in each Region. Configure the S3 buckets to use server-side encryption with Amazon S3 managed encryption keys (SSE-S3). Configure replication between the S3 buckets.
+>  
+>  B. Create a customer managed multi-Region KMS key. Create an S3 bucket in each Region. Configure replication between the S3 buckets. Configure the application to use the KMS key with client-side encryption. Most Voted
+>  
+>  C. Create a customer managed KMS key and an S3 bucket in each Region. Configure the S3 buckets to use server-side encryption with Amazon S3 managed encryption keys (SSE-S3). Configure replication between the S3 buckets.
+>  
+>  D. Create a customer managed KMS key and an S3 bucket in each Region. Configure the S3 buckets to use server-side encryption with AWS KMS keys (SSE-KMS). Configure replication between the S3 buckets.
 
 ## 268 KMS Key Rotation
 
@@ -4122,7 +4199,24 @@ Wavelength Zones are AWS infrastructure deployments that embed AWS compute and s
 
 =>AWS Certificate Manager automatically generates AWS Health events. 
 
-**AWS Systems Manager** 让您能够查看和控制 AWS 上的基础设施。Systems Manager 提供一个统一的用户界面，因此您可以查看多种 AWS 服务的操作数据，并跨 AWS 资源自动执行操作任务。**Patch Manager**, a capability of AWS Systems Manager, uses the appropriate built-in mechanism for an operating system type to install updates on a managed node. For example, on Windows Server, the Windows Update API is used, and on Amazon Linux the `yum` package manager is used.
+**AWS Systems Manager** 让您能够查看和控制 AWS 上的基础设施。Systems Manager 提供一个统一的用户界面，因此您可以查看多种 AWS 服务的操作数据，并跨 AWS 资源自动执行操作任务。
+
+**Patch Manager**, a capability of AWS Systems Manager, uses the appropriate built-in mechanism for an operating system type to install updates on a managed node. For example, on Windows Server, the Windows Update API is used, and on Amazon Linux the `yum` package manager is used.
+
+**Session Manager** is a fully managed AWS Systems Manager capability. With Session Manager, you can manage your Amazon Elastic Compute Cloud (Amazon EC2) instances, edge devices, and on-premises servers and virtual machines (VMs). You can use either an interactive one-click browser-based shell or the AWS Command Line Interface (AWS CLI). Session Manager provides secure and auditable node management without the need to open inbound ports, maintain bastion hosts, or manage SSH keys.
+
+> 例题
+> 
+> A company recently launched a variety of new workloads on Amazon EC2 instances in its AWS account. The company needs to create a strategy to access and administer the instances remotely and securely. The company needs to implement a repeatable process that works with native AWS services and follows the AWS Well-Architected Framework.
+Which solution will meet these requirements with the LEAST operational overhead?
+> 
+> A. Use the EC2 serial console to directly access the terminal interface of each instance for administration.
+> 
+> B. Attach the appropriate IAM role to each existing instance and new instance. Use AWS Systems Manager Session Manager to establish a remote SSH session. Most Voted
+> 
+> C. Create an administrative SSH key pair. Load the public key into each EC2 instance. Deploy a bastion host in a public subnet to provide a tunnel for administration of each instance.
+> 
+> D. Establish an AWS Site-to-Site VPN connection. Instruct administrators to use their local on-premises machines to connect directly to the instances by using SSH keys across the VPN tunnel.
 
 ### Developer Tools
 
