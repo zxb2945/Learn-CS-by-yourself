@@ -1643,6 +1643,22 @@ Glacier: very low cost, 取用时需要额外的唤醒时间(1-12hours)
 
 Glacier Deep Archive: for super long storage, even cheaper, more retrieval time(12-48hours) 
 
+=> newer version:
+
+Amazon Simple Storage Service (Amazon S3) also provides three Amazon S3 Glacier archive storage classes. These storage classes are designed for different access patterns and storage duration. These storage classes differ as follows:
+
+- **S3 Glacier Instant Retrieval** – Use for archiving data that is rarely accessed and requires milliseconds retrieval. => almost same with Standard...
+- **S3 Glacier Flexible Retrieval** (formerly the S3 Glacier storage class) – Use for archives where portions of the data might need to be retrieved in minutes. Data stored in the S3 Glacier Flexible Retrieval storage class can be accessed in as little as 1-5 minutes by using Expedited retrieval. You can also request free Bulk retrievals in up to 5-12 hours. => more cost-effective
+- **S3 Glacier Deep Archive** – Use for archiving data that rarely needs to be accessed. Data stored in the S3 Glacier Deep Archive storage class has a default retrieval time of 12 hours.
+
+> A company stores call transcript files on a monthly basis. Users access the files randomly within 1 year of the call, but users access the files infrequently after 1 year. The company wants to optimize its solution by giving users the ability to query and retrieve files that are less than 1-year-old as quickly as possible. A delay in retrieving older files is acceptable.
+> Which solution will meet these requirements MOST cost-effectively?
+>
+> - A. Store individual files with tags in Amazon S3 Glacier Instant Retrieval. Query the tags to retrieve the files from S3 Glacier Instant Retrieval.
+> - B. Store individual files in Amazon S3 Intelligent-Tiering. Use S3 Lifecycle policies to move the files to S3 Glacier Flexible Retrieval after 1 year. Query and retrieve the files that are in Amazon S3 by using Amazon Athena. Query and retrieve the files that are in S3 Glacier by using S3 Glacier Select. **Most Voted**
+> - C. Store individual files with tags in Amazon S3 Standard storage. Store search metadata for each archive in Amazon S3 Standard storage. Use S3 Lifecycle policies to move the files to S3 Glacier Instant Retrieval after 1 year. Query and retrieve the files by searching for metadata from Amazon S3.
+> - D. Store individual files in Amazon S3 Standard storage. Use S3 Lifecycle policies to move the files to S3 Glacier Deep Archive after 1 year. Store search metadata in Amazon RDS. Query the files from Amazon RDS. Retrieve the files from S3 Glacier Deep Archive.
+
 ## 153 S3 Lifecycle Rules
 
 You can transition objects between storage classes
@@ -4227,6 +4243,14 @@ Which solution will meet these requirements with the LEAST operational overhead?
 ### Analytics
 
 **Amazon AppFlow** 是一项完全托管式 API 集成服务，您可利用它将<u>软件即服务 (SaaS)</u> 应用程序连接到 AWS 服务，并安全地传输数据。使用 Amazon AppFlow 流可以管理数据传输并实现传输的自动化，而不需要编写代码。=>Saas -> Redshift,S3
+
+> A company's application integrates with multiple software-as-a-service (SaaS) sources for data collection. The company runs Amazon EC2 instances to receive the data and to upload the data to an Amazon S3 bucket for analysis. The same EC2 instance that receives and uploads the data also sends a notification to the user when an upload is complete. The company has noticed slow application performance and wants to improve the performance as much as possible.
+> Which solution will meet these requirements with the LEAST operational overhead?
+>
+> - A. Create an Auto Scaling group so that EC2 instances can scale out. Configure an S3 event notification to send events to an Amazon Simple Notification Service (Amazon SNS) topic when the upload to the S3 bucket is complete.
+> - B. Create an Amazon AppFlow flow to transfer data between each SaaS source and the S3 bucket. Configure an S3 event notification to send events to an Amazon Simple Notification Service (Amazon SNS) topic when the upload to the S3 bucket is complete.
+> - C. Create an Amazon EventBridge (Amazon CloudWatch Events) rule for each SaaS source to send output data. Configure the S3 bucket as the rule's target. Create a second EventBridge (Cloud Watch Events) rule to send events when the upload to the S3 bucket is complete. Configure an Amazon Simple Notification Service (Amazon SNS) topic as the second rule's target.
+> - D. Create a Docker container to use instead of an EC2 instance. Host the containerized application on Amazon Elastic Container Service (Amazon ECS). Configure Amazon CloudWatch Container Insights to send events to an Amazon Simple Notification Service (Amazon SNS) topic when the upload to the S3 bucket is complete.
 
 **AWS Lake Formation** 是一种完全托管服务，它让用户能够轻松地构建、保护和管理数据湖。Lake Formation 简化并自动化了创建数据湖通常所需的许多复杂的手动步骤。这些步骤包括收集、清理、移动和编目数据，以及安全地将这些数据用于分析和机器学习您可以使用 Lake Formation 来保护和提取 Amazon Simple Storage Service (Amazon S3) 数据湖中的数据。
 
