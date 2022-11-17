@@ -228,7 +228,65 @@ unique（C++）函数的功能是元素去重。即”删除”序列中所有�
 
 
 
-## memo
+## 3 Majority Element
+
+2022.11.17
+
+> Given an array `nums` of size `n`, return *the majority element*.
+>
+> The majority element is the element that appears more than `⌊n / 2⌋` times. You may assume that the majority element always exists in the array.
+
+```C++
+//二分法排序
+vector<int> merge(vector<int> a, vector<int> b) {
+	vector<int> res;
+	size_t ai = 0, bi = 0;
+	while (ai < a.size() && bi < b.size()) {
+		if (a[ai] <= b[bi])
+			res.push_back(a[ai++]);
+		else
+			res.push_back(b[bi++]);
+	}
+	if (ai == a.size())
+		res.insert(res.end(), b.begin() + bi, b.end());
+	else if (bi == b.size())
+		res.insert(res.end(), a.begin() + ai, a.end());
+	return res;
+}
+
+vector<int> mergeSort(vector<int>& arr) {
+	if (arr.size() < 2) return arr;
+	const size_t mid = arr.size() / 2;
+	vector<int> left(arr.begin(), arr.begin() + mid);
+	vector<int> right(arr.begin() + mid, arr.end());
+	return merge(mergeSort(left), mergeSort(right));
+}
+
+class Solution {
+public:
+    int majorityElement(vector<int>& nums) {
+        int i;
+		#if 1
+        nums = mergeSort(nums);
+        #else
+/*
+C++ STL 标准库中的 sort()  函数，本质就是一个模板函数
+只对 array、vector、deque 这 3 个容器提供支持
+sort默认为升序排列
+必须要有的：#include<algorithm>
+*/
+        sort(nums.begin(),nums.end()); 
+        #endif
+        i = nums.size()/2;
+
+        return nums[i];
+    }
+};
+```
+
+
+
+## 101 NOTE
 
 ### 1.namespace
 
@@ -248,4 +306,10 @@ C＋＋标准程序库中的所有标识符都被定义于一个名为std的name
 */
 ```
 
-### 2.STL??
+### 2.STL
+
+> STL:Standard Template Library，是一套功能强大的 C++ 模板类，提供了通用的模板类和函数。这些模板类和函数可以实现多种流行和常用的算法和数据结构，如向量、链表、队列、栈。
+>
+> STL 中常用的一些模板类 ：vector, list, queue, stack, set, map...
+>
+> STL 中常用的一些算法函数：<algorithm>中的sort, unique...
