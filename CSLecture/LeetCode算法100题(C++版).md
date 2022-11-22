@@ -286,6 +286,122 @@ sort默认为升序排列
 
 
 
+## 4 Happy Number
+
+2022.11.18
+
+> Write an algorithm to determine if a number `n` is happy.
+>
+> A **happy number** is a number defined by the following process:
+>
+> - Starting with any positive integer, replace the number by the sum of the squares of its digits.
+> - Repeat the process until the number equals 1 (where it will stay), or it **loops endlessly in a cycle** which does not include 1.
+> - Those numbers for which this process **ends in 1** are happy.
+>
+> Return `true` *if* `n` *is a happy number, and* `false` *if not*.
+
+```C++
+class Solution {
+public:
+    int getNext(int n){
+        int sum = 0;
+        //split the number to digits without transfering to string.
+        while(n/10 != 0){
+            sum += pow(n%10,2);
+            n = n/10;
+        }
+        sum += pow(n%10,2);
+        return sum;
+    }
+
+    bool isHappy(int n) {
+        int slow, fast;
+        slow = n;
+        fast = n;
+		//快慢指针法判断链表或数组是否循环的问题
+        while(true){
+            slow = getNext(slow);
+            fast = getNext(getNext(fast));
+            if(slow == 1 || fast == 1){
+                return true;
+            }
+            if(slow == fast){
+                return false;
+            }
+        }
+    }
+};
+```
+
+## 5 Best Time to Buy and Sell Stock
+
+> You are given an array `prices` where `prices[i]` is the price of a given stock on the `ith` day.
+>
+> You want to maximize your profit by choosing a **single day** to buy one stock and choosing a **different day in the future** to sell that stock.
+>
+> Return *the maximum profit you can achieve from this transaction*. If you cannot achieve any profit, return `0`.
+
+```C++
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        #if 1
+        int minP = prices[0], profit = 0, i;
+
+        for(i = 0; i < prices.size(); i++){
+            minP = min(prices[i],minP);
+            profit = max(profit, (prices[i] - minP));
+        }
+        
+        return profit;
+        #else //下面一段有逻辑漏洞，无法解决 Input: prices = [7,1,9,3,0,1]
+        auto minPosition = min_element(prices.begin(), prices.end());
+        auto maxPosition = max_element(minPosition, prices.end());
+        //留意数组最大值最小值查询以及值和位置输出方式
+        cout << "minPostion:" << minPosition - prices.begin() << " minValue:" << *minPosition  << endl; 
+        return *maxPosition - *minPosition;
+        #endif
+    }
+};
+```
+
+## 6 Reverse Bits
+
+> Reverse bits of a given 32 bits unsigned integer.
+>
+> **Note:**
+>
+> - Note that in some languages, such as Java, there is no unsigned integer type. In this case, both input and output will be given as a signed integer type. They should not affect your implementation, as the integer's internal binary representation is the same, whether it is signed or unsigned.
+> - In Java, the compiler represents the signed integers using [2's complement notation](https://en.wikipedia.org/wiki/Two's_complement). Therefore, in **Example 2** above, the input represents the signed integer `-3` and the output represents the signed integer `-1073741825`.
+
+```C++
+class Solution {
+public:
+    uint32_t reverseBits(uint32_t n) {
+        stringstream ss, ss2;
+        string str;
+		//留意bitset的使用方法
+        bitset<32> bitvec = n;
+        ss << bitvec;
+        ss >> str;
+        cout << str << endl;
+        reverse(str.begin(), str.end());
+        cout << str << endl;
+        ss2 << str;
+        ss2 >> bitvec;
+
+        n = bitvec.to_ulong(); 
+
+        return n;
+
+    }
+};
+```
+
+
+
+
+
 ## 101 NOTE
 
 ### 1.namespace
