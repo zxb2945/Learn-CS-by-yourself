@@ -398,7 +398,26 @@ public:
 };
 ```
 
+## 7 Contains Duplicate
 
+2022.11.24
+
+> Given an integer array `nums`, return `true` if any value appears **at least twice** in the array, and return `false` if every element is distinct.
+
+```C++
+class Solution {
+public:
+    bool containsDuplicate(vector<int>& nums) {
+        sort(nums.begin(),nums.end());
+        //unique返回值是迭代器
+        int length = unique(nums.begin(),nums.end()) - nums.begin();
+        if(length < nums.size()){
+            return true;
+        }
+        return false;
+    }
+};
+```
 
 
 
@@ -409,23 +428,204 @@ public:
 ```C++
 using namespace std;
 //You can use cout rather than std::cout in the context.
-/*
-所谓namespace，是指标识符的各种可见范围。
-C＋＋标准程序库中的所有标识符都被定义于一个名为std的namespace中。
-<iostream>和<iostream.h>是不一样，前者没有后缀，实际上，在你的编译器include文件夹里面可以看到，二者是两个文件，打开文件就会发现，里面的代码是不一样的。
-后缀为.h的头文件c++标准已经明确提出不支持了，早些的实现将标准库功能定义在全局空间里，声明在带.h后缀的头文件里，c++标准为了和C区别开，也为了正确使用命名空间，规定头文件不使用后缀.h。
-因此，当使用<iostream.h>时，相当于在c中调用库函数，使用的是全局命名空间，也就是早期的c++实现；当使用<iostream>的时候，该头文件没有定义全局命名空间，必须使用namespace std；这样才能正确使用cout。
-*/
-/* 
-<string.h>是旧的C头文件，对应的是基于char*的字符串处理函数；
-<string>是包装了std的C++头文件，对应的是新的strng类；
-*/
 ```
 
-### 2.STL
+> 所谓namespace，是指标识符的各种可见范围。
+> C＋＋标准程序库中的所有标识符都被定义于一个名为std的namespace中。
+> <iostream>和<iostream.h>是不一样，前者没有后缀，实际上，在你的编译器include文件夹里面可以看到，二者是两个文件，打开文件就会发现，里面的代码是不一样的。
+> 后缀为.h的头文件c++标准已经明确提出不支持了，早些的实现将标准库功能定义在全局空间里，声明在带.h后缀的头文件里，c++标准为了和C区别开，也为了正确使用命名空间，规定头文件不使用后缀.h。
+> 因此，当使用<iostream.h>时，相当于在c中调用库函数，使用的是全局命名空间，也就是早期的c++实现；当使用<iostream>的时候，该头文件没有定义全局命名空间，必须使用namespace std；这样才能正确使用cout。
+
+> <string.h>是旧的C头文件，对应的是基于char*的字符串处理函数；
+> <string>是包装了std的C++头文件，对应的是新的strng类；
+
+### 2.标准模板库：STL
 
 > STL:Standard Template Library，是一套功能强大的 C++ 模板类，提供了通用的模板类和函数。这些模板类和函数可以实现多种流行和常用的算法和数据结构，如向量、链表、队列、栈。
 >
 > STL 中常用的一些模板类 ：vector, list, queue, stack, set, map...
 >
 > STL 中常用的一些算法函数：<algorithm>中的sort, unique...
+
+### 3.迭代器：iterator
+
+**迭代器的原理**:
+
+> 为了提高C++编程的效率，STL中提供了许多容器，包括vector、list、map等。为了统一访问方式，STL为每种容器在实现的时候设计了一个内嵌的iterator类，不同的容器有自己专属的迭代器，使用迭代器来访问容器中的数据。迭代器对一些基本操作如*、–、++、==、!=进行了重载，使其具有了遍历复杂数据结构的能力，其遍历机制取决于所遍历的容器，迭代器的使用和指针的使用非常相似。通过begin，end函数获取容器的头部和尾部迭代器，当begin和end返回的迭代器相同时表示容器为空。简单来说，迭代器就是一个遍历的过程，像使用指针一样使用迭代器就可以访问这个容器。
+
+=>可以想象链表容器list与数组容器vector迭代器实现的原理不同，最后呈现的性质也会有区别。
+
+**迭代器的实现（以vector为例）**:
+
+```C++
+template<typename T> 
+class Vector  
+{
+private:
+	T* parr; //数组的指针
+	int cursize;//当前元素个数 ：也可以当做当前容器中最后一个元素的后一个元素下标，用于插入操作
+	int totalsize;//当前vector总大小  
+ 
+public:
+	typedef Iterator<T> iterator;
+	Vector()
+	{
+		parr = new T[2]();//new动态分配模板类型的数组的语法格式
+/*
+new动态分配数组：
+1.为了让new分配一个数组对象，我们需要在类型名之后跟一对方括号，在其中指明要分配的对象的数目=> int *p = new int[INT_NUM];方括号中的数必须是整型，但不必是常量
+2.new T()动态分配一个数组，会得到一个元素类型（T*）的指针。
+*/
+		cursize = 0;
+		totalsize = 2;
+	}
+	iterator begin()
+	{
+		return iterator(this, 0);
+	}
+	iterator end()
+	{
+		return iterator(this, cursize);
+	}
+    /* 省略 push_back(),insert() */
+	~Vector()
+	{
+		delete[] parr; // 释放动态数组的语法格式
+/*
+如果在delete一个指向数组的指针时忽略了方括号（或在delete一个指向单一对象的指针时使用了方括号），其行为是未定义的。
+*/
+		parr = NULL;
+	}
+	/* 省略resize(),Show() */
+	T& operator[](int index) //T&为引用格式中的类型声明
+        					//要把“operator[]”看成函数名
+	{
+		return parr[index];
+	}
+ 
+};
+```
+
+```C++
+template<typename T>
+class Vector;
+template<typename T>
+class Iterator
+{
+private:
+	Vector<T>* pvec; //迭代器的一种说法：对象的指针，即vector对象的指针
+	int index;   //因为遍历vector用下标就可以  
+public:
+    //这里构造一个迭代器，用一个对vector象的指针，和 vector对象的下标，下标可以确定要具体的那个
+	Iterator(Vector<T>* pv, int idx) :
+		pvec(pv), index(idx)
+	{}    
+    //重载!= ++ -- *等等，因为迭代器的使用中要使用大量的运算符 
+	bool operator!=(const Iterator left)
+	{
+		return index != left.index;
+	}
+	const Iterator operator++(int)
+	{
+		const Iterator tmp(*this);
+		index++;
+		return tmp;
+	}
+	/*省略余下运算符重载*/
+};
+```
+
+### 4.模板：template
+
+**模板的声明**
+
+```C++
+template <typename T>  int compare (T t1, T t2);//模板函数声明
+template <typename T> class compare;//模板类声明
+```
+
+> 1.因为T是一个模版实例化时才知道的类型，所以编译器更对T不知所云，为了通知编译器T是一个合法的类型，使用typename语句可以避免编译器报错。 
+> 2.template < typename var_name > class class_name; 表示var_name是一个类型， 在模版实例化时可以替换任意类型，不仅包括内置类型（int等），也包括自定义类型class。
+
+**在模板类中使用模板类**
+
+```C++
+
+template <typename T>
+class A
+{
+private:
+    vector<T> vec;//<T>表示vector这个类中有未实例化的类型
+};
+```
+
+也可以这样定义
+
+```c++
+template <typename T>
+class B
+{
+private:
+    vector<int> vec;//<int>就向编译器说明把模板实例化int类型
+};
+```
+
+### 5.C++中&的用途
+
+> 第一种用途：位运算中的“与”（AND）;
+> 第二种用途：取地址。这个功能在C中比较常见;
+> 第三种用途：引用。这个功能是C++的补充，常用在函数传参（C中一般用指针）、临时变量引用等。
+
+C++的**引用**：
+
+> 概念：
+>
+> 引用是为已存在的变量取了一个别名，引用和引用的变量共用同一块内存空间
+>
+> 格式：
+>
+> **类型& 引用变量名**(对象名) = **引用实体**；   `int& ra = a;`  ra为a的引用
+>
+> 特点：
+>
+> 引用实体和引用类型必须为同种类型
+> 引用在定义时必须初始化
+> 一个实体可以有多个引用，但一个引用只能引用一个实体
+
+### 6.C++子类的构造函数后面加:冒号的作用
+
+> 在C++类的构造函数中经常会看到如下格式的写法：
+
+```c++
+Iterator(Vector<T>* pv, int idx) : pvec(pv), index(idx)
+```
+
+> 上述语句中单冒号(:)的作用是表示后面是初始化列表，一般有三种使用场景。
+>
+> 1、对父类进行初始化
+>
+> 调用格式为子类构造函数 : 父类构造函数”，如下，其中QMainWindow是MyWindow的父类：
+
+```C++
+MyWindow::MyWindow(QWidget* parent , Qt::WindowFlags flag) : QMainWindow(parent,flag)
+```
+
+> 2、对类成员进行初始化
+>
+> 调用格式为“构造函数 : A(初始值),B(初始值),C(初始值)……”，如下，其中pvec、index分别是类的成员变量：
+
+```C++
+Iterator(Vector<T>* pv, int idx) : pvec(pv), index(idx)
+```
+
+> 3、对类的const成员变量进行初始化
+>
+> 由于const成员变量的值无法在构造函数内部初始化，因此只能在变量定义时赋值或使用初始化列表赋值。
+>
+> 对于2、3中的应用场景，有以下两点说明：
+>
+> 1、构造函数列表初始化执行顺序与成员变量在类中声明顺序相同，与初始化列表中语句书写先后无关。
+>
+> 2、相对于在构造函数中赋值，初始化列表执行效率更高。
+
+(2022.11.24)
