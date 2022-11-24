@@ -419,6 +419,73 @@ public:
 };
 ```
 
+## 8 Same Tree
+
+> Given the roots of two binary trees `p` and `q`, write a function to check if they are the same or not.
+>
+> Two binary trees are considered the same if they are structurally identical, and the nodes have the same value.
+
+```C++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    bool isSameTree(TreeNode* p, TreeNode* q) {
+        //先分析终止条件
+        if(p == NULL && q != NULL) return false;
+        if(p != NULL && q == NULL) return false;
+        if(p == NULL && q == NULL) return true;
+        if(p->val != q->val) return false;
+		//这里递归的应用真的是浑然天成！
+        return isSameTree(p->left, q->left) && isSameTree(p->right, q->right);
+    }
+};
+```
+
+## 9 Remove Duplicates from Sorted List
+
+> Given the `head` of a sorted linked list, *delete all duplicates such that each element appears only once*. Return *the linked list **sorted** as well*.
+
+```C++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* deleteDuplicates(ListNode* head) {     
+        if(head == NULL) return head;
+        
+        ListNode* temp = head;
+        while(temp){
+            //注意temp->next != NULL的先决条件，否则temp->next->val处报compile error：member access within null pointer
+            if(temp->next != NULL && temp->val == temp->next->val){
+                temp->next = temp->next->next;
+            }else{
+                temp = temp->next;
+            }
+        }
+
+        return head;
+    }
+};
+```
+
 
 
 ## 101 NOTE
