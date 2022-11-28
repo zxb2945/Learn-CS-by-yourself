@@ -878,6 +878,33 @@ fi
 
 ```
 
+##  ImuiMapChg.sh
+
+```shell
+#!/bin/sh
+
+# 440103300009001
+
+[ "${1}" == "" ] && echo "[Error] IMUIなし" && exit
+[ ${#1} -ne 15 ] && echo "[Error] IMUI? 異常" && exit
+_dmy=`echo ${1} | sed -e "s/[0-9]/X/g"`
+[ ${_dmy} != "XXXXXXXXXXXXXXX" ] && echo "[Error] 数字以外" && exit
+
+IMUI="${1}"
+MAPIMUI=""
+#seq 0 2 13=> 从0开始，间隔2，打出数字，直到12
+for pos in `seq 0 2 13` 
+do
+    _dmy=${IMUI:${pos}:2}
+    MAPIMUI=${MAPIMUI}${_dmy:1:1} 
+    MAPIMUI=${MAPIMUI}${_dmy:0:1}
+done
+MAPIMUI=${MAPIMUI}F${IMUI:14:1}
+
+
+echo "$IMUI ====> $MAPIMUI"
+```
+
 
 
 ## 附录：Shell逻辑运算总结
