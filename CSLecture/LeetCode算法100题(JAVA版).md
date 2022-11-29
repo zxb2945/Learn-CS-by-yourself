@@ -628,6 +628,12 @@ names.add(123); //编译不通过
 
 相当于告诉编译器每个集合接收的对象类型是什么，编译器在编译期就会做类型检查，告知是否插入了错误类型的对象，使得程序更加安全，增强了程序的健壮性。
 
+**Java中所有的泛型必须是引用类型。**
+
+> 什么是引用类型？Integer是引用类型，那int是什么类型？int是基本数据类型，不是引用类型。这就是为什么java中没有`List<int>`，而只有`List<Integer>`。
+> 
+> 举一反三：其他8种基本数据类型byte、short、int、long、float、double、char也都不是引用类型，所以8种基本数据类型都不能作为List的形参。但String、数组、class、interface是引用类型，都可以作为List的形参，所以存在`List<Runnable>`接口类型的集合、`List<int[]>`数组类型的集合、`List<String>`类的集合。但不存在`list<byte>`、`list<short>` 等基本类型的集合。
+
 #### 7.2 如何使用泛型
 
 ##### 7.2.1 泛型类
