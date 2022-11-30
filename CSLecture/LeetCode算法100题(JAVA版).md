@@ -359,9 +359,192 @@ Strng var = String.valueOf(num);
 String var = Integer.toString(num);
 ```
 
+## 13 Power of Four
+
+(2022.11.29)
+
+> Given an integer `n`, return *`true` if it is a power of four. Otherwise, return `false`*.
+>
+> An integer `n` is a power of four, if there exists an integer `x` such that `n == 4x`.
+
+```java
+class Solution {
+    public boolean isPowerOfFour(int n) {
+        if(n == 1){
+            return true;
+        }
+        if(n%4 == 0 && n != 0){
+            System.out.println(n);
+            return isPowerOfFour(n/4);
+        }
+        System.out.println(n);
+        return false;
+    }
+}
+```
+
+## 14 Is Subsequence
+
+> Given two strings `s` and `t`, return `true` *if* `s` *is a **subsequence** of* `t`*, or* `false` *otherwise*.
+>
+> A **subsequence** of a string is a new string that is formed from the original string by deleting some (can be none) of the characters without disturbing the relative positions of the remaining characters. (i.e., `"ace"` is a subsequence of `"abcde"` while `"aec"` is not).
+
+```java
+class Solution {
+    public boolean isSubsequence(String s, String t) {
+        //System.out.println(s[0]);=>JAVA中字符串不作为字符类型数组看待了，只有C特殊啊
+        char[] cs = s.toCharArray();//字符串转数组，长度不变
+        //估计按strlen来实现，JAVA不会去考虑末尾\0这种细枝末节，直接底层实现隐藏了。
+        System.out.println("Array.Lenth="+cs.length);
+        System.out.println("String.Length="+s.length());
+        //字符串跟数组不搭界后，连取长度也不一样了
+        char[] ts = t.toCharArray();
+        int j = 0;
+        boolean bingo = false;
+        for(int i = 0; i < cs.length; i++){ 
+            for(; j < ts.length; j++){
+                System.out.println(j);
+                if(cs[i] == ts[j]){
+                    System.out.println(i+":"+cs[i]+"="+j+":"+ts[j]);
+                    bingo = true;
+                    break;                          
+                }
+            }
+            if(bingo == true){
+                bingo = false;
+                j++; //因为此处是break而来的，要补一次i++
+               	//此处可以看出for(;;j++）中，j++是在单次循环最末尾执行的
+            }else{
+                return false;
+            }
+        }
+
+        return true;
+        /*
+        int sub = 0, word = 0;
+        while (sub < s.length() && word < t.length()) {
+            if (s.charAt(sub) == t.charAt(word)) {
+                sub++;
+            }
+            word++;
+        }
+        return sub == s.length();
+        */
+    }
+}
+```
+
+## 15 Find All Numbers Disappeared in an Array
+
+> Given an array `nums` of `n` integers where `nums[i]` is in the range `[1, n]`, return *an array of all the integers in the range* `[1, n]` *that do not appear in* `nums`.
+
+```java
+class Solution {
+    public List<Integer> findDisappearedNumbersBackUp(int[] nums) { //Time Limit Exceeded
+        int n = nums.length;
+        /*
+		基本数据类型转化为包装类的方法是借用Stream，感觉跟C++类似
+        */
+        Integer[] Integernums = IntStream.of(nums)//先把int[]转成IntStream
+                                .boxed()//再把IntStream转成Stream<Integer>
+                                .toArray(Integer[]::new); 
+        						//用toArray方法，传入IntFunction<A[]> generator
+        /*
+        Arrays.asList()用于数组转化为List：
+        1、String类型数组使用asList()，正常：  aa bb cc 
+        2、对象类型的数组使用asList()，正常：  1 2 3 
+        3、基本数据类型的数组使用asList()，出错(输出的是一个引用，把ints当成一个元素了)：[I@1540e19d
+        List list = Arrays.asList(nums);
+        System.out.println(list.size());
+        */
+        List list = Arrays.asList(Integernums);                        
+        //List<int> anslist = new ArrayList<int>();
+        //=>Java中所有的泛型必须是引用类型！不能是基本数据类型
+        List<Integer> anslist = new ArrayList<Integer>();
+        for(int i = 1; i < n + 1; i++){
+            if(!list.contains(i)){
+                System.out.println(i+" appears");
+                anslist.add(i);
+            }
+        }
+        return anslist;
+        
+    }
+
+    public List<Integer> findDisappearedNumbers(int[] nums) {//算法时间O(n)
+        int[] temp=new int[nums.length+1];
+        List<Integer> list=new ArrayList<>();
+        for(int i=0;i<nums.length;i++)
+        {
+            temp[nums[i]]=nums[i];
+        }
+        
+        for(int i=1;i<temp.length;i++)
+        {
+            if(temp[i]==0)
+            list.add(i);
+        }
+        return list;
+    }
+}
+```
+
+## 16 Island Perimeter
+
+> You are given `row x col` `grid` representing a map where `grid[i][j] = 1` represents land and `grid[i][j] = 0` represents water.
+>
+> Grid cells are connected **horizontally/vertically** (not diagonally). The `grid` is completely surrounded by water, and there is exactly one island (i.e., one or more connected land cells).
+>
+> The island doesn't have "lakes", meaning the water inside isn't connected to the water around the island. One cell is a square with side length 1. The grid is rectangular, width and height don't exceed 100. Determine the perimeter of the island.
+
+```java
+class Solution {
+    public int islandPerimeter(int[][] grid) {
+        int ans = 0;
+        for(int i = 0; i < grid.length; i++){
+            for(int j = 0; j < grid[i].length; j++){ //JAVA的二维数组逻辑与C相同
+                if(grid[i][j] == 1){
+                    ans += 4;
+                    if(i != 0 && grid[i-1][j] == 1) ans -= 2;
+                    if(j != 0 && grid[i][j-1] == 1) ans -= 2;
+                }
+            }
+        }
+        return ans;
+    }
+}
+```
+
+## 17 Ransom Note
+
+> Given two strings `ransomNote` and `magazine`, return `true` *if* `ransomNote` *can be constructed by using the letters from* `magazine` *and* `false` *otherwise*.
+>
+> Each letter in `magazine` can only be used once in `ransomNote`.
+
+```java
+    public boolean canConstruct(String ransomNote, String magazine) {
+        int[] ascii = new int[26];
+        for(int i = 0; i < ransomNote.length(); i++){
+            ascii[ransomNote.charAt(i) - 97]--;
+        }
+        for (int i = 0; i < magazine.length(); i++) {
+            ascii[magazine.charAt(i) - 97]++;
+        }
+        for(int i = 0; i < 26; i++){
+            if(ascii[i] < 0){
+                return false;
+            }
+        }
+        return true;
+    }
+}
+```
+
+
+
 ## 101 NOTE
 
-### 1  Java-数组常用api
+### 1  Java数组常用API
 
 1. 获取数组长度：`arrays .length()`
 
@@ -421,8 +604,8 @@ String类、StringBuilder类、StringBuffer类是三个字符串相关类。Stri
 
 StringBuffer和StringBuilder类非常相似,均代表可变的字符序列,两个类都是抽象类AbstractStringBuilder的子类,方法几乎一模一样
 两个类的区别主要是:
-- StringBuffer JDK1.0提供的类,线程安全,做线程同步检查,效率较低
-- StringBuilder JDK1.5提供的类,线程不安全,不做线程同步检查,因此效率较高,建议使用
+- StringBuffer JDK1.0提供的类,**线程安全**,做线程同步检查,效率较低
+- StringBuilder JDK1.5提供的类,**线程不安全**,不做线程同步检查,因此效率较高,建议使用
 
 #### 2.4 Date类和DateFormat类
 
@@ -486,7 +669,7 @@ Java语言的一个非常重要的特点就是与**平台的无关性**。而使
 
 ### 4 Java中的类（基础详解）
 
-#### 类 = 字段+方法
+#### 4.1 类 = 字段+方法
 
 ```java
 class person{
@@ -500,7 +683,7 @@ class person{
 }
 ```
 
-#### 类的修饰符 / 控制符
+#### 4.2 类的修饰符 / 控制符
 
 作用：可以修饰**类**，也可以修饰类中的成员（字段，方法）
 
@@ -588,7 +771,93 @@ list.clear();
 
 特点是**key值无序不可重复，value值可重复**。常用的有`HashMap`，`HashTable`（线程安全），`TreeMap`（可排序）
 
-### 6 Java.lang包简单总结
+### 6 Java.lang包的框架
+
+ java.lang包是提供利用java编程语言进行程序设计的基础类，在项目中使用的时候不需要import。
+
+#### 6.1 interface
+
+> Iterable: 迭代器
+>
+> Runable: 线程
+>
+> Compareble：自然排序
+>
+> CharSequence：char的可读序列
+
+#### 6.2 class
+
+##### 6.2.1 超类
+
+Object是所有类的超类。
+
+Object类定义了一些有用的方法，由于是根类，这些方法在其他类中都存在，一般是进行重载或者重写覆盖，实现了给子类的具体功能。比如：
+
+equals：返回值类型boolean，比较两个对象是否相同
+
+toString：返回值类型String，返回对象的字符串表示形式
+
+##### 6.2.2 包装类
+
+> Boolean，Character，Byte，Short，Integer，Long，Float，Double
+
+知识点：装箱和拆箱，类型转换
+
+> 自动装箱：自动加基本数据类型转成包装类，如：Integer i = 1；
+>
+> 自动拆箱：自动将包装类转成基本数据类型，如：Integer i = 2；int n = i;
+>
+> **装箱**过程是通过调用包装器的valueOf方法实现的，而**拆箱**过程是通过调用包装器的 xxxValue方法实现的。（xxx代表对应的基本数据类型）。
+
+包装类和基本数据类型的区别：
+
+> 1. 声明方式不同：基本类型不使用new关键字，而包装类型需要使用new关键字来在堆中分配存储空间；
+>
+> 2. 存储方式及位置不同：基本类型是直接将变量值**存储在栈中**，而包装类型是**将对象放在堆中**，然后通过引用来使用；
+>
+> 3. 初始值不同：基本类型的初始值如int为0，boolean为false，而**包装类型的初始值为null**；
+>
+> 4. 使用方式不同：基本类型直接赋值直接使用就好，而**包装类型在集合如Collection、Map时会使用到**。
+
+##### 6.2.3 字符串
+
+> String ，StringBuilder， StringBuffer
+
+在java.lang中还提供了处理字符串的String类，String类用于处理“不可变”的字符串，它们的值在创建后不能被更改；相对地，还提供了StringBuffer类和StringBuilder用于处理“可变”字符串。Stirng类，StringBuffer类和StringBuilder都被声明为final类型，因此不能将其当做父类再被继承使用了。
+
+##### 6.2.4 System
+
+System类代表系统，系统级的很多属性和控制方法都放置在该类的内部。由于该类的构造方法是private的，所以无法创建该类的对象，也就是无法实例化该类。其内部的成员变量和成员方法都是static的，所以也可以很方便的进行调用。
+
+成员变量：in、out、err，分别代表标准输入流(键盘输入)，标准输出流(显示器)和标准错误输出流(显示器)。
+
+最典型如`System.out.println`
+
+##### 6.2.5 Math
+
+math类中包含执行基本数学运算的方法，比如：绝对值-abs()、较大值-max()、较小值-min{}、四舍五入-round()
+
+##### 6.2.6 Throwable
+
+Throwable是 Java 语言中所有错误或异常的超类。
+Throwable包含两个子类: Error 和 Exception。它们通常用于指示发生了异常情况。
+Throwable包含了其线程创建时线程执行堆栈的快照，它提供了printStackTrace()等接口用于获取堆栈跟踪数据等信息。
+
+Java将可抛出(Throwable)的结构分为三种类型：被检查的异常(Checked Exception)，运行时异常(RuntimeException)和错误(Error)。
+
+> 1. 运行时异常
+>    定义: RuntimeException及其子类都被称为运行时异常。
+>    特点: Java编译器不会检查它。也就是说，当程序中可能出现这类异常时，倘若既"没有通过throws声明抛出它"，也"没有用try-catch语句捕获它"，还是会编译通过。例如，除数为零时产生的ArithmeticException异常，数组越界时产生的IndexOutOfBoundsException异常，fail-fail机制产生的ConcurrentModificationException异常等，都属于运行时异常。
+>    虽然Java编译器不会检查运行时异常，但是我们也可以通过throws进行声明抛出，也可以通过try-catch对它进行捕获处理。
+>    如果产生运行时异常，则需要通过修改代码来进行避免。例如，若会发生除数为零的情况，则需要通过代码避免该情况的发生！
+> 2. 被检查的异常
+>    定义: Exception类本身，以及Exception的子类中除了"运行时异常"之外的其它子类都属于被检查异常。
+>    特点: **Java编译器会检查它**。此类异常，要么通过throws进行声明抛出，要么通过try-catch进行捕获处理，否则不能通过编译。例如，CloneNotSupportedException就属于被检查异常。当通过clone()接口去克隆一个对象，而该对象对应的类没有实现Cloneable接口，就会抛出CloneNotSupportedException异常。
+>    被检查异常通常都是可以恢复的。
+> 3. 错误
+>    定义: Error类及其子类。
+>    特点: 和运行时异常一样，编译器也不会对错误进行检查。
+>    当资源不足、约束失败、或是其它程序无法继续运行的条件发生时，就产生错误。程序本身无法修复这些错误的。例如，VirtualMachineError就属于错误。
 
 ### 7 Java泛型详解
 
@@ -697,5 +966,62 @@ public static void main(String[] args) {
 }
 ```
 
-### 8 java中接口（interface）详解
+### 8 java接口详解
 
+接口(interface): 有时必须从几个类中派生出一个子类，继承它们所有的属性和方法。但是，Java不支持多重继承。有了接口，就可以得到多重继承的效果。
+
+接口(interface)是抽象方法和常量值的定义的集合。
+
+```java
+//定义接口
+public interface LiveAble {
+    //静态与.class 文件相关，只能使用接口名调用，不可以通过实现类的类名或者实现类的对象调用
+    public static void run(){
+		System.out.println("跑起来~~~");
+	}
+    //定义默认方法:可以继承(类中可以什么都不写)，可以重写
+    public default void fly(){
+		System.out.println("天上飞");
+	}
+	// 定义抽象方法
+	public abstract void eat();
+}
+//定义实现类
+public class Animal implements LiveAble {
+    //重写默认方法
+	@Override
+	public void fly() {
+		System.out.println("自由自在的飞");
+	} 
+    //实现类必须重写抽象方法
+	@Override
+	public void eat() {
+		System.out.println("吃东西");
+	}
+}
+```
+
+从本质上讲，接口是一种特殊的抽象类，这种抽象类中只包含常量和方法的定义，而没有变量和方法的实现。
+
+> 面向对象的语言基本上都可以实现接口。C++中，没有特定的关键词如`interface`来定义接口类，但是可以间接通过多继承抽象类来实现。
+
+#### 8.1 多接口实现
+
+在继承体系中，一个类只能继承一个父类。而对于接口而言，一个类是可以实现多个接口的，这叫做接口的多实现。并且，一个类能继承一个父类，同时实现多个接口。
+
+```java
+class 类名 [extends 父类名] implements 接口名1, 接口名2, {
+	// 重写接口中抽象方法【必须】
+	// 重写接口中默认方法【不重名时可选】
+}
+```
+
+#### 8.2 接口与抽象类的异同点
+
+> 相同点：
+> 都是不断向上抽取而来的。
+>
+> 不同点：
+>
+> 1. 抽象类需要被继承，而且只能单继承。接口需要被实现，而且可以多实现。
+> 2. 抽象类中可以定义非抽象方法，子类继承后可以直接使用非抽象方法。**接口只能定义抽象方法**，必须由子类去实现。
