@@ -676,7 +676,7 @@ public class TestMath {
 
 #### 3.1 JDK
 
-JDK: ava Development Kit    Java开发工具包
+JDK: Java Development Kit    Java开发工具包
 
 JDK = JRE + Java 开发工具包（例如Javac，Java编译工具等）
 
@@ -860,7 +860,7 @@ list.clear();
 
 ##### 5.2.4 TreeMap和HashMap的区别
 
-TreeMap 和 HashMap 底层实现逻辑不同，所以插入时间、删除时间、插入方法等都不相同。两者均为线程不安全。
+TreeMap 和 HashMap 底层实现逻辑不同，所以插入时间、删除时间、插入方法等都不相同。两者均为线程不安全(Hashmap有一个线程安全版本Hashtable)。
 
 |                    | TreeMap                       | HashMap                  |
 | ------------------ | ----------------------------- | ------------------------ |

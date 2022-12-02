@@ -137,6 +137,7 @@ Create an EC2 Instance with EC2 user data to have a website hands on
 ```shell
 #!/bin/bash
 #install httpd
+#-y是个参数 表示接下来的默认选择YES
 yum update -y
 yum install -y httpd
 systemctl start httpd
