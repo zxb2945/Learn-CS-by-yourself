@@ -486,6 +486,54 @@ public:
 };
 ```
 
+## 10.Search Insert Position
+
+> Given a sorted array of distinct integers and a target value, return the index if the target is found. If not, return the index where it would be if it were inserted in order.
+>
+> You must write an algorithm with `O(log n)` runtime complexity.
+
+```c++
+class Solution {
+public:
+    int searchInsert(vector<int>& nums, int target) {
+        #if 0 //第一次尝试二分法，特制了长度尺len，到二分终点因为奇偶性不稳定无法得到正确答案
+        int i, len, pos;
+        pos = size(nums)/2;
+        len = pos;
+        while(len != 0){
+            if(target < nums[pos]){
+                len = len/2;
+                pos -= len;
+                cout << "min:" << pos << endl;
+            }else if(target > nums[pos]){
+                len = len/2;
+                pos += len;
+                cout << "max:" <<pos << endl;
+            }else{
+                return pos;
+                cout << "bingo:" <<pos << endl;
+            }
+        }
+
+        if(target < nums[pos - 1]){
+            return pos;
+        }else{
+            return pos+1;
+        }
+        #else //正确的方法，用截取思想，简便达成
+        int i=0, j=nums.size()-1;
+		while(i<=j){
+			int mid=i+(j-i)/2;
+			if(nums[mid]==target){return mid;}
+			else if(nums[mid]>target){j=mid-1;}
+			else{i=mid+1;}
+		}
+		return i;
+        #endif
+    }
+};
+```
+
 
 
 ## 101 NOTE
