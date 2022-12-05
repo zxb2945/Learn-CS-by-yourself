@@ -811,7 +811,7 @@ list.clear();
 
 ##### 5.1.2 Set
 
-##### 5.2.3 Queue
+Set和Map有千丝万缕的联系呀。例如`HashSet`底层实现其实就是一个固定value的`HashMap`。LinkedHashSet就是一个value固定的`LinkedHashMap`，`TreeSet`就是一个value固定的`TreeMap`。
 
 #### 5.2  Map
 
@@ -878,10 +878,73 @@ TreeMap 和 HashMap 底层实现逻辑不同，所以插入时间、删除时间
 
 #### 6.1 interface
 
-> Iterable: 迭代器
->
-> Runable: 线程
->
+##### 6.1.1 迭代器
+
+Iterable: 迭代器
+
+##### 6.1.2 线程
+
+有两种方法可以创建一个新的执行线程：一种是将类声明为`Thread`。创建线程的另一种方法是声明一个实现`Runnable`接口的类。
+
+```java
+//Thread源代码概略
+//标记线程是否为守护线程。JVM进程中均为守护线程，如垃圾回收线程
+public final void setDaemon(boolean on){};
+//父子线程信息
+private final ThreadGroup parent;
+//初始化,新的线程的创建是由父线程创建的，main函数所在的线程是JVM创建
+public Thread() {
+        init(null, null, "Thread-" + nextThreadNum(), 0);}
+//启动,使用了本地调用，通过C代码初始化线程需要的系统资源
+public synchronized void start() {}；
+//运行,执行start后处于可运行状态
+//所以使用继承Thread创建线程类时，需要重写run方法，因为默认的run方法什么也不干。
+ public void run() {
+        if (target != null) {
+//这里的target实际上要保存的是一个Runnable接口的实现的引用    
+//所以当我们使用Runnable接口实现线程类时，为了启动线程，需要先勇该线程类实例初始化一个Thread               
+            target.run();
+        }
+    }
+//此外还有wait,join,norify,sleep,yield等许多方法
+```
+
+Thread和Runnable的实质是继承关系，没有可比性。无论使用Runnable还是Thread，都会new Thread，然后执行run方法。用法上，如果有复杂的线程操作需求，那就选择继承Thread，如果只是简单的执行一个任务，那就实现runnable。
+
+示例：
+
+```java
+public class Thread02 {
+    public static void main(String[] args) {
+        Dog dog = new Dog();
+        //dog.start(); //这里不能调用 start 方法
+        //创建了 Thread 对象，把 dog 对象(实现了 Runnable )，放入了 Thread
+        Thread thread = new Thread(dog);
+        thread.start();
+    }
+}
+
+class Dog implements Runnable { //通过实现Runnable接口来实现
+    int count =  0;
+    @Override
+    public void run() { //普通方法
+        while (true) {
+            System.out.println("你好，兮动人-" + (++count) + Thread.currentThread().getName());
+            try {
+                Thread.sleep(1000);//休眠1秒
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (count == 10) {
+                break;
+            }
+        }
+    }
+}
+```
+
+##### 6.1.3 其他
+
 > Compareble：自然排序
 >
 > CharSequence：char的可读序列
@@ -1126,3 +1189,176 @@ class 类名 [extends 父类名] implements 接口名1, 接口名2, {
 >
 > 1. 抽象类需要被继承，而且只能单继承。接口需要被实现，而且可以多实现。
 > 2. 抽象类中可以定义非抽象方法，子类继承后可以直接使用非抽象方法。**接口只能定义抽象方法**，必须由子类去实现。
+
+### 9 JavaWeb详解
+
+#### 9.1 Servlet
+
+##### 9.1.1 Servlet概述
+
+Servlet（Server Applet），全称Java Servlet。是用Java编写的服务器端程序。其主要功能在于交互式地浏览和修改数据，生成动态Web内容。**狭义的Servlet是指Java语言实现的一个接口，广义的Servlet是指任何实现了这个Servlet接口的类**，一般情况下，人们将Servlet理解为后者。绝大多数情况下Servlet只用来扩展基于HTTP协议的Web服务器。
+
+Servlet接口定义了**Servlet**与**servlet容器**之间的契约。这个契约是：Servlet容器将Servlet类载入内存，并产生Servlet实例和调用它具体的方法。
+
+一个简单的Servlet的生命周期: `init( )`=>`service( )`=>`destory()`
+
+```java
+//Servlet接口的实现例
+public class MyFirstServlrt implements Servlet { 
+    @Override
+    public void init(ServletConfig servletConfig) throws ServletException {
+        System.out.println("Servlet正在初始化");
+    } 
+    @Override
+    public void service(ServletRequest servletRequest, ServletResponse servletResponse) throws ServletException, IOException {
+        //专门向客服端提供响应的方法
+        System.out.println("Servlet正在提供服务"); 
+    } 
+    @Override
+    public void destroy() {
+        System.out.println("Servlet正在销毁");
+    }
+}      
+```
+
+##### 9.1.2 Servlet简单配置
+
+1. 写一个简单的用户名，密码的登录界面的form.html文件，通过提交按钮回信；
+2. 写一个Servlet用来接收密码及回信逻辑，类名叫做FormServlet；
+3. 在Tomcat下的web.xml上配置form.html与FormServlet的映射；
+
+##### 9.1.3 Servlet局限性
+
+Servlet是把HTML语句一行一行输出，随着互联网的不断发展，一个普通的HTML文件可能就达到好几百行。所以Sun公司开发出了动态网页生成技术，使得可以在HTML文件里内嵌JAVA代码，这就是现在的JSP技术。
+
+#### 9.2 JSP
+
+##### 9.2.1 JSP概述
+
+> JSP全称Java Server Pages，是一种动态网页开发技术。它使用JSP标签在HTML网页中插入Java代码。标签通常以<%开头以%>结束。
+> JSP可以编译成Servlet，主要用于实现Java web应用程序的用户界面部分。JSP通过网页表单获取用户输入数据、访问数据库及其他数据源，然后动态地创建网页。
+> JSP是Servlet的扩展，在没有JSP之前，就已经出现了Servlet技术。Servlet是利用输出流动态生成HTML页面，包括每一个HTML标签和每个在HTML页面中出现的内容。
+
+##### 9.2.2 JSP处理流程
+
+1. 浏览器发送一个 HTTP 请求给服务器。
+
+2. Web 服务器识别出这是一个对 JSP 网页的请求，并且将该请求传递给 JSP 引擎。
+
+3. JSP 引擎从磁盘中载入 JSP 文件，然后将它们转化为 Servlet。
+
+4. JSP 引擎将 JSP 文件**编译成**可执行的Servlet类，并将原始请求传递给 Servlet 引擎。
+
+5. Web 服务器的某组件将会调用 Servlet 引擎，然后载入并执行 Servlet 类。在执行过程中，Servlet 产生 HTML 格式的输出并将其内嵌于 HTTP response 中上交给 Web 服务器。
+
+6. Web 服务器以静态 HTML 网页的形式将 HTTP response 返回到浏览器中。
+
+7. Web 浏览器处理 HTTP response 中动态产生的HTML网页。
+
+JSP生命周期测试代码：
+
+```jsp
+<%@ page language="java" contentType="text/html; charset=utf-8"
+    pageEncoding="utf-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>jsp生命周期</title>
+</head>
+<body>
+	<%! 
+	//声明变量
+		private int initCnt = 0;
+		private int serviceCnt = 0;
+		private int destroyCnt = 0;
+	%>
+	<%!
+	//初始化方法
+  	public void jspInit(){
+		initCnt++;
+    	System.out.println("jspInit(): JSP被初始化了"+initCnt+"次");
+  	}
+	//销毁方法
+  	public void jspDestroy(){
+  		destroyCnt++;
+    	System.out.println("JSP被销毁了"+destroyCnt+"次");
+  	}
+	%>
+	<%
+		serviceCnt++;
+		System.out.println("Jsp响应了"+serviceCnt+"次");
+		String initString="初始化次数 : "+initCnt;
+		String serviceString="响应客户请求次数 : "+serviceCnt;
+		String destroyString ="销毁次数 : "+destroyCnt;
+	%>
+	<h1>结果如下：</h1>
+	<p><%= initString%></p>
+	<p><%= serviceString%></p>
+	<p><%= destroyString%></p>
+</body>
+</body>
+</html>
+```
+
+#### 9.3 MVC设计框架
+
+MVC模式(Model-View-Controller)是软件工程中的一种软件架构模式，把软件系统分为三个基本部分：模型(Model)、视图(View)和控制器(Controller)。
+
+最典型的MVC 就是JSP+Servlet+Javabean 的模式。
+
+> JavaBean是使用Java语言开发的一个可重用的组件，在JSP的开发中可以使用JavaBean将HTML和Java代码分离，减少重复代码，使整个JSP代码的开发更简洁。
+>
+> JavaBean本身就是一个类，属于Java的面向对象编程。
+>
+> 如果在一个类中只包含属性、setter、getter方法，那么这种类就成为简单JavaBean。如：
+
+```java
+public class SimpleBean{
+	private String name;
+	private int age;
+	public void setName(String name){
+		this.name = name;
+	}
+	public String getName(){
+		return this.name;
+	}
+```
+
+> Model(Javabean)：
+>
+> 1. 业务处理=>业务逻辑(Service); 
+> 2. 数据持久层=>CRUD(Dao);
+>
+> View(JSP)：
+>
+> 1. 展示数据；
+> 2. 提供链接发起Servlet请求;
+>
+> Controller (Servlet): 
+>
+> 1. 接受用户请求; 
+> 2. 交给业务层处理对应的代码; 
+> 3. 控制视图的跳转;
+
+常见的服务器端MVC框架有：Spring MVC、ASP.NET MVC等；
+
+#### 9.4 Tomcat
+
+##### 9.4.1 Tomcat概述
+
+Tomcat 服务器是一个免费的开放源代码的Web 应用服务器，支持最新的Servlet 和JSP 规范。Tomcat是Apache 服务器的扩展，但运行时它是独立运行的，所以当你运行tomcat 时，它实际上作为一个与Apache 独立的进程单独运行的。
+
+##### 9.4.2 Tomcat原理
+
+Tomcat要实现两个核心功能：
+
+1. 处理Socket连接，负责网络字节流与Request和Response对象的转化。
+2. 加载和管理Servlet，以及具体处理Request请求。
+
+Tomcat的模块分层：
+
+1. Catalina(Servlet容器)：Tomcat本质上就是一款 Servlet 容器，因此Catalina 才是 Tomcat 的核心，其他模块都是为Catalina提供支撑的。
+2. Coyote(连接器)：封装了底层的网络通信（Socket请求及响应处理），为Catalina容器提供了统一的接口，使Catalina容器与具体的请求协议及IO操作方式完全解耦。
+3. Jasper(JSP引擎)：Tomcat在默认的web.xml中配置了一个org.apache.jasper.servlet.JspServlet，用于处理所有的.jsp或 .jspx结尾的请求，该Servlet 实现即是运行时编译的入口。
+
