@@ -1192,7 +1192,9 @@ class 类名 [extends 父类名] implements 接口名1, 接口名2, {
 
 ### 9 JavaWeb详解
 
-#### 9.1 Servlet
+#### 9.1 Servlet(Optional)
+
+> 虽然 SpringMVC 的底层是以 Servlet 为基础的，是 JavaWeb 容器的基石，但直接使用Servlet 越来越少。
 
 ##### 9.1.1 Servlet概述
 
@@ -1231,7 +1233,9 @@ public class MyFirstServlrt implements Servlet {
 
 Servlet是把HTML语句一行一行输出，随着互联网的不断发展，一个普通的HTML文件可能就达到好几百行。所以Sun公司开发出了动态网页生成技术，使得可以在HTML文件里内嵌JAVA代码，这就是现在的JSP技术。
 
-#### 9.2 JSP
+#### 9.2 JSP(Optional)
+
+> JSP 在实际开发中，主要是作为 MVC 模型中的V（View）层出现的。它本来是为 Java 后端程序员开发前端界面而生的，但随着技术的发展，前后端分离的流行，JSP 的生命周期已经到头了。
 
 ##### 9.2.1 JSP概述
 
@@ -1305,7 +1309,7 @@ JSP生命周期测试代码：
 
 MVC模式(Model-View-Controller)是软件工程中的一种软件架构模式，把软件系统分为三个基本部分：模型(Model)、视图(View)和控制器(Controller)。
 
-最典型的MVC 就是JSP+Servlet+Javabean 的模式。
+最典型的MVC 就是JSP+Servlet+Javabean 的模式(随着前后端分离，以及SpringMVC流行，该模式基本淘汰)。
 
 > JavaBean是使用Java语言开发的一个可重用的组件，在JSP的开发中可以使用JavaBean将HTML和Java代码分离，减少重复代码，使整个JSP代码的开发更简洁。
 >
