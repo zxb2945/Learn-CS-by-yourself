@@ -582,6 +582,139 @@ class Solution {
 }
 ```
 
+## 19 First Bad Version
+
+(2022.12.9)
+
+> You are a product manager and currently leading a team to develop a new product. Unfortunately, the latest version of your product fails the quality check. Since each version is developed based on the previous version, all the versions after a bad version are also bad.
+>
+> Suppose you have `n` versions `[1, 2, ..., n]` and you want to find out the first bad one, which causes all the following ones to be bad.
+>
+> You are given an API `bool isBadVersion(version)` which returns whether `version` is bad. Implement a function to find the first bad version. You should minimize the number of calls to the API.
+
+```java
+/* The isBadVersion API is defined in the parent class VersionControl.
+      boolean isBadVersion(int version); */
+
+public class Solution extends VersionControl {
+    public int firstBadVersion(int n) {
+        for(int i = 1; n > 2; ){
+            //Please avoid the integer overflow condition
+            //int mid = (i + n)/2;
+            int mid = i + ( n - i)/2;
+            if(isBadVersion(mid) && !isBadVersion(mid - 1)){
+                return mid;
+            }else if(isBadVersion(mid)){
+                n = mid - 1;
+            }else{
+                i = mid + 1;
+                System.out.println(i);
+            }
+        }
+//有更简洁的判断的二分法，可以去掉下面的尾巴...
+        if(isBadVersion(1)){
+            return 1;
+        }else{
+            return 2;
+        }
+    }
+}
+```
+
+## 20 Add Strings
+
+> Given two non-negative integers, `num1` and `num2` represented as string, return *the sum of* `num1` *and* `num2` *as a string*.
+>
+> You must solve the problem without using any built-in library for handling large integers (such as `BigInteger`). You must also not convert the inputs to integers directly.
+
+```java
+class Solution {
+    public String addStrings(String num1, String num2) {
+        //String 转 字符数组
+        char[] longer = num1.length() > num2.length() ? num1.toCharArray() : num2.toCharArray();
+        char[] shorter = num1.length() > num2.length() ? num2.toCharArray() : num1.toCharArray();
+        StringBuilder ans = new StringBuilder();
+        int ascii1, ascii2, extra = 0;
+        for(int i = 1; i <= longer.length; ++i){
+            //字符与字符相减，是两个字符的ASCII码相减，返回就是int
+            ascii1 = longer[longer.length - i] - '0';
+            if(i > shorter.length){
+                ascii2 = 0;
+            }else{
+                ascii2 = shorter[shorter.length - i] - '0';
+            }
+            int add = ascii1 + ascii2 + extra;
+            //StringBuilder的insert(),delete(),append()等方法
+            ans.insert(0,add%10);
+            extra = add/10;
+        }
+
+        if(extra > 0){
+            ans.insert(0,extra);
+        }
+		//任何包裹数据均可以使用toString这个接口吧
+        return ans.toString();
+    }
+}
+```
+
+## 21 Construct String from Binary Tree
+
+> Given the `root` of a binary tree, construct a string consisting of parenthesis and integers from a binary tree with the preorder traversal way, and return it.
+>
+> Omit all the empty parenthesis pairs that do not affect the one-to-one mapping relationship between the string and the original binary tree.
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    //注意这里完全没必要用到static，反而会使各测试例互相影响
+    private StringBuilder ans = new StringBuilder();
+	//这个枚举没用，就是单纯玩一玩，就像true没和1绑定，JAVA中枚举也不和数字绑定
+    enum KIND{
+        ROOT,LEFT,RIGHT
+    }
+	//规定要用二叉树先序遍历：preorder traversal way
+    private int preorder(TreeNode tree, KIND num){
+        if(tree == null){
+            return 0;
+        }
+        ans.append('(');
+        ans.append(tree.val);
+        if(tree.left == null && tree.right != null){
+            ans.append("()");
+        }
+        //先序遍历核心就是两行递归函数调用
+        preorder(tree.left, KIND.LEFT);
+        preorder(tree.right, KIND.RIGHT);
+        ans.append(')');
+
+        return 0;
+    }
+
+    public String tree2str(TreeNode root) {
+        preorder(root, KIND.ROOT);
+        //StringBuilder删除首尾元素方法
+        ans.deleteCharAt(0);
+        ans.deleteCharAt(ans.length() - 1);
+        return ans.toString();
+    }
+}
+```
+
 
 
 ## 101 NOTE
@@ -729,21 +862,34 @@ class person{
 
 作用：可以修饰**类**，也可以修饰类中的成员（字段，方法）
 
-第一类：访问修饰符
+##### 4.2.1 访问修饰符
 
-public: 可以被其他类所访问
+###### 4.2.1.1 修饰类时
 
-private: 只能在同一个类中被访问
+public 或者 没有修饰符 两种情况。前者对所有类可见，后者只在自己的包中可见；
 
-protected: 可以被不同包中的子类中被访问
+###### 4.2.1.2 修饰成员时
 
-如果不加修饰符，则只能在同一个类和同一个包中，这2中情况下访问。
+java共有四种控制可见的访问修饰符，分别是：
 
-备注：java文件中可以有多个类，但是只能有一个public类（这个public类的名字必须和文件名相同）。因为每一个java程序运行的时候都会先执行public这个类，而且只执行public类中的代码
+public: 任何类都可见；
+
+protected: **对本包**以及子类可见;
+
+无修饰符: 对本包可见; (包是组织类的一种方式，使用包是为了保证类的唯一性，可以理解为文件夹，在不同的保中可以创建相同的类名)
+
+private: 仅自己的类中对象可见，继承的子类不可见;
+
+| Modifier    | Class | Package | Subclass | World |
+| ----------- | ----- | ------- | -------- | ----- |
+| public      | Y     | Y       | Y        | Y     |
+| protected   | Y     | Y       | Y        | N     |
+| no modifier | Y     | Y       | N        | N     |
+| private     | Y     | N       | N        | N     |
 
 
 
-第二类：其他修饰符 / 非访问控制符
+##### 4.2.2 其他修饰符 
 
 static：静态的，非实例的，类的
 
@@ -1399,3 +1545,46 @@ Spring,Spring MVC,Spring Boot 之间什么关系?
 > - **Before**（前置通知）：目标对象的方法调用之前触发
 > - **After** （后置通知）：目标对象的方法调用之后触发
 > - ...
+
+### 11 Java main函数
+
+```java
+package hello;
+public class Hello {
+	public static void main(String[] args) {
+        System.out.println("Hello World");      
+	}
+}
+```
+
+`public static void main(String[] args)`的说明：
+
+`public`: 因为main是程序的入口，java程序通过JVM调用，属于外部调用，所以需要使用public修饰，否则虚拟机无法调用。
+
+`static`: 因为main是程序的入口，这时候还没有实例化对象，因此将main方法声明为static的，这样main()中的代码是存储在静态存储区的，即当定义了类以后，这段代码就已经存在了，无需像其他方法那样必须实例化为对象后才能被调用。
+
+`void`: 对于java中的main()，jvm有限制，不能有返回值，因此返回值类型为void。
+
+
+
+`public class Hello` 的说明：
+
+> 1. 一个java源文件当中可以定义多个class
+> 2. 一个java源文件当中public的class不是必须的
+> 3. 一个class会定义生成一个xxx.class字节码文件
+> 4. 一个java源文件当中定义公开的类的话,**只能有一个，并且该类名称必须和java源文件名称一致**
+>    每一个class当中都可以编写main方法，都可以设定程序的入口，向执行B.class中的main方法: java B，想执行x.class当中的main方法:java x
+>    注意:当在命令窗口中执行java Hello，那么要求hello.class当中必须有主方法。
+
+备注：
+
+> 1. 任何一个 class 中都可以设定程序入口，也就是说任何一个 class
+>    中都可以写 main 方法（主方法），想从哪个入口进去执行，则让类加载器先加载对应的类即
+>    可，例如：想让 A类中的 main 方法执行，则执行：java A，想让 B 类中的 main 方法执行，则
+>    执行：java B。但实际上，对于一个完整的独立的应用来说，只需要提供一个入口，也就是说
+>    只需要定义一个 main 方法即可。
+> 2. 还有，在实际的开发中，虽然一个 java 源文件可以定义多个 class，实际上这是不规范的，
+>    比较规范的写法是一个 java 源文件中只定义一个 class。
+
+
+
