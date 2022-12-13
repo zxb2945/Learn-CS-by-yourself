@@ -715,6 +715,110 @@ class Solution {
 }
 ```
 
+## 22 Flood Fill
+
+> An image is represented by an `m x n` integer grid `image` where `image[i][j]` represents the pixel value of the image.
+>
+> You are also given three integers `sr`, `sc`, and `color`. You should perform a **flood fill** on the image starting from the pixel `image[sr][sc]`.
+>
+> To perform a **flood fill**, consider the starting pixel, plus any pixels connected **4-directionally** to the starting pixel of the same color as the starting pixel, plus any pixels connected **4-directionally** to those pixels (also with the same color), and so on. Replace the color of all of the aforementioned pixels with `color`.
+>
+> Return *the modified image after performing the flood fill*.
+
+(2022.12.13)
+
+```java
+//如果用递归，在主体处理前总结递归结束逻辑会更清晰，而不是如下这样与主体逻辑杂糅
+//Java中的二维数组边界处理与C相同
+//Java中数组名也是地址，与C相同
+class Solution {
+    public int[][] floodFill(int[][] image, int sr, int sc, int color) {
+        int oldcolor = image[sr][sc];
+        image[sr][sc] = color;
+
+        if((sr - 1 >= 0) && image[sr-1][sc] == oldcolor && image[sr-1][sc] != color){
+            int tem = sr - 1;
+            floodFill(image, tem, sc, color);
+        }
+        if((sr + 1 < image.length) && image[sr+1][sc] == oldcolor && image[sr+1][sc] != color){
+            int tem = sr + 1;
+            floodFill(image, tem, sc, color);
+        }
+        if((sc - 1 >= 0) && image[sr][sc-1] == oldcolor && image[sr][sc-1] != color){
+            int tem = sc - 1;
+            floodFill(image, sr, tem, color);
+        }
+        if((sc + 1 < image[0].length) && image[sr][sc+1] == oldcolor && image[sr][sc+1] != color){
+            int tem = sc + 1;
+            floodFill(image, sr, tem, color);
+        }
+
+        return image;
+
+    }
+}
+```
+
+## 23 Set Mismatch
+
+> You have a set of integers `s`, which originally contains all the numbers from `1` to `n`. Unfortunately, due to some error, one of the numbers in `s` got duplicated to another number in the set, which results in **repetition of one** number and **loss of another** number.
+>
+> You are given an integer array `nums` representing the data status of this set after the error.
+>
+> Find the number that occurs twice and the number that is missing and return *them in the form of an array*.
+
+```java
+class Solution {
+    public int[] findErrorNums(int[] nums) {
+        Arrays.sort(nums);
+        int[] ans = new int[2];
+        int mis = -1;
+        int rep = -1;
+
+        for(int i = 1; i < nums.length; ++i){
+            if(nums[i] == nums[i-1]){
+                rep = nums[i];
+                break;
+            }
+        }
+
+        if(nums[0] == 2){
+            ans[0] = rep;
+            ans[1] = 1; 
+            return ans;          
+        }
+
+        for(int i = 1; i < nums.length; ++i){
+            if(nums[i] == nums[i-1] + 2){
+                mis = nums[i] - 1;
+                break;
+            }
+        }
+        if(mis == -1){
+            mis = nums.length;
+        }
+
+        ans[0] = rep;
+        ans[1] = mis;
+
+        return ans;
+        
+        /*下面这段代码才是美丽的，利用了数组值与下标范围相同这一重要特性！
+        并且不用排序，只需多申请一个数组即可
+        int[] res = new int[2];
+		int[] count = new int[nums.length + 1];
+		for (int i = 0; i < nums.length; i++)	count[nums[i]]++;
+		for (int i = 1; i < count.length; i++) {
+		if (count[i] == 2)  res[0] = i;
+		if (count[i] == 0)  res[1] = i;
+		}
+		return res;
+        */
+        
+    }
+}
+```
+
 
 
 ## 101 NOTE
