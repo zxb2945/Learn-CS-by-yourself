@@ -819,6 +819,119 @@ class Solution {
 }
 ```
 
+## 24 Baseball Game
+
+(2022.12.14)
+
+> You are keeping the scores for a baseball game with strange rules. At the beginning of the game, you start with an empty record.
+>
+> You are given a list of strings `operations`, where `operations[i]` is the `ith` operation you must apply to the record and is one of the following:
+>
+> - An integer
+>
+>   ```
+>   x
+>   ```
+>
+>   - Record a new score of `x`.
+>
+> - ```
+>   '+'
+>   ```
+>
+>   - Record a new score that is the sum of the previous two scores.
+>
+> - ```
+>   'D'
+>   ```
+>
+>   - Record a new score that is the double of the previous score.
+>
+> - ```
+>   'C'
+>   ```
+>
+>   - Invalidate the previous score, removing it from the record.
+>
+> Return *the sum of all the scores on the record after applying all the operations*.
+>
+> The test cases are generated such that the answer and all intermediate calculations fit in a **32-bit** integer and that all operations are valid.
+
+```java
+class Solution {
+    public int calPoints(String[] operations) {
+        //本题用Stack<Integer> stack = new Stack<>();更好！
+        //注意ArrayList中List首字母大写，Integer中只有末尾是er
+        ArrayList<Integer> ans = new ArrayList<Integer>();
+        //迭代器用法
+        for(String str : operations){
+            //这个放在最后else框里不更简洁？
+            if((str.charAt(0) > 47 && str.charAt(0) < 58) 
+            || str.charAt(0) == 45){
+                ans.add(Integer.parseInt(str));
+            } 
+            if(str.charAt(0) == 43 && ans.size() >= 2){
+                //ArrayList取最后一个字符除了ans.get(ans.size()-1)无他
+                int tem = ans.get(ans.size()-1) + ans.get(ans.size()-2);
+                ans.add(tem);
+            }
+            if(str.charAt(0) == 68){
+                ans.add(ans.get(ans.size()-1)*2);
+            }
+            //str.equals("C")才是更清楚的用法！
+            if(str.charAt(0) == 67){
+                ans.remove(ans.size()-1);
+            }
+        }
+
+        int res = 0;
+        for(int i : ans){
+            res += i;
+        } 
+
+        return res;
+    }
+}
+```
+
+## 25 Valid Parentheses
+
+> Given a string `s` containing just the characters `'('`, `')'`, `'{'`, `'}'`, `'['` and `']'`, determine if the input string is valid.
+>
+> An input string is valid if:
+>
+> 1. Open brackets must be closed by the same type of brackets.
+> 2. Open brackets must be closed in the correct order.
+> 3. Every close bracket has a corresponding open bracket of the same type.
+
+```java
+class Solution {
+    public boolean isValid(String s) {
+        //注意char的包裹类型是Character
+        Stack<Character> stack = new Stack<>();
+        //key无法比较，所以只能用HashMap，不能用TreeMap
+        Map<Character,Character> map = new HashMap<>();
+        map.put('(',')');
+        map.put('{','}');
+        map.put('[',']');
+        //这个方案不够简洁，考虑一下不用map，只推‘)}]’进入stack的方案
+        for(int i = 0; i < s.length(); ++i){
+            if(!stack.isEmpty() //无此前提，pop()要抛出异常
+            && !map.containsKey(s.charAt(i))
+            && s.charAt(i) == map.get(stack.peek())){
+                stack.pop();
+            }else if(!map.containsKey(s.charAt(i))){
+                return false;
+            }
+            else{
+                stack.push(s.charAt(i));
+            }
+        }
+        return stack.isEmpty();
+    }
+}
+```
+
 
 
 ## 101 NOTE
@@ -878,6 +991,23 @@ class Solution {
 #### 2.2 String类
 
 String类、StringBuilder类、StringBuffer类是三个字符串相关类。String类的对象代表不可变的字符序列,StringBuilder类和StringBuffer类代表可变字符序列
+
+String类的常用方法：
+
+```java
+String s = "ilikejava";
+//字符串的长度
+int length = s.length();
+//字符串相比较
+boolean a = s.equals("ilikejava");
+//字符串截取
+String sa = s.substring(0,5);
+//返回指定位置的字符
+char sb = s.charAt(0);
+//字符串转化为数字(虽说不是String类的方法)
+Integer.parseInt("100");
+//...
+```
 
 #### 2.3 StringBuffer和StringBuilder类
 
@@ -1058,6 +1188,15 @@ list.clear();
 ###### 5.1.1.3 Vector
 
 `Vector`底层实现和`ArrayList`类似，区别在于在许多方法上加了`synchronized`关键字，来实现了多线程安全。但代价是性能的降低。由于加锁的是整个集合，所以并发情况下进行迭代会锁住很长时间。
+
+`Stack`是`Vector`的一个子类，它实现标准的后进先出堆栈。
+
+```java
+ E push(E item); //把项压入堆栈顶部。 
+ E pop();//移除堆栈顶部的对象，并作为此函数的值返回该对象。 
+ E peek();//查看堆栈顶部的对象，但不从堆栈中移除它。 
+ boolean empty();//测试堆栈是否为空。  
+```
 
 ##### 5.1.2 Set
 
