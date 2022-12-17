@@ -932,6 +932,78 @@ class Solution {
 }
 ```
 
+## 31 Sort Characters By Frequency
+
+(2022.12.16)
+
+> Given a string `s`, sort it in **decreasing order** based on the **frequency** of the characters. The **frequency** of a character is the number of times it appears in the string.
+>
+> Return *the sorted string*. If there are multiple answers, return *any of them*.
+
+```java
+class Solution {
+    public String frequencySort(String s) {
+        //字符串转数组
+        char[] arr = s.toCharArray();
+        Map<Character,Integer> map = new HashMap<>();
+        //要求前K个高频元素，那么果断用优先队列
+        PriorityQueue<Pair> queue = new PriorityQueue<>();
+        StringBuilder str = new StringBuilder();
+		//把字符数组放到map中
+        for(int i = 0; i < arr.length; ++i){
+            //这里就是要用getOrDefault而不是get的典型
+            //int value = map.get(arr[i]);
+            int value = map.getOrDefault(arr[i],0);
+            map.put(arr[i], ++value);
+        }
+		//遍历map，放入优先队列
+        for(Map.Entry<Character,Integer> entry : map.entrySet()){
+            char pKey = entry.getKey();
+            System.out.println("key="+pKey);
+            int pValue = entry.getValue();
+            System.out.println("value="+pValue);
+            //注意！循环中定义的变量生命周期只在这次循环中，出了循环无法利用，显示未声明！
+        	//即便是C也是这样的语法
+            //这也是循环中可以反复声明的原理
+            Pair pair = new Pair(pKey, pValue);
+            queue.offer(pair);
+        }
+        
+		//优先队列转化为字符串
+        while(!queue.isEmpty()){
+            Pair pair = queue.poll();
+            int count = pair.value;
+            while(count > 0){
+               str.append(pair.key);
+               count--; 
+            }
+        }
+
+        return str.toString();
+
+        
+    }
+	//定义一个可比较类作为优先队列的元素
+    class Pair implements Comparable{
+        char key;
+        int value;
+
+        Pair(char key, int value){
+            this.key = key;
+            this.value = value;
+        }
+
+		//实现Comparable接口
+	    @Override
+	    public int compareTo(Object o) {
+		    Pair p = (Pair)o;
+		    return p.value - this.value;
+	    }
+
+    }
+}
+```
+
 
 
 ## 101 NOTE
@@ -1006,6 +1078,8 @@ String sa = s.substring(0,5);
 char sb = s.charAt(0);
 //字符串转化为数字(虽说不是String类的方法)
 Integer.parseInt("100");
+//字符串转化为字符数组
+char[] arr = s.toCharArray();
 //...
 ```
 
@@ -1142,7 +1216,7 @@ util包的框架：常用的**集合类**主要实现两个“super接口”而�
 
 #### 5.1 Collection
 
-`Collection`有两个子接口：`List`, `Set`和`Queue`
+`Collection`有三个子接口：`List`, `Set`和`Queue`
 
 `List`特点是**元素有序，且可重复**。实现的常用集合类有`ArrayList`、`LinkedList`，和`Vector`（线程安全）。
 
@@ -1189,7 +1263,7 @@ list.clear();
 
 `Vector`底层实现和`ArrayList`类似，区别在于在许多方法上加了`synchronized`关键字，来实现了多线程安全。但代价是性能的降低。由于加锁的是整个集合，所以并发情况下进行迭代会锁住很长时间。
 
-`Stack`是`Vector`的一个子类，它实现标准的后进先出堆栈。
+**Stack**是`Vector`的一个子类，它实现标准的后进先出LIFO堆栈。
 
 ```java
  E push(E item); //把项压入堆栈顶部。 
@@ -1201,6 +1275,25 @@ list.clear();
 ##### 5.1.2 Set
 
 Set和Map有千丝万缕的联系呀。例如`HashSet`底层实现其实就是一个固定value的`HashMap`。LinkedHashSet就是一个value固定的`LinkedHashMap`，`TreeSet`就是一个value固定的`TreeMap`。
+
+##### 5.1.3 Queue
+
+队列是一种比较特殊的线性结构。它只允许在表的前端（front）进行删除操作，而在表的后端（rear）进行插入操作。进行插入操作的端称为队尾，进行删除操作的端称为队头。队列中最先插入的元素也将最先被删除，对应的最后插入的元素将最后被删除。因此队列又称为“先进先出”（FIFO—first in first out）的线性表，与栈(FILO-first in last out)刚好相反。
+
+Queue接口常用方法：
+
+| 方法               |                                                     |
+| ------------------ | --------------------------------------------------- |
+| E add()            | 增加一个元索 ，如果队列已满，则抛出异常             |
+| boolean offer(E e) | 添加一个元素并返回true    如果队列已满，则返回false |
+| E remove()         | 移除并返回队列头部的元素  如果队列为空，则抛出异常  |
+| E poll()           | 移除并返问队列头部的元素  如果队列为空，则返回null  |
+| boolean isEmpty()  | 检测优先级队列是否为空,为空返回true,否则false       |
+| ...                | ...                                                 |
+
+队列是一种先进先出的数据结构,没有优先级,众数据平等.但是在某些情况下,我们操作的数据可能带有优先级,出队列时要优先级高的先出,低的后出.在这种情况下,我们的数据结构应该提供两个最基本的操作,一个是返回最高优先级对象,一个是添加新的对象.这种数据结构就是优先级队列**PriorityQueue**.
+
+PriorityQueue的底层使用了堆来实现,而堆实际上就是在完全二叉树的基础上进行了一些元素的调整. (首先,堆结构就是用数组实现的完全二叉树结构; 其次,堆中某个节点的值总是不大于或不小于双亲节点的值)
 
 #### 5.2  Map
 
@@ -1218,16 +1311,17 @@ Set和Map有千丝万缕的联系呀。例如`HashSet`底层实现其实就是�
 >
 > 5. Map 中键值对的 Key 不能直接修改， value 可以修改，如果要修改 key ，只能先将该 key 删除掉，然后再来进行重新插入。
 
-##### 5.2.2 的常用方法：
+##### 5.2.2 的常用方法
 
-| 方法                            | 解释                                      |
-| ------------------------------- | ----------------------------------------- |
-| V get(Object key)               | 返回 key 对应的 value                     |
-| V put(K key, V value)           | 设置 key 对应的 value                     |
-| V remove(Object key)            | 删除 key 对应的映射关系                   |
-| Set<Map.Entry<K, V>> entrySet() | 返回所有的 key-value 映射关系**【重要】** |
-| boolean containsKey(Object key) | 判断是否包含 key                          |
-| ...                             | ...                                       |
+| 方法                                       | 解释                                          |
+| ------------------------------------------ | --------------------------------------------- |
+| V get(Object key)                          | 返回 key 对应的 valuev，key 不存在，抛出异常  |
+| V getOrDefault(Object key, V defaultValue) | 返回 key 对应的 value，key 不存在，返回默认值 |
+| V put(K key, V value)                      | 设置 key 对应的 value                         |
+| V remove(Object key)                       | 删除 key 对应的映射关系                       |
+| Set<Map.Entry<K, V>> entrySet()            | 返回所有的 key-value 映射关系**【重要】**     |
+| boolean containsKey(Object key)            | 判断是否包含 key                              |
+| ...                                        | ...                                           |
 
 ##### 5.2.3  Map.Entry<K, V>
 
