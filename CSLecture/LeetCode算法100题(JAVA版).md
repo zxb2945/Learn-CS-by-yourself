@@ -932,7 +932,108 @@ class Solution {
 }
 ```
 
-## 31 Sort Characters By Frequency
+## 26 Maximum Product of Two Elements in an Array
+
+(2022.12.18)
+
+> Given the array of integers `nums`, you will choose two different indices `i` and `j` of that array. *Return the maximum value of* `(nums[i]-1)*(nums[j]-1)`.
+
+```java
+class Solution {
+    public int maxProduct(int[] nums) {
+        Arrays.sort(nums);
+        int ans = (nums[nums.length-1]-1)*(nums[nums.length-2]-1);
+        return ans;        
+    }
+}
+```
+
+## 27 Find Center of Star Graph
+
+> There is an undirected **star** graph consisting of `n` nodes labeled from `1` to `n`. A star graph is a graph where there is one **center** node and **exactly** `n - 1` edges that connect the center node with every other node.
+>
+> You are given a 2D integer array `edges` where each `edges[i] = [ui, vi]` indicates that there is an edge between the nodes `ui` and `vi`. Return the center of the given star graph.
+
+```java
+class Solution {
+    public int findCenter(int[][] edges) {
+        if(edges[0][0] == edges[1][0] || edges[0][0] == edges[1][1]) return edges[0][0];
+        return edges[0][1];
+    }
+}
+```
+
+## 28 Search in a Binary Search Tree
+
+> You are given the `root` of a binary search tree (BST) and an integer `val`.
+>
+> Find the node in the BST that the node's value equals `val` and return the subtree rooted with that node. If such a node does not exist, return `null`.
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    //注意：总想着用c的思维static去定义函数体之外的变量
+    //在Java类的思想下，static属于类，而private就属于对象
+    //后者也是函数体之外的变量，生存周期独立于对象内的函数！！！
+    private TreeNode ans;
+    private void preorder(TreeNode root, int val) {
+        if(root.val == val){
+            //类赋值，浅拷贝
+            ans = root;
+            System.out.println("2"+ans);
+            return;
+        } 
+        if(root.left != null) preorder(root.left, val);
+        if(root.right != null) preorder(root.right, val);       
+    } 
+    public TreeNode searchBST(TreeNode root, int val) {
+        if(root.val == val){
+            return root;
+        }
+        System.out.println("1"+ans);
+        preorder(root, val);
+        System.out.println("3"+ans);
+        return ans;
+    }
+}
+/*
+上记解法没有利用Binary Search Tree(BST)二叉搜索树的排序特征：
+节点的左子树只包含小于当前节点的数；
+节点的右子树只包含大于当前节点的数；
+所有左子树和右子树自身必须也是二叉搜索树；
+    public TreeNode searchBST(TreeNode root, int val) {
+        if (root == null){
+            return null;
+        }
+        if (root.val == val){
+            return root;
+        }
+        if (root.val < val){
+            return searchBST(root.right, val);
+        }else{
+            return searchBST(root.left, val);
+        }                
+    }
+*/
+```
+
+
+
+## 41 Sort Characters By Frequency
 
 (2022.12.16)
 
@@ -1195,8 +1296,6 @@ private: 仅自己的类中对象可见，继承的子类不可见;
 | no modifier | Y     | Y       | N        | N     |
 | private     | Y     | N       | N        | N     |
 
-
-
 ##### 4.2.2 其他修饰符 
 
 static：静态的，非实例的，类的
@@ -1207,6 +1306,19 @@ final:
 2. final字段和final局部变量：它们的值一旦给定，就不能更改。
 
 abstract: 抽象类, 不能被实例化。
+
+#### 4.3 对象赋值
+
+1. 浅拷贝：是按位拷贝对象，它会创建一个新对象，这个对象有着原始对象属性值的一份精确拷贝。如果属性是基本类型，拷贝的就是基本类型的值；如果属性是内存地址（引用类型），拷贝的就是内存地址 ，因此如果其中一个对象改变了这个地址，就会影响到另一个对象。
+
+2. 深拷贝：复制变量值，对于引用数据，则递归至基本类型后，再复制。深拷贝后的对象与原来的对象是完全隔离的，互不影响，对一个对象的修改并不会影响另一个对象。深拷贝相比于浅拷贝速度较慢并且花销较大。
+
+直接赋值说明：被赋值的是对象的内存地址。即浅拷贝。
+
+深拷贝的实现方法主要有两种：
+
+1. 通过重写clone方法来实现深拷贝(实现Cloneable接口)；
+2. 通过对象序列化实现深拷贝(实现Serializable接口)。
 
 ### 5 Java.util包的框架
 
@@ -1293,7 +1405,37 @@ Queue接口常用方法：
 
 队列是一种先进先出的数据结构,没有优先级,众数据平等.但是在某些情况下,我们操作的数据可能带有优先级,出队列时要优先级高的先出,低的后出.在这种情况下,我们的数据结构应该提供两个最基本的操作,一个是返回最高优先级对象,一个是添加新的对象.这种数据结构就是优先级队列**PriorityQueue**.
 
-PriorityQueue的底层使用了堆来实现,而堆实际上就是在完全二叉树的基础上进行了一些元素的调整. (首先,堆结构就是用数组实现的完全二叉树结构; 其次,堆中某个节点的值总是不大于或不小于双亲节点的值)
+PriorityQueue的底层使用了堆**(heap)**来实现,而堆实际上就是在完全二叉树的基础上进行了一些元素的调整. (首先,堆结构就是用数组实现的完全二叉树结构; 其次,堆中某个节点的值总是不大于或不小于双亲节点的值)
+
+优先级队列的构造:
+
+```java
+//创建一个空的优先级队列,存放的是Integer类型数据,底层默认容量是11.
+PriorityQueue<Integer> pq1=new PriorityQueue<>();
+//创建一个空的优先级队列,存放的是Integer类型数据,底层容量为100.
+PriorityQueue<Integer> pq2=new PriorityQueue<>(100);
+//用一个集合来创建优先级队列
+List<Integer> list=new ArrayList<Integer>();
+list.add(2);
+list.add(3);
+PriorityQueue<Integer> pq3=new PriorityQueue<>(list);
+```
+
+PriorityQueue(优先队列)默认小顶堆，即队列的头部为最小值。通过传入自定义的Comparator比较器可以实现大顶堆。如下：
+
+```java
+PriorityQueue<Integer> heap = new PriorityQueue<Integer>(new Comparator<Integer>() {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                //o1是新插入的元素
+                //return为正不交换，为负则交换来排序
+                return o2 - o1;
+            }
+        });
+//或Lambda写法：
+PriorityQueue<Integer> queue = new PriorityQueue<>((o1 , o2) -> o1 - o2); // 小根堆
+PriorityQueue<Integer> queue = new PriorityQueue<>((o1 , o2) -> o2 - o1); // 大根堆
+```
 
 #### 5.2  Map
 
@@ -1355,17 +1497,75 @@ TreeMap 和 HashMap 底层实现逻辑不同，所以插入时间、删除时间
 
 备注1：key(确切说第一组键值对)用数组，相同key的value（第二组键值对往后）用链表。每发生一次hash冲突，链表的长度都会+1，当链表的长度大于特定长度后，会将链表转化为红黑树以提高检索效率。
 
+#### 5.3  其余重要接口和类
+
+##### 5.3.1 Iterator
+
+Iterator：迭代接口
+
+##### 5.3.2 Comparator
+
+数组工具类和集合工具类中提供的工具方法sort方法都给出了含有Comparator接口的重载方法。
+
+```java
+Arrays.sort(T[],Comparator<? super T> c);
+Collections.sort(List<T> list,Comparator<? super T> c);
+```
+
+demo如下：
+
+```java
+List<Character> letters = new ArrayList<>(str.length());
+
+// 将英文字母先排序好
+letters.sort(new Comparator<Character>() {
+    @Override
+    public int compare(Character o1, Character o2) {
+        return Character.toLowerCase(o1) - Character.toLowerCase(o2);
+    }
+});
+
+```
+
+使用总结：在可以使用 Comparator实例 的地方，`new Comparator<注意这里泛型要写>` 然后覆写 compare方法即可。
+
+在List或数组中的对象如果没有实现Comparable接口时，那么就需要调用者为需要排序的数组或List设置一个Compartor，Compartor的compare方法用来告诉代码应该怎么去比较两个实例，然后根据比较结果进行排序。
+
+**Comparable和Comparator的区别**
+
+Comparable是java.lang包下面的接口，lang包下面可以看做是java的基础语言接口。
+
+Comparator在java.util包中，代表其是一个工具类，用来辅助排序的。
+
+Comparable指定了对象的natural ordering，**如果我们在添加到可排序集合类的时候想按照我们自定义的方式进行排序**，这个时候就需要使用到Comparator了。
+
+所以前者可以看成类的内比较器，后者为外比较器。
+
+##### 5.3.3 其它
+
+AbstractXXX：骨架类：所谓骨架类，其实就是不同集合的核心代码实现，让继承这个抽象类的子类少干点活。
+
+Collections、Arrays：**集合工具类和数组工具类**。Java中的工具类好像都喜欢在对应的接口或类名称后，加`S`来表示其工具类。
+
+比如：
+
+```java
+//这里Arrays就是数组工具类
+int[] a={10,2,30,45,5};
+Arrays.sort(a);
+```
+
 ### 6 Java.lang包的框架
 
  java.lang包是提供利用java编程语言进行程序设计的基础类，在项目中使用的时候不需要import。
 
 #### 6.1 interface
 
-##### 6.1.1 迭代器
+##### 6.1.1 Iterable
 
 Iterable: 迭代器
 
-##### 6.1.2 线程
+##### 6.1.2 Runnable
 
 有两种方法可以创建一个新的执行线程：一种是将类声明为`Thread`。创建线程的另一种方法是声明一个实现`Runnable`接口的类。
 
@@ -1426,10 +1626,36 @@ class Dog implements Runnable { //通过实现Runnable接口来实现
 }
 ```
 
-##### 6.1.3 其他
+##### 6.1.3 Comparable
 
-> Compareble：自然排序
->
+`Comparable`可以认为是一个内比较器，实现了`Comparable`接口的类有一个特点，就是这些类是可以和自己比较的，至于具体和另一个实现了`Comparable`接口的类如何比较，则依赖`compareTo`方法的实现，`compareTo`方法也被称为自然比较方法。如果开发者想要Collections的sort方法帮你自动进行排序的话，那么这个对象必须实现`Comparable`接口。`compareTo`方法的返回值是int，有三种情况：
+
+1. 比较者大于被比较者（也就是compareTo方法里面的对象），那么返回正整数
+
+2. 比较者等于被比较者，那么返回0 
+
+3. 比较者小于被比较者，那么返回负整数
+
+举例：
+
+```java
+    class Pair implements Comparable{
+        char key;
+        int value;
+        Pair(char key, int value){
+            this.key = key;
+            this.value = value;
+        }
+	    @Override
+	    public int compareTo(Object o) {
+		    Pair p = (Pair)o;
+		    return p.value - this.value;
+	    }
+    }
+```
+
+##### 6.1.4 其它
+
 > CharSequence：char的可读序列
 
 #### 6.2 class
@@ -1923,5 +2149,5 @@ public class Hello {
 > 2. 还有，在实际的开发中，虽然一个 java 源文件可以定义多个 class，实际上这是不规范的，
 >    比较规范的写法是一个 java 源文件中只定义一个 class。
 
-
+### 12 Java Lambda表达式
 
