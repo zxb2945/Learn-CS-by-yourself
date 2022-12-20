@@ -1105,6 +1105,90 @@ class Solution {
 }
 ```
 
+## 42 Exam Room
+
+(2022.12.19)
+
+> There is an exam room with `n` seats in a single row labeled from `0` to `n - 1`.
+>
+> When a student enters the room, they must sit in the seat that maximizes the distance to the closest person. If there are multiple such seats, they sit in the seat with the lowest number. If no one is in the room, then the student sits at seat number `0`.
+>
+> Design a class that simulates the mentioned exam room.
+>
+> Implement the `ExamRoom` class:
+>
+> - `ExamRoom(int n)` Initializes the object of the exam room with the number of the seats `n`.
+> - `int seat()` Returns the label of the seat at which the next student will set.
+> - `void leave(int p)` Indicates that the student sitting at seat `p` will leave the room. It is guaranteed that there will be a student sitting at seat `p`.
+
+```java
+class ExamRoom {
+    private int n;
+    //为什么用Set？用于需要存储的value作为索引值的情况
+    //为什么用TreeSet？Tree即代表有序
+    private TreeSet<Integer> set;
+
+    public ExamRoom(int n) {
+        this.n = n;
+        set = new TreeSet<>();
+    }
+    
+    public int seat() {
+        if(set.isEmpty()){
+            set.add(0);
+            return 0;
+        }
+        if(set.size() == 1){
+            if(set.first() < n/2){
+                set.add(n-1);
+                return n-1;                
+            }
+            set.add(0);
+            return 0;
+        }
+        int pos = -1;
+        int distance = -1;
+        int pre = -1;
+
+        if(set.first() != 0){
+            pos = 0;
+            distance = set.first();
+        }
+        //Java遍历set，没法像C++灵活用指针，只能用迭代器
+        //所以需要额外变量来进行元素相互比较
+        for(int seat : set){
+            if(pre == -1){
+                pre = seat;
+                continue; 
+            }
+            if(distance < (seat - pre)/2){
+                distance = (seat - pre)/2;
+                pos = pre + distance;
+            }
+            pre = seat;
+        }
+        if(set.last() != n -1){
+            if(distance < (n-1-set.last())){
+                pos = n - 1;
+            }
+        }
+        set.add(pos);
+        return pos;        
+    }
+    
+    public void leave(int p) {
+        set.remove(p);
+    }
+}
+
+/**
+ * Your ExamRoom object will be instantiated and called as such:
+ * ExamRoom obj = new ExamRoom(n);
+ * int param_1 = obj.seat();
+ * obj.leave(p);
+ */
+```
+
 
 
 ## 101 NOTE
@@ -1387,6 +1471,26 @@ list.clear();
 ##### 5.1.2 Set
 
 Set和Map有千丝万缕的联系呀。例如`HashSet`底层实现其实就是一个固定value的`HashMap`。LinkedHashSet就是一个value固定的`LinkedHashMap`，`TreeSet`就是一个value固定的`TreeMap`。
+
+**TreeSet**的使用方法总结：
+
+存储特点：有序，不重复；（总结一点：凡是有Tree的集合，都是有序的，凡是有Set的就是不重复的）
+
+| 方法                                             | 说明                                                         |
+| ------------------------------------------------ | ------------------------------------------------------------ |
+| public TreeSet()                                 | 构造函数：底层创建新的TreeMap                                |
+| public TreeSet(Collection<? extends E> c)        | 构造函数：通过集合构造TreeSet                                |
+| public TreeSet(Comparator<? super E> comparator) | 如果Treeset存储的是对象，可以通过对象实现Comparator，实现自定义对象比较器 |
+| public boolean add(E e)                          | 添加元素                                                     |
+| public E first()                                 | 获取首点                                                     |
+| public boolean isEmpty()                         | 判断集合是否为空                                             |
+| public E last()                                  | 获取最后的值                                                 |
+| public boolean remove(Object o)                  | 移除元素                                                     |
+| public int size()                                | 当前set容量                                                  |
+| ...                                              | ...                                                          |
+|                                                  |                                                              |
+
+备注：The syntax `? extends E` means "some type that either is E or a subtype of E". The `?` is a wildcard(通配符). 
 
 ##### 5.1.3 Queue
 
@@ -1839,6 +1943,24 @@ public static void main(String[] args) {
 }
 ```
 
+#### 7.3 通配符(wildcard)
+
+泛型类型是固定的，某些场景下使用起来不太灵活，于是，通配符就来了！ 通配符可以允许参数类型变化。
+
+```java
+//无界通配符: ？
+//接收任何泛型类型数据，用于实现不依赖于具体类型参数的简单方法，可以捕获参数类型并交由泛型方法进行处理
+public static void printList（List <？> list）{/*........*/}
+//上界通配符：？extends
+//传入的类型实参必须是指定类型的子类型
+public static void process（List <？extends Foo> list）{/ * ... * /}
+//下界通配符：？super
+//传入的类型参数必须是指定类型的父类型
+public static void addNumbers（List <？super Integer> list）{}
+```
+
+泛型与通配符区别：最根本的区别就是，java编译器，把T(泛型)推断成具体类型，而把通配符?推断成未知类型。而java编辑器只能操作具体类型，不能操作未知类型。导致如果有对参数有修改的操作就必须要使用泛型，如果仅是查看就可以使用通配符. 利用以上推断，我们可以利用通配符特性设计出安全的接口，比如我在一个接口的方法定义了通配符参数，则继承该接口的所有方法，都不能修改该方法传递过来的参数。=>就像const 参数了。
+
 ### 8 java接口详解
 
 接口(interface): 有时必须从几个类中派生出一个子类，继承它们所有的属性和方法。但是，Java不支持多重继承。有了接口，就可以得到多重继承的效果。
@@ -2151,3 +2273,4 @@ public class Hello {
 
 ### 12 Java Lambda表达式
 
+### 
