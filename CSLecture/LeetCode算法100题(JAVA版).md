@@ -1189,6 +1189,74 @@ class ExamRoom {
  */
 ```
 
+## 43 Keys and Rooms
+
+(2022.12.20)
+
+> There are `n` rooms labeled from `0` to `n - 1` and all the rooms are locked except for room `0`. Your goal is to visit all the rooms. However, you cannot enter a locked room without having its key.
+>
+> When you visit a room, you may find a set of **distinct keys** in it. Each key has a number on it, denoting which room it unlocks, and you can take all of them with you to unlock the other rooms.
+>
+> Given an array `rooms` where `rooms[i]` is the set of keys that you can obtain if you visited room `i`, return `true` *if you can visit **all** the rooms, or* `false` *otherwise*.
+
+```java
+class Solution {
+    private TreeSet<Integer> set;
+    private TreeMap<Integer, List<Integer>> map;
+
+    private void Visit(int room){
+        set.add(room);
+        for(Integer i : map.get(room)){
+            if(!set.contains(i)){
+                Visit(i);
+            }
+        }
+    }
+
+    public boolean canVisitAllRooms(List<List<Integer>> rooms) {
+        map = new TreeMap();
+        int key = 0;
+        for(List<Integer> i : rooms){
+            map.put(key, i);
+            key++;
+        }
+        //Map好像是据key查value，没有据value查key的说法
+        List<Integer> x = map.get(0);
+        set = new TreeSet();
+        Visit(0);
+		//return visited.size() == rooms.size();不更简洁？
+        if(set.size() == rooms.size()){
+            return true;
+        }
+        return false;
+    }
+}
+//上记解法可以说非常慢...下记利用queue就漂亮多了,就是迭代之于递归的效率优势
+/*
+class Solution {
+    public boolean canVisitAllRooms(List<List<Integer>> rooms) {
+    	//在插入、查找方面，HashSet 通常优于TreeSet. hashSet查询和删除和增加元素的效率都非常高.
+        Set<Integer> visited = new HashSet<>();
+        //LinkedList既实现List接口，也实现了Queue接口
+        //既可以采用声明接口，new对象的方式单独使用接口方法
+        Queue<Integer> queue = new LinkedList<>();
+        queue.offer(0);
+        visited.add(0);
+        while (!queue.isEmpty()) {
+            int i = queue.poll();
+            for (int k : rooms.get(i)) {
+                if (!visited.contains(k)) {
+                    queue.offer(k);
+                    visited.add(k);
+                }
+            }
+        }
+        return visited.size() == rooms.size();
+    }
+}
+*/
+```
+
 
 
 ## 101 NOTE
@@ -1455,6 +1523,8 @@ list.clear();
 
 `LinkedList`采用双向链表。集合中的每一个元素都会有两个成员变量`prev`和`next`，分别指向它的前一元素和后一元素。
 
+(`LinkedList`类实现了Queue接口，因此我们可以把LinkedList当成Queue来用)
+
 ###### 5.1.1.3 Vector
 
 `Vector`底层实现和`ArrayList`类似，区别在于在许多方法上加了`synchronized`关键字，来实现了多线程安全。但代价是性能的降低。由于加锁的是整个集合，所以并发情况下进行迭代会锁住很长时间。
@@ -1487,8 +1557,8 @@ Set和Map有千丝万缕的联系呀。例如`HashSet`底层实现其实就是�
 | public E last()                                  | 获取最后的值                                                 |
 | public boolean remove(Object o)                  | 移除元素                                                     |
 | public int size()                                | 当前set容量                                                  |
+| boolean containsKey(Object key)                  | 判断该TreeMap中是否包含指定key的映射                         |
 | ...                                              | ...                                                          |
-|                                                  |                                                              |
 
 备注：The syntax `? extends E` means "some type that either is E or a subtype of E". The `?` is a wildcard(通配符). 
 
