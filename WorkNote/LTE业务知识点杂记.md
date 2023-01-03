@@ -134,3 +134,64 @@ IMSI和MSISDN都是[用户标识](https://baike.sogou.com/lemma/ShowInnerLink.ht
 ### 2.3 IMEI
 
 **国际移动设备识别码**（**International Mobile Equipment Identity**，**IMEI**），即通常所说的手机“串号”，用于在移动电话网络中识别每一部独立的手机等移动通信设备，相当于[移动电话](https://zh.wikipedia.org/wiki/行動電話)的[身份证](https://zh.wikipedia.org/wiki/身份證)。序列号共有15位数字，前6位（TAC）是型号核准号码，代表手机类型。接着2位（FAC）是最后装配号，代表产地。后6位（SNR）是串号，代表生产顺序号。最后1位（SP）一般为0，是检验码，备用。国际移动设备识别码一般贴于机身背面与外包装上，同时也存在于手机[存储器](https://zh.wikipedia.org/wiki/記憶體)中，通过输入*#06#即可查询。
+
+
+
+## 3 移動機通信関連資料
+
+(2020.3.18)
+
+移動通信サービス**における**高速・大容量のバケット通信を実現し…
+
+…3GPP Release 8 SAE 標準化**において**新たに規定された
+
+また、これらの機能の提供**にあたって**、AIPNが目指す高い汎用性を実現している。
+
+EPCは3GPP事業者**のみならず**、多様な移動系においても広く利用可能ネットワークとなっている。
+
+なお、eNodeBはMMEから受信した指示**に従い**…を開始する
+
+LTEおよび3Gで以前に登録した位置登録エリアから変更が**ない限り**、位置登録を省略することが可能となる。
+
+
+
+EPCネットワーク（LTE交換局）：
+
+3G無線アクセス収容網：ユーザーデータ ---> RNC/NodeB ---> SGSN --->S-GW --->P-GW----> PDN
+
+LTE無線アクセス収容網：ユーザーデータ ---> eNodeB ---> MME--->S-GW --->P-GW----> PDN: IMSなど
+
+SGSN/MME <--制御信号--> HSS
+
+S-GW/P-GW  <--制御信号-->  PCRF
+
+
+
+EPCはMME, S-GW, P-GW, PCRFから構成されており、C-Plane(Control Plane)を制御する装置(MME,PCRF)とU-Plane(User Plane)を制御する装置(S-GW,P-GW)を分離するアーキテクチャを採用し、増大するU-Planeトラフィックへの対応が容易になっている。さらに、既存装置であるSGSN,HSSとも連携して、ネットワークの制御を行う。EPCでは、ユーザーの認証、契約分析、PDNでの認証、ユーザーデータパケットの転送経路の設定、QoS制御、移動制御などの機能を提供している。
+
+LTE無線アクセスを導入する＝＞EPC導入
+
+
+
+| abbreviation |                                                              |
+| ------------ | ------------------------------------------------------------ |
+| **3GPP**     | 3rd Generation Partnership Project                           |
+| EPC          | Evolved Packet Core                                          |
+| LTE          | Long Term Evolution                                          |
+| WLAN         | Wireless LAN                                                 |
+| S-GW         | Serving Gateway                                              |
+| P-GW         | Packet Data Network Gateway                                  |
+| **MME**      | Mobility Management Entity                                   |
+| **eNodeB**   | evolved Node B => LTE　無線アクセスシステムにおける基地局    |
+| SGSN         | Serving GPRS(General Packet Radio Service) Support Node=> 3G交換局 |
+| IMS          | IP Multimedia Subsystem                                      |
+| PDN          | Packet Data Network                                          |
+| RNC          | Radio Network Controller => 3G無線制御局                     |
+| HSS          | Home Subscriber Server                                       |
+| BTS          | Base Transceiver Station => 3G無線基地局                     |
+| GGSN         | Gateway GPRS Support Node                                    |
+| HLR          | Home Location Register                                       |
+| PCRF         | Policy and Charging Rules Function                           |
+| VGN          | VoLTE Gateway Node                                           |
+| CSN          | Call Session control Node                                    |
+
