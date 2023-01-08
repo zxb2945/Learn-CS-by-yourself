@@ -218,11 +218,51 @@ MyBatisPlus只是对单表查询优化
 
 
 
-## P8 Vue框架快速上手
+## P8 Vue框架快速上手 20230108
 
 前端环境准备：编码工具 VSCode，依赖管理 NPM，项目构建 VueCli
 
 Vue.js提供了MVVM数据绑定和一个可组合的组件系统，具有灵活的API
 
 MVVM：Model-View-ViewModel
+
+完全屏蔽了DOM
+
+首先Vue是js的框架
+
+感觉就是在一个html文件中编写data+渲染
+
+就是html中加CSS和Js，那么VUE框架体现在哪里呢？加了更多的关键字？比如`v-for`?
+
+`v-model` 双向绑定  
+
+
+
+## P9 Vue组件化开发
+
+Vue提供了很多组件来加快开发频率
+
+NPM的使用：(Node Package Manager)是一个NodeJS包管理和分发工具，相当于Java中的Maven，其中的package.json相当于pom.xml =>要使用NPM，首先得安装Node
+
+Node.js是一个基于Chrom V8引擎的JavaScript运行环境
+
+
+
+Vue CLI使用：用于快速搭建一个带有热重载及构建版本等的页面使用
+
+（在windows下文件路径直接输入cmd，就可以打开窗口，powershell也一样）
+
+
+
+Vue中规定组件的后缀名是.vue
+
+每个.vue组件都是由三部分构成：
+
+1. templete，组件的模板结构，可以包含HTML标签及其它的组件
+2. script，组建的Javascript代码
+3. style，组件的样式
+
+
+
+
 
