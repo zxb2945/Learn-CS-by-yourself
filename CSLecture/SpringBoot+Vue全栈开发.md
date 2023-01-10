@@ -264,5 +264,26 @@ Vue中规定组件的后缀名是.vue
 
 
 
+## P10 第三方组件element-ui 20220110
+
+Element是国内饿了么公司提供的一套开源前端框架，提供了Vue，React等版本
+
+Website：https://element.eleme.io/#/zh-CN
+
+由于Element UI提供的字体图符较少，一般会采用其他图标库，如著名的Font Awesome
 
 
+
+## P11 Axios网络请求
+
+在实际项目开发中，前端页面所需要的数据往往需要从服务器端获取，这必然涉及到与服务器的通信。
+
+Axios是一个基于promise网络请求库，作用于node.js和浏览器中。
+
+Axios在浏览器端使用XMLHttpRequest(Ajax)发送网络请求，并能自动完成JSON数据的转化。
+
+
+
+前后端交互时有时需要解决CORS问题，在后端SpringBoot中添加@Configuration
+
+然后前后端就可以通信了
