@@ -264,7 +264,7 @@ Vue中规定组件的后缀名是.vue
 
 
 
-## P10 第三方组件element-ui 20220110
+## P10 第三方组件element-ui 20230110
 
 Element是国内饿了么公司提供的一套开源前端框架，提供了Vue，React等版本
 
@@ -287,3 +287,40 @@ Axios在浏览器端使用XMLHttpRequest(Ajax)发送网络请求，并能自动�
 前后端交互时有时需要解决CORS问题，在后端SpringBoot中添加@Configuration
 
 然后前后端就可以通信了
+
+
+
+## P12 前端路由VueRouter 20230111
+
+Vue的单页面应用是基于路由和组件的，路由用于设定访问路径，并将路径和组件映射起来
+
+对于单页面的应用而言（如网易云音乐），页面的刷新基于组件的切换
+
+VueRouter就是Vue官方提供的插件
+
+
+
+## P13 状态管理VueX
+
+解决兄弟组件数据传递
+
+VueX是一个专为Vue.js应用程序开发的状态管理库，采用集中式存储管理应用的所有组件的状态
+
+
+
+Vue Component <= State <=  Mutation <=  Action <= Vue Component
+
+Action <=> Backend API
+
+State：用于维护所有应用层的状态，并确保应用只有唯一的数据源
+
+Mutation：提供了修改State的方法
+
+Action: 类似于Mutation，不同处在于前者不能直接修改状态，只能通过提交Mutation来修改，Action可以包含异步操作
+
+Getter:维护由State派生的一些状态，这些状态随着State状态的变化而变化
+
+
+
+一般VueX的逻辑放在store文件夹
+
