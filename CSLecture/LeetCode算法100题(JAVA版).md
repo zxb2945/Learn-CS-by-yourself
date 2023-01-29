@@ -1031,7 +1031,177 @@ class Solution {
 */
 ```
 
+## 29 Degree of an Array
 
+(2022.12.22)
+
+> Given a non-empty array of non-negative integers `nums`, the **degree** of this array is defined as the maximum frequency of any one of its elements.
+>
+> Your task is to find the smallest possible length of a (contiguous) subarray of `nums`, that has the same degree as `nums`.
+
+```java
+class Solution {
+    public int findShortestSubArray(int[] nums) {
+        HashMap<Integer,Integer> left = new HashMap<>(),
+        right = new HashMap<>(),
+        count = new HashMap<>();
+
+        for(int i = 0; i < nums.length; ++i){
+            if(left.get(nums[i]) == null) left.put(nums[i],i);
+            right.put(nums[i],i);
+            count.put(nums[i], count.getOrDefault(nums[i],0)+1);
+        }
+
+        int val = 0, len = 0;
+        Set<Map.Entry<Integer,Integer>> entrySet = count.entrySet();
+        for(Map.Entry<Integer,Integer> entry : entrySet){
+            if(entry.getValue() == val){
+                int temlen;
+                temlen = right.get(entry.getKey()) - left.get(entry.getKey()) + 1;
+                if(temlen < len){
+                    len = temlen;
+                    val = entry.getValue();
+                }
+            }else if(entry.getValue() > val){
+                len = right.get(entry.getKey()) - left.get(entry.getKey()) + 1;
+                val = entry.getValue();              
+            }
+        }
+/*
+        int len = nums.length;
+        int degree = Collections.max(count.values());
+        for (int x: count.keySet()) {
+            if (count.get(x) == degree) {
+                len = Math.min(len, right.get(x) - left.get(x) + 1);
+            }
+        }        
+*/
+        return len;
+
+    }
+}
+```
+
+## 30 To Lower Case
+
+> Given a string `s`, return *the string after replacing every uppercase letter with the same lowercase letter*.
+
+```java
+class Solution {
+    public String toLowerCase(String s) {
+        return s.toLowerCase();
+    }
+}
+```
+
+## 31 Longest Harmonious Subsequence
+
+> We define a harmonious array as an array where the difference between its maximum value and its minimum value is **exactly** `1`.
+>
+> Given an integer array `nums`, return *the length of its longest harmonious subsequence among all its possible subsequences*.
+>
+> A **subsequence** of array is a sequence that can be derived from the array by deleting some or no elements without changing the order of the remaining elements.
+
+```java
+class Solution {
+    public int findLHS(int[] nums) {
+        HashMap<Integer, Integer> map = new HashMap();
+        for(int i = 0; i < nums.length; ++i){
+            map.put(nums[i], map.getOrDefault(nums[i],0) + 1 );
+        }
+        Arrays.sort(nums);
+        int len = 0;
+        for(int i = 1; i < nums.length; ++i){
+            if(nums[i] == nums[i-1] + 1){
+                if(len < (map.get(nums[i]) + map.get(nums[i-1]))){
+                    len = map.get(nums[i]) + map.get(nums[i-1]);
+                }
+            }
+        }
+        return len;
+    }
+}
+```
+
+## 32 Word Pattern
+
+> Given a `pattern` and a string `s`, find if `s` follows the same pattern.
+>
+> Here **follow** means a full match, such that there is a bijection between a letter in `pattern` and a **non-empty** word in `s`.
+
+```java
+class Solution {
+    public boolean wordPattern(String pattern, String s) {
+        String[] arr = s.split("\\s+");
+        char[] pa = pattern.toCharArray();
+
+        if(pa.length != arr.length) return false;
+
+        HashMap<Character, String> map = new HashMap();
+
+        for(int i = 0; i < pa.length; ++i){
+            if(map.get(pa[i]) == null){
+                if(map.containsValue(arr[i])){
+                    return false;
+                }
+                map.put(pa[i], arr[i]);
+                continue; 
+            }
+            //String 使用“==” 比较并不是在比较字符串内容, 而是比较两个引用是否是指向同一个对象。
+            if(!map.get(pa[i]).equals(arr[i])){
+                System.out.println(map.get(pa[i])+":"+arr[i]);
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
+```
+
+## 33 Invert Binary Tree
+
+> Given the `root` of a binary tree, invert the tree, and return *its root*.
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    private void invert(TreeNode root){
+        if(root == null || (root.left == null)&&(root.right == null)){
+            return;
+        }
+        TreeNode tem;
+        tem = root.left;
+        root.left = root.right;
+        root.right = tem;
+        invert(root.left);
+        invert(root.right);                
+    }
+    public TreeNode invertTree(TreeNode root) {
+        if(root == null){
+            return root;
+        }
+
+        invert(root);
+
+        return root;        
+    }
+}
+```
 
 ## 41 Sort Characters By Frequency
 
