@@ -1132,7 +1132,8 @@ class Solution {
 ```java
 class Solution {
     public boolean wordPattern(String pattern, String s) {
-        String[] arr = s.split("\\s+");
+/*\s表示匹配任何空白字符，包括空格、制表符、换页符等等, 等价于[ \f\n\r\t\v]。
+而+在正则表达式中表示“匹配一次或多次”。综上，\s+则表示匹配任意多个上面的字符*/           String[] arr = s.split("\\s+");
         char[] pa = pattern.toCharArray();
 
         if(pa.length != arr.length) return false;

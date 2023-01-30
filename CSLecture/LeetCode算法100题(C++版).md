@@ -534,6 +534,242 @@ public:
 };
 ```
 
+## 31 Longest Harmonious Subsequence
+
+> We define a harmonious array as an array where the difference between its maximum value and its minimum value is **exactly** `1`.
+>
+> Given an integer array `nums`, return *the length of its longest harmonious subsequence among all its possible subsequences*.
+>
+> A **subsequence** of array is a sequence that can be derived from the array by deleting some or no elements without changing the order of the remaining elements.
+
+```C++
+class Solution {
+public:
+    int findLHS(vector<int>& nums) {
+        map<int,int> my_map;
+        for(int i = 0; i < nums.size(); ++i){
+            if(my_map.count(nums[i]) > 0){//判断是否已存在key
+                my_map[nums[i]]++;
+                //my_map.insert(pair<int,int>(nums[i], my_map[nums[i]] + 1));  没法用insert修改value
+            }else{
+                //用insert时要用pair作为参数
+                my_map.insert(pair<int,int>(nums[i], 1));
+            }
+        }
+        #if 0 //打印map的方式
+        for (auto it = my_map.begin(); it != my_map.end(); ++it) {
+            cout << "{" << (*it).first << ": " << (*it).second << "}\n";
+        }
+        #endif
+        sort(nums.begin(), nums.end());
+        #if 0 //打印vector的方式
+        for (auto i = nums.begin(); i != nums.end(); i++) {
+            cout << *i << ' ';
+        }
+        #endif
+        int len = 0;
+        for(int i = 1; i < nums.size(); ++i){
+            if(nums[i] == nums[i-1] + 1){
+                if(len < (my_map[nums[i]] + my_map[nums[i-1]])){
+                    len = my_map[nums[i]] + my_map[nums[i-1]];
+                }
+            }
+        }
+        return len;
+        
+    }
+};
+```
+
+```java
+//Java:
+class Solution {
+    public int findLHS(int[] nums) {
+        HashMap<Integer, Integer> map = new HashMap();
+        for(int i = 0; i < nums.length; ++i){
+            map.put(nums[i], map.getOrDefault(nums[i],0) + 1 );
+        }
+        Arrays.sort(nums);
+        int len = 0;
+        for(int i = 1; i < nums.length; ++i){
+            if(nums[i] == nums[i-1] + 1){
+                if(len < (map.get(nums[i]) + map.get(nums[i-1]))){
+                    len = map.get(nums[i]) + map.get(nums[i-1]);
+                }
+            }
+        }
+        return len;
+    }
+}
+```
+
+## 32 Word Pattern
+
+> Given a `pattern` and a string `s`, find if `s` follows the same pattern.
+>
+> Here **follow** means a full match, such that there is a bijection between a letter in `pattern` and a **non-empty** word in `s`.
+
+```C++
+class Solution {
+public:
+    bool wordPattern(string pattern, string s) {
+ 
+        vector<string> arr;
+        //C++没有split函数，分割字符串要利用C的strtok()
+        //当使用C和C++的混合编程，在某些情况下，需要将C++的string，转换成char* 的字符串。
+        char *s2 = s.data();//string=>char*  
+	    char *p = strtok(s2, " ");
+        for(int i = 0; i < pattern.size(); ++i){
+            if(p == NULL){
+                return false;
+            }
+            //char*转string，直接赋值即可。
+            string s3 = p;
+            arr.push_back(s3);
+            p = strtok(NULL, " ");
+        }  
+        if(p != NULL){
+            return false;
+        }
+
+        map<char, string> mmap;
+        for(int i = 0; i < pattern.size(); ++i){
+            if(mmap.count(pattern[i]) == 0){
+                //To check if a value exists in a C++ map, you have to iterate over all pairs.
+                map<char, string>::iterator iter;
+                for (iter = mmap.begin(); iter != mmap.end(); iter++) 				  {
+                    if(iter->second == arr[i]){
+                        return false;
+                    }
+                }             
+
+                mmap.insert(pair<char, string>(pattern[i], arr[i]));
+                continue; 
+            }
+
+            if(!(mmap[pattern[i]] == arr[i])){ //C++比较字符串相等可以直接用==，大概是重载运算符了
+                return false;
+            }          
+        }
+
+        return true;       
+    }
+};//C++的STL感觉没有Java.util包好用...
+```
+
+```java
+//Java:
+class Solution {
+    public boolean wordPattern(String pattern, String s) {
+/*\s表示匹配任何空白字符，包括空格、制表符、换页符等等, 等价于[ \f\n\r\t\v]。
+而+在正则表达式中表示“匹配一次或多次”。综上，\s+则表示匹配任意多个上面的字符*/           String[] arr = s.split("\\s+");
+        char[] pa = pattern.toCharArray();
+
+        if(pa.length != arr.length) return false;
+
+        HashMap<Character, String> map = new HashMap();
+
+        for(int i = 0; i < pa.length; ++i){
+            if(map.get(pa[i]) == null){
+                if(map.containsValue(arr[i])){
+                    return false;
+                }
+                map.put(pa[i], arr[i]);
+                continue; 
+            }
+            //String 使用“==” 比较并不是在比较字符串内容, 而是比较两个引用是否是指向同一个对象。
+            if(!map.get(pa[i]).equals(arr[i])){
+                System.out.println(map.get(pa[i])+":"+arr[i]);
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
+```
+
+## 33 Invert Binary Tree
+
+> Given the `root` of a binary tree, invert the tree, and return *its root*.
+
+```C++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+private: //C++和Java类的写法略有不同
+    void invert(TreeNode* root){ 
+        if(root == NULL || (root->left == NULL)&&(root->right == NULL)){ //C++用NULL，Java用null
+            return;
+        }
+        TreeNode* tem;
+        tem = root->left; //C++结构体，此处必须用->
+        root->left = root->right;
+        root->right = tem;
+        invert(root->left);
+        invert(root->right);
+    }     
+public:
+    TreeNode* invertTree(TreeNode* root) { //C++显性用*标明地址
+        if(root == NULL){
+            return root;
+        }
+        invert(root);
+        return root;        
+    }
+};//C++这边有冒号
+```
+
+```java
+//Java:
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    private void invert(TreeNode root){
+        if(root == null || (root.left == null)&&(root.right == null)){
+            return;
+        }
+        TreeNode tem;
+        tem = root.left;
+        root.left = root.right;
+        root.right = tem;
+        invert(root.left);
+        invert(root.right);                
+    }
+    public TreeNode invertTree(TreeNode root) {
+        if(root == null){
+            return root;
+        }
+
+        invert(root);
+
+        return root;        
+    }
+}
+```
+
 
 
 ## 101 NOTE
@@ -744,3 +980,24 @@ Iterator(Vector<T>* pv, int idx) : pvec(pv), index(idx)
 > 2、相对于在构造函数中赋值，初始化列表执行效率更高。
 
 (2022.11.24)
+
+### 7.map
+
+> map是STL的一个关联容器，以键值对存储的数据，其类型可以自己定义，每个关键字在map中只能出现一次，关键字不能修改，值可以修改；内部数据结构是红黑树；map内部有序（自动排序，单词时按照字母序排序），查找时间复杂度为O(logn)。
+
+基本方法：
+
+| **函数名**        | **功能**                                                     |
+| ----------------- | ------------------------------------------------------------ |
+| my_map.insert()   | 插入（也可以像数组那样取下标直接赋值）                       |
+| my_map.begin()    | 返回指向map头部的迭代器                                      |
+| my_map.end()      | 返回指向map末尾的迭代器                                      |
+| my_map.count(key) | 由于map不包含重复的key，因此m.count(key)取值为0，或者1，表示是否包含。 |
+| ...               | ...                                                          |
+
+map与unordered_map区别及使用：
+
+> map内部实现了一个红黑树，红黑树具有自动排序的功能，因此map内部的所有元素都是有序的，红黑树的每一个节点都代表着map的一个元素。因此，对于map进行的查找，删除，添加等一系列的操作都相当于是对红黑树进行的操作。
+> unordered_map内部实现了一个哈希表，查找的时间复杂度可达到O(1)，其在海量数据处理中有着广泛应用。其元素的排列顺序是无序的。对于查找问题，unordered_map会更加高效一些。
+
+> unordered_map的用法和map是一样的，提供了 insert，size，count等操作，并且里面的元素也是以pair类型来存贮的。其底层实现是完全不同的，上方已经解释了，但是就外部使用来说却是一致的。
