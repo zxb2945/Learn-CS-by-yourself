@@ -1,131 +1,5 @@
 # 编程练习
 
-## demo task
-
-2022.11.10
-
-This is a demo task.
-
-Write a function:
-
-> ```
-> int solution(int A[], int N);
-> ```
-
-that, given an array A of N integers, returns the smallest positive integer (greater than 0) that does not occur in A.
-
-For example, given A = [1, 3, 6, 4, 1, 2], the function should return 5.
-
-Given A = [1, 2, 3], the function should return 4.
-
-Given A = [−1, −3], the function should return 1.
-
-Write an ***\*efficient\**** algorithm for the following assumptions:
-
-> - N is an integer within the range [1..100,000];
-> - each element of array A is an integer within the range [−1,000,000..1,000,000].
-
-**Solution：**
-
-```
-int solution(int A[], int N) {
-    // write your code in C99 (gcc 6.2.0)
-
-   int i,j,t;
-   int ans=1;
-
-    for(i=0;i<N-1;i++)//n个数的数列总共扫描n-1次
-    {
-        for(j=0;j<N-i-1;j++)//每一趟扫描到a[n-i-2]与a[n-i-1]比较为止结束
-        {
-            if(A[j]>A[j+1])//后一位数比前一位数小的话，就交换两个数的位置（升序）
-            {
-               t=A[j+1];
-               A[j+1]=A[j];
-               A[j]=t;
-            }
-        }
-    }
-
-    for(i=0;i<N;i++)
-    {
-        if(A[i]<1 || (i>0 && A[i]==A[i-1])){
-            continue;
-        }
-        
-        if(A[i]>ans){
-            return ans;
-        }else{
-            ans++;
-           // printf("A[i]: %d\n", A[i]);
-           // printf("Answer: %d\n", ans);
-        }
-    }
-
-    return ans;
-}
-
-```
-
-
-
-```C++
-vector<int> merge(vector<int> a, vector<int> b) {
-	vector<int> res;
-	size_t ai = 0, bi = 0;
-	while (ai < a.size() && bi < b.size()) {
-		if (a[ai] <= b[bi])
-			res.push_back(a[ai++]);
-		else
-			res.push_back(b[bi++]);
-	}
-	if (ai == a.size())
-		res.insert(res.end(), b.begin() + bi, b.end());
-	else if (bi == b.size())
-		res.insert(res.end(), a.begin() + ai, a.end());
-	return res;
-}
-
-vector<int> mergeSort(vector<int>& arr) {
-	if (arr.size() < 2) return arr;
-	const size_t mid = arr.size() / 2;
-	vector<int> left(arr.begin(), arr.begin() + mid);
-	vector<int> right(arr.begin() + mid, arr.end());
-	return merge(mergeSort(left), mergeSort(right));
-}
-
-int solution(vector<int> &A) {
-    // write your code in C++14 (g++ 6.2.0)
-
-	A = mergeSort(A);
-	
-	for (const int& a : A)
-		cout << a << ' ';
-	cout << endl;
-
-    int i,j,ans=1;
-    for(i=0;i<A.size();i++)
-    {
-        if(A[i]<1 || (i>0 && A[i]==A[i-1])){
-            continue;
-        }
-        
-        if(A[i]>ans){
-            return ans;
-        }else{
-            ans++;
-           // printf("A[i]: %d\n", A[i]);
-           // printf("Answer: %d\n", ans);
-        }
-    }
-    return ans;
-}
-
-
-```
-
-
-
 ## 1 Palindrome Number
 
 2022.11.15
@@ -534,6 +408,163 @@ public:
 };
 ```
 
+## 11 Ugly Number
+
+2023.1.31
+
+> An **ugly number** is a positive integer whose prime factors are limited to `2`, `3`, and `5`.
+>
+> Given an integer `n`, return `true` *if* `n` *is an **ugly number***.
+
+```C++
+static int my_count=0;
+class Solution {
+private:
+    //非const的静态值初始化必须在类外
+    //static int count=0;
+public:
+    bool isUgly(int n) {
+        my_count++;
+        if(n == 0) return false;
+        if(n == 1){
+            return true;
+        }        
+        else if(n%2 == 0){
+            n/=2; 
+            return isUgly(n);
+        } 
+        else if(n%3 == 0){
+            n/=3;
+            return isUgly(n); 
+        } 
+        else if(n%5 == 0){
+            n/=5;
+            return isUgly(n); 
+        } 
+
+        return false;        
+    }
+};
+```
+
+## 12 Fizz Buzz
+
+> Given an integer `n`, return *a string array* `answer` *(**1-indexed**) where*:
+>
+> - `answer[i] == "FizzBuzz"` if `i` is divisible by `3` and `5`.
+> - `answer[i] == "Fizz"` if `i` is divisible by `3`.
+> - `answer[i] == "Buzz"` if `i` is divisible by `5`.
+> - `answer[i] == i` (as a string) if none of the above conditions are true.
+
+```C++
+class Solution {
+public:
+    vector<string> fizzBuzz(int n) {
+        vector<string> answer; //相较于Java需要去heap中new比如ArrayList，C++的vector直接开辟在栈中
+        for(int i = 1; i <= n; i++){
+           if(i%15 == 0){   
+                answer.push_back("FizzBuzz");
+            }else if(i%3 == 0){
+                answer.push_back("Fizz");
+            }else if(i%5 == 0){
+                answer.push_back("Buzz");
+            }else{
+                //answer.push_back(i + "");=>类型转换int=>String时，Java可用这种形式：num + ""
+                answer.push_back(to_string(i));
+            }
+        }
+        return answer;
+        
+    }
+};
+```
+
+## 13 Power of Four
+
+> Given an integer `n`, return *`true` if it is a power of four. Otherwise, return `false`*.
+>
+> An integer `n` is a power of four, if there exists an integer `x` such that `n == 4x`.
+
+```C++
+class Solution {
+public:
+    bool isPowerOfFour(int n) { //Java 用 boolean
+        if(n == 1){
+            return true;
+        }
+        if(n%4 == 0 && n != 0){
+            return isPowerOfFour(n/4);
+        }
+        return false;        
+    }
+};
+```
+
+## 14 Is Subsequence
+
+> Given two strings `s` and `t`, return `true` *if* `s` *is a **subsequence** of* `t`*, or* `false` *otherwise*.
+>
+> A **subsequence** of a string is a new string that is formed from the original string by deleting some (can be none) of the characters without disturbing the relative positions of the remaining characters. (i.e., `"ace"` is a subsequence of `"abcde"` while `"aec"` is not).
+
+```java
+class Solution {
+public:
+    bool isSubsequence(string s, string t) {
+        char* cs = s.data();
+        char* ts = t.data();
+        int j = 0;
+        bool bingo = false;
+        for(int i = 0; i < s.size(); i++){ 
+            for(; j < t.size(); j++){
+                if(cs[i] == ts[j]){
+                    bingo = true;
+                    break;                          
+                }
+            }
+            if(bingo == true){
+                bingo = false;
+                j++; 
+            }else{
+                return false;
+            }
+        }
+
+        return true;
+    }
+};
+```
+
+## 15 Find All Numbers Disappeared in an Array
+
+> Given an array `nums` of `n` integers where `nums[i]` is in the range `[1, n]`, return *an array of all the integers in the range* `[1, n]` *that do not appear in* `nums`.
+
+```C++
+class Solution {
+public:
+    vector<int> findDisappearedNumbers(vector<int>& nums) {
+        int temp[nums.size()+1];
+        for(int i=0;i<=nums.size();i++)//C++数组不会在栈上自动初始化为0，要手动初始化
+        {
+            temp[i]=0;
+        }
+
+        for(int i=0;i<nums.size();i++)
+        {
+            temp[nums[i]]=1;//vector数组下标似乎不能用变量，大概是vector容器重载了数组的访问形式。
+        }
+
+        vector<int> list;        
+        for(int i=1;i<=nums.size();i++)
+        {
+            if(temp[i]==0){
+                list.push_back(i);
+            }
+        }
+        return list;        
+    }
+};
+```
+
 ## 31 Longest Harmonious Subsequence
 
 > We define a harmonious array as an array where the difference between its maximum value and its minimum value is **exactly** `1`.
@@ -579,28 +610,6 @@ public:
         
     }
 };
-```
-
-```java
-//Java:
-class Solution {
-    public int findLHS(int[] nums) {
-        HashMap<Integer, Integer> map = new HashMap();
-        for(int i = 0; i < nums.length; ++i){
-            map.put(nums[i], map.getOrDefault(nums[i],0) + 1 );
-        }
-        Arrays.sort(nums);
-        int len = 0;
-        for(int i = 1; i < nums.length; ++i){
-            if(nums[i] == nums[i-1] + 1){
-                if(len < (map.get(nums[i]) + map.get(nums[i-1]))){
-                    len = map.get(nums[i]) + map.get(nums[i-1]);
-                }
-            }
-        }
-        return len;
-    }
-}
 ```
 
 ## 32 Word Pattern
@@ -657,38 +666,6 @@ public:
 };//C++的STL感觉没有Java.util包好用...
 ```
 
-```java
-//Java:
-class Solution {
-    public boolean wordPattern(String pattern, String s) {
-/*\s表示匹配任何空白字符，包括空格、制表符、换页符等等, 等价于[ \f\n\r\t\v]。
-而+在正则表达式中表示“匹配一次或多次”。综上，\s+则表示匹配任意多个上面的字符*/           String[] arr = s.split("\\s+");
-        char[] pa = pattern.toCharArray();
-
-        if(pa.length != arr.length) return false;
-
-        HashMap<Character, String> map = new HashMap();
-
-        for(int i = 0; i < pa.length; ++i){
-            if(map.get(pa[i]) == null){
-                if(map.containsValue(arr[i])){
-                    return false;
-                }
-                map.put(pa[i], arr[i]);
-                continue; 
-            }
-            //String 使用“==” 比较并不是在比较字符串内容, 而是比较两个引用是否是指向同一个对象。
-            if(!map.get(pa[i]).equals(arr[i])){
-                System.out.println(map.get(pa[i])+":"+arr[i]);
-                return false;
-            }
-        }
-
-        return true;
-    }
-}
-```
-
 ## 33 Invert Binary Tree
 
 > Given the `root` of a binary tree, invert the tree, and return *its root*.
@@ -727,47 +704,6 @@ public:
         return root;        
     }
 };//C++这边有冒号
-```
-
-```java
-//Java:
-/**
- * Definition for a binary tree node.
- * public class TreeNode {
- *     int val;
- *     TreeNode left;
- *     TreeNode right;
- *     TreeNode() {}
- *     TreeNode(int val) { this.val = val; }
- *     TreeNode(int val, TreeNode left, TreeNode right) {
- *         this.val = val;
- *         this.left = left;
- *         this.right = right;
- *     }
- * }
- */
-class Solution {
-    private void invert(TreeNode root){
-        if(root == null || (root.left == null)&&(root.right == null)){
-            return;
-        }
-        TreeNode tem;
-        tem = root.left;
-        root.left = root.right;
-        root.right = tem;
-        invert(root.left);
-        invert(root.right);                
-    }
-    public TreeNode invertTree(TreeNode root) {
-        if(root == null){
-            return root;
-        }
-
-        invert(root);
-
-        return root;        
-    }
-}
 ```
 
 
