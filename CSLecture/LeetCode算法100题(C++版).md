@@ -565,6 +565,130 @@ public:
 };
 ```
 
+## 16 Island Perimeter
+
+2023.2.2
+
+> You are given `row x col` `grid` representing a map where `grid[i][j] = 1` represents land and `grid[i][j] = 0` represents water.
+>
+> Grid cells are connected **horizontally/vertically** (not diagonally). The `grid` is completely surrounded by water, and there is exactly one island (i.e., one or more connected land cells).
+>
+> The island doesn't have "lakes", meaning the water inside isn't connected to the water around the island. One cell is a square with side length 1. The grid is rectangular, width and height don't exceed 100. Determine the perimeter of the island.
+
+```C++
+class Solution {
+public:
+    int islandPerimeter(vector<vector<int>>& grid) {
+        int ans = 0;
+        for(int i = 0; i < grid.size(); i++){
+            for(int j = 0; j < grid[i].size(); j++){
+                if(grid[i][j] == 1){//vector版二维数组
+                    ans += 4;
+                    if(i != 0 && grid[i-1][j] == 1) ans -= 2;
+                    if(j != 0 && grid[i][j-1] == 1) ans -= 2;
+                }
+            }
+        }
+        return ans;        
+    }
+};
+```
+
+## 17 Ransom Note
+
+> Given two strings `ransomNote` and `magazine`, return `true` *if* `ransomNote` *can be constructed by using the letters from* `magazine` *and* `false` *otherwise*.
+>
+> Each letter in `magazine` can only be used once in `ransomNote`.
+
+```C++
+class Solution {
+public:
+    bool canConstruct(string ransomNote, string magazine) {
+        int ascii[26];
+        for(int i = 0; i < 26; i++){//相较Java，CPP数组必须初始化
+            ascii[i] = 0;
+        }
+        for(int i = 0; i < ransomNote.size(); i++){
+            ascii[ransomNote[i] - 97]--;//相较JAVA，CPP的string可以直接当字符数组用
+        }
+        for (int i = 0; i < magazine.size(); i++) {
+            ascii[magazine[i] - 97]++;
+        }
+        for(int i = 0; i < 26; i++){
+            if(ascii[i] < 0){
+                return false;
+            }
+        }
+        return true;        
+    }
+};
+```
+
+## 18 Number of Good Pairs
+
+> Given an array of integers `nums`, return *the number of **good pairs***.
+>
+> A pair `(i, j)` is called *good* if `nums[i] == nums[j]` and `i` < `j`.
+
+```C++
+class Solution {
+public:
+    int numIdenticalPairs(vector<int>& nums) {
+        map<int,int> mmap;
+        for(int i = 0; i < nums.size(); ++i){
+            if(mmap.count(nums[i])){
+                ++mmap[nums[i]];
+            }else{
+                mmap[nums[i]] = 1;
+            }           
+        }
+
+        int ans = 0;
+        map<int, int>::iterator iter; //注意总结map的遍历方式
+        for (iter = mmap.begin(); iter != mmap.end(); iter++){ 	        
+            int count = iter->second;
+            ans = ans + count*(count - 1)/2;
+        }
+
+        return ans;        
+    }
+};
+```
+
+## 19 First Bad Version
+
+> You are a product manager and currently leading a team to develop a new product. Unfortunately, the latest version of your product fails the quality check. Since each version is developed based on the previous version, all the versions after a bad version are also bad.
+>
+> Suppose you have `n` versions `[1, 2, ..., n]` and you want to find out the first bad one, which causes all the following ones to be bad.
+>
+> You are given an API `bool isBadVersion(version)` which returns whether `version` is bad. Implement a function to find the first bad version. You should minimize the number of calls to the API.
+
+```C++
+// The API isBadVersion is defined for you.
+// bool isBadVersion(int version);
+
+class Solution {
+public:
+    int firstBadVersion(int n) {
+        for(int i = 1; n > 2; ){
+            int mid = i + ( n - i)/2;
+            if(isBadVersion(mid) && !isBadVersion(mid - 1)){
+                return mid;
+            }else if(isBadVersion(mid)){
+                n = mid - 1;
+            }else{
+                i = mid + 1;
+            }
+        }
+        if(isBadVersion(1)){
+            return 1;
+        }else{
+            return 2;
+        }
+    }        
+};
+```
+
 ## 31 Longest Harmonious Subsequence
 
 > We define a harmonious array as an array where the difference between its maximum value and its minimum value is **exactly** `1`.
