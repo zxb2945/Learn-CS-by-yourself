@@ -689,7 +689,366 @@ public:
 };
 ```
 
+## 20 Add Strings
+
+2023.2.5
+
+> Given two non-negative integers, `num1` and `num2` represented as string, return *the sum of* `num1` *and* `num2` *as a string*.
+>
+> You must solve the problem without using any built-in library for handling large integers (such as `BigInteger`). You must also not convert the inputs to integers directly.
+
+```C++
+class Solution {
+public:
+    string addStrings(string num1, string num2) {
+        string longer = num1.size() > num2.size() ? num1 : num2;
+        string shorter = num1.size() > num2.size() ? num2 : num1;
+        string ans = "";//string性质几乎处处模仿char数组，只是毕竟是对象，用作一些C函数参数时还需要转化
+        int ascii1, ascii2, extra = 0;
+        for(int i = 1; i <= longer.size(); ++i){
+            ascii1 = longer[longer.size() - i] - '0';
+            if(i > shorter.size()){
+                ascii2 = 0;
+            }else{
+                ascii2 = shorter[shorter.size() - i] - '0';
+            }
+            int add = ascii1 + ascii2 + extra;
+            cout << add <<endl;
+            ans.append(to_string(add%10));
+            extra = add/10;
+        }
+
+        if(extra > 0){
+            ans.append(to_string(extra));
+        }
+        reverse(ans.begin(), ans.end()); 
+        return ans;        
+    }
+};
+```
+
+## 21 Construct String from Binary Tree
+
+> Given the `root` of a binary tree, construct a string consisting of parenthesis and integers from a binary tree with the preorder traversal way, and return it.
+>
+> Omit all the empty parenthesis pairs that do not affect the one-to-one mapping relationship between the string and the original binary tree.
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+enum KIND{
+    ROOT,LEFT,RIGHT
+};
+
+class Solution {
+private:
+    string ans;
+    int preorder(TreeNode* tree, KIND num){
+        if(tree == NULL){
+            return 0;
+        }
+        ans.append("(");
+        ans.append(to_string(tree->val));
+        if(tree->left == NULL && tree->right != NULL){
+            ans.append("()");
+        }
+        preorder(tree->left, LEFT);
+        preorder(tree->right, RIGHT);
+        ans.append(")");
+
+        return 0;
+    }    
+public:
+    string tree2str(TreeNode* root) {
+        preorder(root, ROOT);
+        ans.erase(0,1);
+        ans.erase(ans.size()-1,1);
+        return ans;        
+    }
+};
+```
+
+## 22 Flood Fill
+
+> An image is represented by an `m x n` integer grid `image` where `image[i][j]` represents the pixel value of the image.
+>
+> You are also given three integers `sr`, `sc`, and `color`. You should perform a **flood fill** on the image starting from the pixel `image[sr][sc]`.
+>
+> To perform a **flood fill**, consider the starting pixel, plus any pixels connected **4-directionally** to the starting pixel of the same color as the starting pixel, plus any pixels connected **4-directionally** to those pixels (also with the same color), and so on. Replace the color of all of the aforementioned pixels with `color`.
+>
+> Return *the modified image after performing the flood fill*.
+
+(2022.12.13)
+
+```C++
+class Solution {
+public:
+    vector<vector<int>> floodFill(vector<vector<int>>& image, int sr, int sc, int color) {
+        int oldcolor = image[sr][sc];
+        image[sr][sc] = color;
+
+        if((sr - 1 >= 0) && image[sr-1][sc] == oldcolor && image[sr-1][sc] != color){
+            int tem = sr - 1;
+            floodFill(image, tem, sc, color);
+        }
+        if((sr + 1 < image.size()) && image[sr+1][sc] == oldcolor && image[sr+1][sc] != color){
+            int tem = sr + 1;
+            floodFill(image, tem, sc, color);
+        }
+        if((sc - 1 >= 0) && image[sr][sc-1] == oldcolor && image[sr][sc-1] != color){
+            int tem = sc - 1;
+            floodFill(image, sr, tem, color);
+        }
+        if((sc + 1 < image[0].size()) && image[sr][sc+1] == oldcolor && image[sr][sc+1] != color){
+            int tem = sc + 1;
+            floodFill(image, sr, tem, color);
+        }
+
+        return image;        
+    }
+};
+```
+
+## 23 Set Mismatch
+
+> You have a set of integers `s`, which originally contains all the numbers from `1` to `n`. Unfortunately, due to some error, one of the numbers in `s` got duplicated to another number in the set, which results in **repetition of one** number and **loss of another** number.
+>
+> You are given an integer array `nums` representing the data status of this set after the error.
+>
+> Find the number that occurs twice and the number that is missing and return *them in the form of an array*.
+
+```C++
+class Solution {
+public:
+    vector<int> findErrorNums(vector<int>& nums) {
+        #if 0
+        int res[2];
+		int count[nums.size() + 1];
+        for (int i = 0; i < nums.size() + 1; i++) count[i] = 0;
+		for (int i = 0; i < nums.size(); i++) count[nums[i]]++;
+		for (int i = 1; i < (nums.size() + 1); i++) {
+		if (count[i] == 2)  res[0] = i;
+		if (count[i] == 0)  res[1] = i;
+		}
+        vector<int> ress(res,res+2);//通过数组地址赋值vector
+		return ress;
+        #else
+        vector<int> res; //初始化一个size为0的vector
+		int count[nums.size() + 1];
+        for (int i = 0; i < nums.size() + 1; i++) count[i] = 0;
+		for (int i = 0; i < nums.size(); i++) count[nums[i]]++;
+		for (int i = 1; i < (nums.size() + 1); i++) {
+		//if (count[i] == 2)  res[0] = i; 注意不能像数组那样直接对vector赋值！
+        if (count[i] == 2)  res.insert(res.begin(),i);//要通过方法
+		//if (count[i] == 0)  res[1] = i;
+        if (count[i] == 0)  res.insert(res.end(),i);
+		}
+        return res;        
+        #endif
+    }
+};
+```
+
+## 24 Baseball Game
+
+(2023.2.5)
+
+> You are keeping the scores for a baseball game with strange rules. At the beginning of the game, you start with an empty record.
+>
+> You are given a list of strings `operations`, where `operations[i]` is the `ith` operation you must apply to the record and is one of the following:
+>
+> - An integer
+>
+>   ```
+>   x
+>   ```
+>
+>   - Record a new score of `x`.
+>
+> - ```
+>   '+'
+>   ```
+>
+>   - Record a new score that is the sum of the previous two scores.
+>
+> - ```
+>   'D'
+>   ```
+>
+>   - Record a new score that is the double of the previous score.
+>
+> - ```
+>   'C'
+>   ```
+>
+>   - Invalidate the previous score, removing it from the record.
+>
+> Return *the sum of all the scores on the record after applying all the operations*.
+>
+> The test cases are generated such that the answer and all intermediate calculations fit in a **32-bit** integer and that all operations are valid.
+
+```C++
+
+```
+
+## 25 Valid Parentheses
+
+> Given a string `s` containing just the characters `'('`, `')'`, `'{'`, `'}'`, `'['` and `']'`, determine if the input string is valid.
+>
+> An input string is valid if:
+>
+> 1. Open brackets must be closed by the same type of brackets.
+> 2. Open brackets must be closed in the correct order.
+> 3. Every close bracket has a corresponding open bracket of the same type.
+
+```C++
+
+```
+
+## 26 Maximum Product of Two Elements in an Array
+
+> Given the array of integers `nums`, you will choose two different indices `i` and `j` of that array. *Return the maximum value of* `(nums[i]-1)*(nums[j]-1)`.
+
+```C++
+class Solution {
+public:
+    int maxProduct(vector<int>& nums) {
+        sort(nums.begin(), nums.end());//vector排序
+        //vector元素取值两种方式：1.数组下标 2.*迭代器
+        //int ans = (nums[nums.size()-1]-1)*(nums[nums.size()-2]-1);
+        int ans = (*(nums.end()-1)-1)*(*(nums.end()-2)-1);
+        return ans;         
+    }
+};
+```
+
+## 27 Find Center of Star Graph
+
+> There is an undirected **star** graph consisting of `n` nodes labeled from `1` to `n`. A star graph is a graph where there is one **center** node and **exactly** `n - 1` edges that connect the center node with every other node.
+>
+> You are given a 2D integer array `edges` where each `edges[i] = [ui, vi]` indicates that there is an edge between the nodes `ui` and `vi`. Return the center of the given star graph.
+
+```c++
+class Solution {
+public:
+    int findCenter(vector<vector<int>>& edges) {
+        if(edges[0][0] == edges[1][0] || edges[0][0] == edges[1][1]) return edges[0][0];
+        return edges[0][1];        
+    }
+};
+```
+
+## 28 Search in a Binary Search Tree
+
+> You are given the `root` of a binary search tree (BST) and an integer `val`.
+>
+> Find the node in the BST that the node's value equals `val` and return the subtree rooted with that node. If such a node does not exist, return `null`.
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+private:
+    TreeNode* ans;
+    void preorder(TreeNode* root, int val) {
+        if(root->val == val){
+            ans = root;
+            return;
+        } 
+        if(root->left != NULL) preorder(root->left, val);
+        if(root->right != NULL) preorder(root->right, val);       
+    }
+
+public:
+    TreeNode* searchBST(TreeNode* root, int val) {
+        if(root->val == val){
+            return root;
+        }
+        preorder(root, val);
+        return ans;        
+    }
+};
+```
+
+## 29 Degree of an Array
+
+> Given a non-empty array of non-negative integers `nums`, the **degree** of this array is defined as the maximum frequency of any one of its elements.
+>
+> Your task is to find the smallest possible length of a (contiguous) subarray of `nums`, that has the same degree as `nums`.
+
+```C++
+class Solution {
+public:
+    int findShortestSubArray(vector<int>& nums) {
+        map<int,int> left, right, count;
+
+        for(int i = 0; i < nums.size(); ++i){
+            if(!left.count(nums[i])){
+                left[nums[i]] = i;
+                //cout<<nums[i] << " : " << left[nums[i]]<<endl;
+            } 
+            right[nums[i]] = i;
+            if(count.count(nums[i])){
+                count[nums[i]]++;    
+            }else{
+                count[nums[i]] = 1;
+            }
+        }
+        //for(auto it = left.begin(); it != left.end(); ++it) cout<<it->first << " : " << it->second<<endl;
+        //for(auto it = right.begin(); it != right.end(); ++it) cout<<it->first << " : " << it->second<<endl;
+        //for(auto it = count.begin(); it != count.end(); ++it) cout<<it->first << " : " << it->second<<endl;
+        int val = 0, len = 0;
+        map<int, int>::iterator iter;
+        iter = count.begin();
+        while(iter != count.end()) {
+            if(iter->second == val){
+                int temlen;
+                temlen = right[iter->first] - left[iter->first] + 1;
+                if(temlen < len){
+                    len = temlen;
+                    val = iter->second;
+                }
+            }else if(iter->second > val){
+                len = right[iter->first]  - left[iter->first]  + 1;
+                val = iter->second;              
+            }            
+            iter++;
+        }
+       
+        return len;        
+    }
+};
+```
+
+## 30 To Lower Case
+
+> Given a string `s`, return *the string after replacing every uppercase letter with the same lowercase letter*.
+
+```C++
+
+```
+
 ## 31 Longest Harmonious Subsequence
+
+2023.1.30
 
 > We define a harmonious array as an array where the difference between its maximum value and its minimum value is **exactly** `1`.
 >
@@ -1061,3 +1420,22 @@ map与unordered_map区别及使用：
 > unordered_map内部实现了一个哈希表，查找的时间复杂度可达到O(1)，其在海量数据处理中有着广泛应用。其元素的排列顺序是无序的。对于查找问题，unordered_map会更加高效一些。
 
 > unordered_map的用法和map是一样的，提供了 insert，size，count等操作，并且里面的元素也是以pair类型来存贮的。其底层实现是完全不同的，上方已经解释了，但是就外部使用来说却是一致的。
+
+### 8.stack
+
+> **栈(Stack)是一种线性存储结构，它具有如下特点：**
+>
+> （1）栈中的数据元素遵守“先进后出"(First In Last Out)的原则，简称FILO结构。
+>
+> （2）限定只能在栈顶进行插入和删除操作
+
+```C++
+#include< stack >
+stack< int > s;
+s.empty();         //如果栈为空则返回true, 否则返回false;
+s.size();          //返回栈中元素的个数
+s.top();           //返回栈顶元素, 但不删除该元素
+s.pop();           //弹出栈顶元素, 但不返回其值
+s.push();          //将元素压入栈顶
+```
+
