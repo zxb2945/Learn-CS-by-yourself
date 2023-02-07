@@ -787,8 +787,6 @@ public:
 >
 > Return *the modified image after performing the flood fill*.
 
-(2022.12.13)
-
 ```C++
 class Solution {
 public:
@@ -897,7 +895,37 @@ public:
 > The test cases are generated such that the answer and all intermediate calculations fit in a **32-bit** integer and that all operations are valid.
 
 ```C++
+class Solution {
+public:
+    int calPoints(vector<string>& operations) {
+        vector<int> ans;
+        vector<string>::iterator it = operations.begin();
+        for(;it != operations.end(); ++it){//利用迭代器遍历vector
+            if(((*it)[0] > 47 && (*it)[0] < 58) 
+            || (*it)[0] == 45){
+                ans.push_back(stoi(*it));
+            } 
+            if((*it)[0] == 43 && ans.size() >= 2){
+                int tem = ans[ans.size()-1] + ans[ans.size()-2];
+                ans.push_back(tem);
+            }
+            if((*it)[0] == 68){
+                ans.push_back(ans[ans.size()-1]*2);
+            }
+            if((*it)[0] == 67){
+                ans.erase(ans.end()-1);//删除数组末位元素要用ans.end()-1
+            }
+        }
 
+        int res = 0;
+        vector<int>::iterator it2 = ans.begin();
+        for(;it2 != ans.end(); ++it2){
+            res += *it2;
+        } 
+
+        return res;        
+    }
+};
 ```
 
 ## 25 Valid Parentheses
@@ -911,7 +939,29 @@ public:
 > 3. Every close bracket has a corresponding open bracket of the same type.
 
 ```C++
-
+class Solution {
+public:
+    bool isValid(string s) {
+        stack<char> sta;
+        map<char,char> mmap;
+        mmap.insert(pair<char, char>('(',')'));
+        mmap.insert(pair<char, char>('{','}'));
+        mmap.insert(pair<char, char>('[',']'));
+        for(int i = 0; i < s.size(); ++i){
+            if(!sta.empty()
+            && !mmap.count(s[i])
+            && s[i] == mmap[sta.top()]){
+                sta.pop();
+            }else if(!mmap.count(s[i])){
+                return false;
+            }
+            else{
+                sta.push(s[i]);
+            }
+        }
+        return sta.empty();//C++与Java于stack容器接口几乎相同        
+    }
+};
 ```
 
 ## 26 Maximum Product of Two Elements in an Array
@@ -1043,7 +1093,13 @@ public:
 > Given a string `s`, return *the string after replacing every uppercase letter with the same lowercase letter*.
 
 ```C++
-
+class Solution {
+public:
+    string toLowerCase(string s) {
+        transform(s.begin(),s.end(),s.begin(),::tolower);//transform是STL中的一个函数
+        return s;
+    }
+};
 ```
 
 ## 31 Longest Harmonious Subsequence
@@ -1400,7 +1456,56 @@ Iterator(Vector<T>* pv, int idx) : pvec(pv), index(idx)
 
 (2022.11.24)
 
-### 7.map
+### 7.C++中 :: 的三种意思
+
+> `"::"`在C++中表示作用域和所属关系。`"::"`是运算符中等级最高的，它分为三种
+
+#### 7.1 作用域符号
+
+作用域符号”::“的前面一般是类名称，后面一般是该类的成员名称，C++为例避免不同的类有名称相同的成员而采用作用域的方式进行区分。
+
+```C++
+class A{
+int member;
+};
+class B{
+int member;
+};
+A::member;//表示类A中的成员member
+B::member;//表示类B中的成员member
+```
+
+#### 7.2 全局作用域符号
+
+当全局变量在局部函数中与其中某个变量重名，那么就可以用 :: 来区分，例如：
+
+```C++
+int a; // 全局变量
+void test ()
+{
+	int a = ::a;//用全局变量，给本地变量a赋值
+}
+```
+
+#### 7.3 作用域分解运算符
+
+比如声明了一个类A，类A里声明了一个成员函数voidf()，但没有在类的声明里给出f的定义，那么在类外定义f时，就要写成voidA::f()，表示这个f()函数是类A的成员函数。例如：
+
+```C++
+class A
+{
+public:
+	int test();
+}
+int A::test()//表示test是属于A的
+{
+	return 0;
+}
+```
+
+(2023.2.7)
+
+### 8.map
 
 > map是STL的一个关联容器，以键值对存储的数据，其类型可以自己定义，每个关键字在map中只能出现一次，关键字不能修改，值可以修改；内部数据结构是红黑树；map内部有序（自动排序，单词时按照字母序排序），查找时间复杂度为O(logn)。
 
@@ -1421,7 +1526,7 @@ map与unordered_map区别及使用：
 
 > unordered_map的用法和map是一样的，提供了 insert，size，count等操作，并且里面的元素也是以pair类型来存贮的。其底层实现是完全不同的，上方已经解释了，但是就外部使用来说却是一致的。
 
-### 8.stack
+### 9.stack
 
 > **栈(Stack)是一种线性存储结构，它具有如下特点：**
 >
