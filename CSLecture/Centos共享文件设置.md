@@ -73,7 +73,7 @@ vmhgfs-fuse .host:/ /mnt/hgfs
 如果每次重启之后想让系统自动挂载
 
 ```
-vi /etc/fstab: 
+vi /etc/fstab
 ```
 
 在最后添加一行： 
