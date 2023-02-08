@@ -1245,7 +1245,216 @@ public:
 };//C++这边有冒号
 ```
 
+## 41 Sort Characters By Frequency
 
+2023.2.8
+
+> Given a string `s`, sort it in **decreasing order** based on the **frequency** of the characters. The **frequency** of a character is the number of times it appears in the string.
+>
+> Return *the sorted string*. If there are multiple answers, return *any of them*.
+
+```C++
+class Solution {
+public:
+    string frequencySort(string s) {
+        //要求前K个高频元素，用优先队列+map=>频率就可以排序了
+        map<char,int> mmap;
+        priority_queue<pair<char,int>, vector<pair<char,int>>, myComp> mqueue;
+
+        //模式1：遍历数组，放入map
+        for(int i = 0; i < s.size(); ++i){
+            if(mmap.count(s[i])){
+                ++mmap[s[i]];
+            }else{
+                mmap[s[i]] = 1;
+            }           
+        }
+        //模式2：遍历map，放入queue
+        map<char, int>::iterator iter; 
+        for (iter = mmap.begin(); iter != mmap.end(); iter++){ 	        
+            char pKey = iter->first;
+            int pValue = iter->second;
+            //利用初始化列表，初始化pair
+            pair<char,int> mpair(pKey, pValue);
+            mqueue.push(mpair);            
+        }
+        
+		//模式3：遍历queue，放入字符串
+        string str = ""; 
+        while(!mqueue.empty()){
+            pair<char,int> mpair = mqueue.top();
+            mqueue.pop();
+            int count = mpair.second;
+            while(count > 0){
+               str.push_back(mpair.first);
+               count--; 
+            }
+        }
+
+        return str;        
+    }
+
+private:
+    struct myComp {
+        bool operator()(pair<char,int> const& a, pair<char,int> const& b) const 
+        {
+            return a.second < b.second;
+        }
+    };
+};
+```
+
+## 42 Exam Room
+
+(2022.12.19)
+
+> There is an exam room with `n` seats in a single row labeled from `0` to `n - 1`.
+>
+> When a student enters the room, they must sit in the seat that maximizes the distance to the closest person. If there are multiple such seats, they sit in the seat with the lowest number. If no one is in the room, then the student sits at seat number `0`.
+>
+> Design a class that simulates the mentioned exam room.
+>
+> Implement the `ExamRoom` class:
+>
+> - `ExamRoom(int n)` Initializes the object of the exam room with the number of the seats `n`.
+> - `int seat()` Returns the label of the seat at which the next student will set.
+> - `void leave(int p)` Indicates that the student sitting at seat `p` will leave the room. It is guaranteed that there will be a student sitting at seat `p`.
+
+```java
+class ExamRoom {
+    private int n;
+    //为什么用Set？用于需要存储的value作为索引值的情况
+    //为什么用TreeSet？Tree即代表有序
+    private TreeSet<Integer> set;
+
+    public ExamRoom(int n) {
+        this.n = n;
+        set = new TreeSet<>();
+    }
+    
+    public int seat() {
+        if(set.isEmpty()){
+            set.add(0);
+            return 0;
+        }
+        if(set.size() == 1){
+            if(set.first() < n/2){
+                set.add(n-1);
+                return n-1;                
+            }
+            set.add(0);
+            return 0;
+        }
+        int pos = -1;
+        int distance = -1;
+        int pre = -1;
+
+        if(set.first() != 0){
+            pos = 0;
+            distance = set.first();
+        }
+        //Java遍历set，没法像C++灵活用指针，只能用迭代器
+        //所以需要额外变量来进行元素相互比较
+        for(int seat : set){
+            if(pre == -1){
+                pre = seat;
+                continue; 
+            }
+            if(distance < (seat - pre)/2){
+                distance = (seat - pre)/2;
+                pos = pre + distance;
+            }
+            pre = seat;
+        }
+        if(set.last() != n -1){
+            if(distance < (n-1-set.last())){
+                pos = n - 1;
+            }
+        }
+        set.add(pos);
+        return pos;        
+    }
+    
+    public void leave(int p) {
+        set.remove(p);
+    }
+}
+
+/**
+ * Your ExamRoom object will be instantiated and called as such:
+ * ExamRoom obj = new ExamRoom(n);
+ * int param_1 = obj.seat();
+ * obj.leave(p);
+ */
+```
+
+## 43 Keys and Rooms
+
+(2022.12.20)
+
+> There are `n` rooms labeled from `0` to `n - 1` and all the rooms are locked except for room `0`. Your goal is to visit all the rooms. However, you cannot enter a locked room without having its key.
+>
+> When you visit a room, you may find a set of **distinct keys** in it. Each key has a number on it, denoting which room it unlocks, and you can take all of them with you to unlock the other rooms.
+>
+> Given an array `rooms` where `rooms[i]` is the set of keys that you can obtain if you visited room `i`, return `true` *if you can visit **all** the rooms, or* `false` *otherwise*.
+
+```java
+class Solution {
+    private TreeSet<Integer> set;
+    private TreeMap<Integer, List<Integer>> map;
+
+    private void Visit(int room){
+        set.add(room);
+        for(Integer i : map.get(room)){
+            if(!set.contains(i)){
+                Visit(i);
+            }
+        }
+    }
+
+    public boolean canVisitAllRooms(List<List<Integer>> rooms) {
+        map = new TreeMap();
+        int key = 0;
+        for(List<Integer> i : rooms){
+            map.put(key, i);
+            key++;
+        }
+        //Map好像是据key查value，没有据value查key的说法
+        List<Integer> x = map.get(0);
+        set = new TreeSet();
+        Visit(0);
+		//return visited.size() == rooms.size();不更简洁？
+        if(set.size() == rooms.size()){
+            return true;
+        }
+        return false;
+    }
+}
+//上记解法可以说非常慢...下记利用queue就漂亮多了,就是迭代之于递归的效率优势
+/*
+class Solution {
+    public boolean canVisitAllRooms(List<List<Integer>> rooms) {
+    	//在插入、查找方面，HashSet 通常优于TreeSet. hashSet查询和删除和增加元素的效率都非常高.
+        Set<Integer> visited = new HashSet<>();
+        //LinkedList既实现List接口，也实现了Queue接口
+        //既可以采用声明接口，new对象的方式单独使用接口方法
+        Queue<Integer> queue = new LinkedList<>();
+        queue.offer(0);
+        visited.add(0);
+        while (!queue.isEmpty()) {
+            int i = queue.poll();
+            for (int k : rooms.get(i)) {
+                if (!visited.contains(k)) {
+                    queue.offer(k);
+                    visited.add(k);
+                }
+            }
+        }
+        return visited.size() == rooms.size();
+    }
+}
+*/
+```
 
 ## 101 NOTE
 
@@ -1542,5 +1751,76 @@ s.size();          //返回栈中元素的个数
 s.top();           //返回栈顶元素, 但不删除该元素
 s.pop();           //弹出栈顶元素, 但不返回其值
 s.push();          //将元素压入栈顶
+```
+
+
+
+### 10.priority_queue
+
+### 11.UML
+
+UML规定函数成员的语法为：
+[访问控制属性] 名称 [（参数表）] [：返回类型] [约束特性]
+
+访问控制属性：
+
+- public： +
+- private： -
+- protected： #
+
+1.泛化（Generalization）: 
+
+**【泛化关系】**：是一种继承关系，表示一般与特殊的关系，它指定了子类如何特化父类的所有特征和行为。例如：老虎是动物的一种，即有老虎的特性也有动物的共性。
+**【箭头指向】**：带三角箭头的实线，箭头指向父类
+
+5.组合(Composition)
+
+**【组合关系】**：是整体与部分的关系，但部分不能离开整体而单独存在。如公司和部门是整体和部分的关系，没有公司就不存在部门。组合关系是关联关系的一种，是比聚合关系还要强的关系，它要求普通的聚合关系中代表整体的对象负责代表部分的对象的生命周期。
+
+**【代码体现】**：成员变量
+
+**【箭头及指向】**：带实心菱形的实线，菱形指向整体
+
+### 12 关键词
+
+throw
+
+**我们知道C++ 异常处理的流程**，具体为：抛出（Throw）--> 检测（Try） --> 捕获（Catch）
+
+在 C++ 中，我们使用 throw 关键字来显式地抛出异常，它的用法为：
+
+```C++
+throw exceptionData;
+//exceptionData 是“异常数据”的意思，它可以包含任意的信息，完全有程序员决定。exceptionData 可以是 int、float、bool 等基本类型，也可以是指针、数组、字符串、结构体、类等聚合类型
+```
+
+```C++
+//自定义的异常类型
+class OutOfRange{
+	//...
+};
+
+int Array::pop(){
+    if(m_len == 0){
+         throw OutOfRange();  //抛出异常（创建一个匿名对象）
+    }
+
+    m_len--;
+    return *(m_p + m_len);
+}
+
+int main(){
+    Array nums;
+	//...
+    try{
+        for(int i=0; i<20; i++){
+            nums.pop();
+        }
+    }catch(OutOfRange &e){
+		//...
+    }
+	//...
+}
+
 ```
 
