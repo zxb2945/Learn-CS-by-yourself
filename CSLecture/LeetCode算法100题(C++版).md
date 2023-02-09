@@ -1868,9 +1868,57 @@ private:
 
 #### 3.2.1 string
 
-#### 3.2.2 vector
+> 之所以抛弃char*的字符串而选用C++标准程序库中的string类，是因为他和前者比较起来，不必担心内存是否足够、字符串长度等等，而且作为一个泛型类出现，他集成的操作函数足以完成我们大多数情况下(甚至是100%)的需要。我们可以用 = 进行赋值操作，== 进行比较，+ 做串联。我们尽可以把它看成是C++的基本数据类型。
+
+常见用法：
+
+| 用途                      | 参照Leetcode序号                      | 说明                                |
+| ------------------------- | ------------------------------------- | ----------------------------------- |
+| string转换为char*         | 32 Word Pattern                       | str.data()                          |
+| 计算string长度            | 2 Remove Duplicates from Sorted Array | str.size()                          |
+| char*、char[]转换为string | 32 Word Pattern                       | 直接赋值                            |
+| int类型转为string类的方法 | 1 Palindrome Number \|\| 12 Fizz Buzz | 利用stringstringstream或to_string() |
+| string的遍历方法          | 41 Sort Characters By Frequency       | 下标遍历                            |
+| 删除字符                  | 21 Construct String from Binary Tree  | str.erase(0, 1)                     |
+| 末尾增加单个字符          | 41 Sort Characters By Frequency       | str.push_back('a')                  |
+| ...                       |                                       |                                     |
+|                           |                                       |                                     |
+
+#### 3.2.2 vector 
+
+> vector是最常用的容器之一，功能十分强大，可以储存、管理各种类型的数据。在很多情况下可以用来代替功能比较局限的普通数组。vector也可以称为动态数组，因为其大小是根据实时更新而变化的，正因为如此vector显得更加灵活易用。
+
+```C++
+vector<int> v;//定义
+//常用的成员函数
+v.size();//返回返回容器中元素个数
+v.push_back();//在末尾添加一个函数
+v.begin();//返回头部迭代器
+v.end();//返回尾部+1迭代器
+v.erase();//在指定位置删除元素
+v.empty();//判断是否为空
+v.clear();//清空容器
+//三种遍历方法：
+//使用迭代器
+vector<int>::iterator it;
+for(it=v.begin();it!=v.end();it++){
+	cout<<*it<<' ';
+} 
+//下标遍历
+for(int i=0;i<v.size();i++){
+	cout<<v[i]<<' ';
+}
+//foreach遍历
+for(int c:v){
+	cout<<c<<' ';
+}
+```
 
 #### 3.2.3 deque
+
+deque是“double-ended queue”的缩写，和vector一样都是STL的容器，唯一不同的是：deque是双端数组，而vector是单端的。
+
+Deque 特点：deque头部和尾部添加或移除元素都非常快速, 但是在中部安插元素或移除元素比较费时。
 
 #### 3.2.4 stack
 
@@ -1892,13 +1940,26 @@ s.push();          //将元素压入栈顶
 
 #### 3.2.5 queue
 
-priority_queue
+##### 3.2.5.1 priority_queue
+
+priority_queue是C++中queue库中的优先队列，语法如下：
+
+```C++
+//第三个参数为仿函数，详细参照 41 Sort Characters By Frequency
+template <class T, class Container = vector, class Compare = less > class priority_queue;
+```
+
+优先队列是一种容器适配器，采用了堆这样的数据结构，保证了第一个元素总是整个优先队列中最大的或最小的元素。优先队列默认使用vector作为底层存储数据的容器，在vector上使用了堆算法将vector中的元素构造成堆的结构，所以其实我们就可以把它当作堆，凡是需要用堆的位置，都可以考虑优先队列。
 
 #### 3.2.6 list
 
-#### 3.2.7 set/multiset
+list容器使用双链表实现；双链表将每个元素存储在不同的位置，每个节点通过next，prev指针链接成顺序表。list与其他标准序列容器（vector和deque）相比，list通常可以在容器内的任何位置插入、提取和移动元素。
 
-#### 3.2.8 map/multimap
+#### 3.2.7 set
+
+set 翻译为集合，是一个内部自动有序且不含重复元素的容器。当出现需要去掉重复元素的情况，可以用 set 来保留元素本身而不考虑它的个数。
+
+#### 3.2.8 map
 
 > map是STL的一个关联容器，以键值对存储的数据，其类型可以自己定义，每个关键字在map中只能出现一次，关键字不能修改，值可以修改；内部数据结构是红黑树；map内部有序（自动排序，单词时按照字母序排序），查找时间复杂度为O(logn)。
 
@@ -1921,11 +1982,18 @@ map与unordered_map区别及使用：
 
 ### 3.3 算法：Algorithms
 
+```C++
+//常用算法
+sort();
+binary_search();
+//...
+```
+
 ### 3.4 迭代器（Iterators）
 
 **迭代器的原理**:
 
-> 为了提高C++编程的效率，STL中提供了许多容器，包括vector、list、map等。为了统一访问方式，STL为每种容器在实现的时候设计了一个内嵌的iterator类，不同的容器有自己专属的迭代器，使用迭代器来访问容器中的数据。迭代器对一些基本操作如*、–、++、==、!=进行了重载，使其具有了遍历复杂数据结构的能力，其遍历机制取决于所遍历的容器，迭代器的使用和指针的使用非常相似。通过begin，end函数获取容器的头部和尾部迭代器，当begin和end返回的迭代器相同时表示容器为空。简单来说，迭代器就是一个遍历的过程，像使用指针一样使用迭代器就可以访问这个容器。
+> 为了提高C++编程的效率，STL中提供了许多容器，包括vector、list、map等。为了统一访问方式，STL为每种容器在实现的时候设计了一个内嵌的iterator类，不同的容器有自己专属的迭代器，使用迭代器来访问容器中的数据。**迭代器对一些基本操作如*、–、++、==、!=进行了重载**，使其具有了遍历复杂数据结构的能力，其遍历机制取决于所遍历的容器，迭代器的使用和指针的使用非常相似。通过begin，end函数获取容器的头部和尾部迭代器，当begin和end返回的迭代器相同时表示容器为空。简单来说，迭代器就是一个遍历的过程，像使用指针一样使用迭代器就可以访问这个容器。
 
 =>可以想象链表容器list与数组容器vector迭代器实现的原理不同，最后呈现的性质也会有区别。
 
@@ -2013,6 +2081,8 @@ public:
 
 仿函数（Functor）又称为函数对象（Function Object）是一个能行使函数功能的类。仿函数的语法几乎和我们普通的函数调用一样，不过作为仿函数的类，都必须重载 operator() 运算符。因为调用仿函数，实际上就是通过类对象调用重载后的 operator() 运算符。
 
+参见：41 Sort Characters By Frequency
+
 ## Others
 
 ### UML
@@ -2038,3 +2108,7 @@ UML规定函数成员的语法为：
 **【代码体现】**：成员变量
 
 **【箭头及指向】**：带实心菱形的实线，菱形指向整体
+
+
+
+> vector是最常用的容器之一，功能十分强大，可以储存、管理各种类型的数据。在很多情况下可以用来代替功能比较局限的普通数组。vector也可以称为动态数组，因为其大小是根据实时更新而变化的，正因为如此vector显得更加灵活易用。
