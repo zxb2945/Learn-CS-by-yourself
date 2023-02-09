@@ -1784,7 +1784,30 @@ a是b好朋友，b是c好朋友，a并不是c的好朋友，友元没有传递�
 }
 ```
 
+### 2.9 继承
 
+继承基类成员访问方式的变化:
+
+| 基类成员      | public继承 | protected继承     | private继承     |
+| ------------- | ---------- | ----------------- | --------------- |
+| public成员    | 不变       | 变为protected成员 | 变为private成员 |
+| protected成员 | 不变       | 不变              | 变为private成员 |
+| private成员   | 不可见     | 不可见            | 不可见          |
+
+```C++
+//三种继承方式，对应上面图表
+//class Student : protected Person
+//class Student : private Person
+class Student : public Person
+{
+protected :
+	int _stunum ; 
+};
+```
+
+使用关键字class时默认的继承方式是private，使用struct时默认的继承方式是public，不过**最好显示的写出继承方式**；
+
+在实际运用中一般使用都是public继承，不提倡使protetced/private继承，因为private 和 protected 继承方式会改变基类成员在派生类中的访问权限，导致继承关系复杂，实际中扩展维护性不强；
 
 ## 3 标准模板库：STL
 
