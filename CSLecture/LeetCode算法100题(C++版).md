@@ -1,4 +1,4 @@
-# 编程练习
+# LeetCode:
 
 ## 1 Palindrome Number
 
@@ -1308,7 +1308,7 @@ private:
 
 ## 42 Exam Room
 
-(2022.12.19)
+2023.2.10
 
 > There is an exam room with `n` seats in a single row labeled from `0` to `n - 1`.
 >
@@ -1322,42 +1322,39 @@ private:
 > - `int seat()` Returns the label of the seat at which the next student will set.
 > - `void leave(int p)` Indicates that the student sitting at seat `p` will leave the room. It is guaranteed that there will be a student sitting at seat `p`.
 
-```java
+```c++
 class ExamRoom {
-    private int n;
-    //为什么用Set？用于需要存储的value作为索引值的情况
-    //为什么用TreeSet？Tree即代表有序
-    private TreeSet<Integer> set;
-
-    public ExamRoom(int n) {
-        this.n = n;
-        set = new TreeSet<>();
+private:
+    int n;
+    set<int> mset; //相较Java模板类型必须是包裹类型，C++可以用基本类型
+public:
+    ExamRoom(int n) {
+        this->n = n;
     }
     
-    public int seat() {
-        if(set.isEmpty()){
-            set.add(0);
+    int seat() {
+        if(mset.empty()){
+            mset.insert(0);//Java和C++容器接口函数名故意搞不一样？
             return 0;
         }
-        if(set.size() == 1){
-            if(set.first() < n/2){
-                set.add(n-1);
+        if(mset.size() == 1){
+            if(*(mset.begin()) < n/2){
+                mset.insert(n-1);
                 return n-1;                
             }
-            set.add(0);
+            mset.insert(0);
             return 0;
         }
         int pos = -1;
         int distance = -1;
         int pre = -1;
 
-        if(set.first() != 0){
+        if(*(mset.begin()) != 0){
             pos = 0;
-            distance = set.first();
+            distance = *(mset.begin());
         }
-        //Java遍历set，没法像C++灵活用指针，只能用迭代器
-        //所以需要额外变量来进行元素相互比较
-        for(int seat : set){
+
+        for(int seat : mset){
             if(pre == -1){
                 pre = seat;
                 continue; 
@@ -1368,31 +1365,24 @@ class ExamRoom {
             }
             pre = seat;
         }
-        if(set.last() != n -1){
-            if(distance < (n-1-set.last())){
+        //set返回最后一个数值（最大值）：mset.rbegin();
+        //mset.end()返回的是set容器的最后一个元素(应该是s的长度)，而不是s队列中的最后一个元素，就是说返回的不是最大值。
+        if(*(mset.rbegin()) != n -1){ //
+            if(distance < (n-1-*(mset.rbegin()))){
                 pos = n - 1;
             }
         }
-        set.add(pos);
-        return pos;        
+        mset.insert(pos);
+        return pos;           
     }
     
-    public void leave(int p) {
-        set.remove(p);
+    void leave(int p) {
+        mset.erase(p);
     }
-}
-
-/**
- * Your ExamRoom object will be instantiated and called as such:
- * ExamRoom obj = new ExamRoom(n);
- * int param_1 = obj.seat();
- * obj.leave(p);
- */
+};
 ```
 
 ## 43 Keys and Rooms
-
-(2022.12.20)
 
 > There are `n` rooms labeled from `0` to `n - 1` and all the rooms are locked except for room `0`. Your goal is to visit all the rooms. However, you cannot enter a locked room without having its key.
 >
@@ -1400,62 +1390,27 @@ class ExamRoom {
 >
 > Given an array `rooms` where `rooms[i]` is the set of keys that you can obtain if you visited room `i`, return `true` *if you can visit **all** the rooms, or* `false` *otherwise*.
 
-```java
+```C++
 class Solution {
-    private TreeSet<Integer> set;
-    private TreeMap<Integer, List<Integer>> map;
-
-    private void Visit(int room){
-        set.add(room);
-        for(Integer i : map.get(room)){
-            if(!set.contains(i)){
-                Visit(i);
-            }
-        }
-    }
-
-    public boolean canVisitAllRooms(List<List<Integer>> rooms) {
-        map = new TreeMap();
-        int key = 0;
-        for(List<Integer> i : rooms){
-            map.put(key, i);
-            key++;
-        }
-        //Map好像是据key查value，没有据value查key的说法
-        List<Integer> x = map.get(0);
-        set = new TreeSet();
-        Visit(0);
-		//return visited.size() == rooms.size();不更简洁？
-        if(set.size() == rooms.size()){
-            return true;
-        }
-        return false;
-    }
-}
-//上记解法可以说非常慢...下记利用queue就漂亮多了,就是迭代之于递归的效率优势
-/*
-class Solution {
-    public boolean canVisitAllRooms(List<List<Integer>> rooms) {
-    	//在插入、查找方面，HashSet 通常优于TreeSet. hashSet查询和删除和增加元素的效率都非常高.
-        Set<Integer> visited = new HashSet<>();
-        //LinkedList既实现List接口，也实现了Queue接口
-        //既可以采用声明接口，new对象的方式单独使用接口方法
-        Queue<Integer> queue = new LinkedList<>();
-        queue.offer(0);
-        visited.add(0);
-        while (!queue.isEmpty()) {
-            int i = queue.poll();
-            for (int k : rooms.get(i)) {
-                if (!visited.contains(k)) {
-                    queue.offer(k);
-                    visited.add(k);
+public:
+    bool canVisitAllRooms(vector<vector<int>>& rooms) {
+        set<int> visited;
+        queue<int> mqueue;
+        mqueue.push(0);
+        visited.insert(0);
+        while (!mqueue.empty()) {
+            int i = mqueue.front();
+            mqueue.pop();
+            for (int k : rooms[i]) {
+                if (!visited.count(k)) {
+                    mqueue.push(k);
+                    visited.insert(k);
                 }
             }
         }
-        return visited.size() == rooms.size();
+        return visited.size() == rooms.size();        
     }
-}
-*/
+};
 ```
 
 # NOTE:
@@ -1938,7 +1893,22 @@ s.pop();           //弹出栈顶元素, 但不返回其值
 s.push();          //将元素压入栈顶
 ```
 
+参见：25 Valid Parentheses
+
 #### 3.2.5 queue
+
+```c++
+//初始化时必须要有数据类型，容器可省略，省略时则默认为deque 类型
+queue<Type, Container>;// (<数据类型，容器类型>）
+queue<int> q;
+q.push();//在队尾插入一个元素
+q.pop();//删除队列第一个元素
+q.size();//返回队列中元素个数
+q.empty();//如果队列空则返回true
+q.front();//返回队列中的第一个元素
+q.back();//返回队列中最后一个元素
+//参照 43 Keys and Rooms                        
+```
 
 ##### 3.2.5.1 priority_queue
 
@@ -1957,7 +1927,30 @@ list容器使用双链表实现；双链表将每个元素存储在不同的位�
 
 #### 3.2.7 set
 
-set 翻译为集合，是一个内部自动有序且不含重复元素的容器。当出现需要去掉重复元素的情况，可以用 set 来保留元素本身而不考虑它的个数。
+set 翻译为集合，是一个**内部自动有序**且不含重复元素的容器。当出现需要去掉重复元素的情况，可以用 set 来保留元素本身而不考虑它的个数。
+
+```C++
+set<int> s;
+//常用方法
+s.insert();
+s.size();
+s.erase();
+s.begin();//返回第一个节点的迭代器
+s.rbegin();//返回最后一个节点的迭代器
+//set的两种遍历方法
+//迭代器iterator
+set<int>::iterator it;//使用迭代器
+for(it=s.begin();it!=s.end();it++){
+	cout<<*it<<' ';
+} 
+//foreach遍历
+//auto用法，c++auto用法强大，当你无法确定变量的类型时，都可以用auto来代替，迭代器iterator很难记住，其实可以用auto来代替：
+for(auto it:s){
+	cout<<it<<' ';
+} 
+```
+
+参见：42 Exam Room
 
 #### 3.2.8 map
 
@@ -1973,12 +1966,36 @@ set 翻译为集合，是一个内部自动有序且不含重复元素的容器�
 | my_map.count(key) | 由于map不包含重复的key，因此m.count(key)取值为0，或者1，表示是否包含。 |
 | ...               | ...                                                          |
 
+参见：31 Longest Harmonious Subsequence
+
 map与unordered_map区别及使用：
 
 > map内部实现了一个红黑树，红黑树具有自动排序的功能，因此map内部的所有元素都是有序的，红黑树的每一个节点都代表着map的一个元素。因此，对于map进行的查找，删除，添加等一系列的操作都相当于是对红黑树进行的操作。
 > unordered_map内部实现了一个哈希表，查找的时间复杂度可达到O(1)，其在海量数据处理中有着广泛应用。其元素的排列顺序是无序的。对于查找问题，unordered_map会更加高效一些。
 
 > unordered_map的用法和map是一样的，提供了 insert，size，count等操作，并且里面的元素也是以pair类型来存贮的。其底层实现是完全不同的，上方已经解释了，但是就外部使用来说却是一致的。
+
+#### 3.2.9 其他
+
+##### 3.2.9.1 pair
+
+pair只含有两个元素，可以看作是只有两个元素的结构体。作为map键值对进行插入。
+
+```c++
+//定义结构体数组
+pair<int,int>p[20];
+for(int i = 0; i < 20; i++)
+{
+	//和结构体类似，first代表第一个元素，second代表第二个元素
+	cout << p[i].first << " " << p[i].second;
+}
+```
+
+##### 3.2.9.2 bitset
+
+bitset 在 bitset 头文件中，它类似数组，并且每一个元素只能是０或１，每个元素只用１bit空间。
+
+参见：6 Reverse Bits
 
 ### 3.3 算法：Algorithms
 
@@ -1989,7 +2006,7 @@ binary_search();
 //...
 ```
 
-### 3.4 迭代器（Iterators）
+### 3.4 迭代器：Iterators
 
 **迭代器的原理**:
 
@@ -2077,7 +2094,7 @@ public:
 };
 ```
 
-### 3.5 仿函数（Functors）
+### 3.5 仿函数：Functors
 
 仿函数（Functor）又称为函数对象（Function Object）是一个能行使函数功能的类。仿函数的语法几乎和我们普通的函数调用一样，不过作为仿函数的类，都必须重载 operator() 运算符。因为调用仿函数，实际上就是通过类对象调用重载后的 operator() 运算符。
 
@@ -2086,6 +2103,11 @@ public:
 ## Others
 
 ### UML
+
+- 一种可视化语言
+- 三种基本元素：事物、关系、图
+- 对象图、类图
+- 依赖关系、关联关系、包含关系、继承关系
 
 UML规定函数成员的语法为：
 [访问控制属性] 名称 [（参数表）] [：返回类型] [约束特性]
@@ -2108,7 +2130,3 @@ UML规定函数成员的语法为：
 **【代码体现】**：成员变量
 
 **【箭头及指向】**：带实心菱形的实线，菱形指向整体
-
-
-
-> vector是最常用的容器之一，功能十分强大，可以储存、管理各种类型的数据。在很多情况下可以用来代替功能比较局限的普通数组。vector也可以称为动态数组，因为其大小是根据实时更新而变化的，正因为如此vector显得更加灵活易用。
