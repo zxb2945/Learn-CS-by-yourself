@@ -1413,6 +1413,69 @@ public:
 };
 ```
 
+## 44 Find First and Last Position of Element in Sorted Array
+
+2023.2.11
+
+> Given an array of integers `nums` sorted in non-decreasing order, find the starting and ending position of a given `target` value.
+>
+> If `target` is not found in the array, return `[-1, -1]`.
+>
+> You must write an algorithm with `O(log n)` runtime complexity.
+
+```C++
+class Solution {
+public:
+    vector<int> searchRange(vector<int>& nums, int target) {
+        //查找容器中大于等于某值的数，返回这个数的指针。
+        auto pos1 = lower_bound(nums.begin(), nums.end(), target);
+        //查找容器中大于某值的数，返回这个数的指针。
+        auto pos2 = upper_bound(nums.begin(), nums.end(), target);
+
+        vector<int> ans(2,-1);//初始化为2个-1
+        if(pos1 != nums.end() && *pos1 == target){
+            ans[0] = pos1 - nums.begin();
+            ans[1] = pos2 - nums.begin() - 1;
+        }       
+
+        return ans;
+    }
+};
+```
+
+## 45 Swap Nodes in Pairs
+
+> Given a linked list, swap every two adjacent nodes and return its head. You must solve the problem without modifying the values in the list's nodes (i.e., only nodes themselves may be changed.)
+
+```C++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* swapPairs(ListNode* head) {
+        if(head == NULL || head->next == NULL){
+            return head;
+        }
+        ListNode* h1, *h2;//h2前面的*别忘
+        //head->next = head; =>会出现编译错误
+        h1 = head->next;
+        h2 = h1->next;
+        h1->next = head;
+        head->next = swapPairs(h2);
+
+        return h1;
+    }
+};
+```
+
 # NOTE:
 
 ## 1 C++对C的扩展
@@ -1844,7 +1907,9 @@ private:
 > vector是最常用的容器之一，功能十分强大，可以储存、管理各种类型的数据。在很多情况下可以用来代替功能比较局限的普通数组。vector也可以称为动态数组，因为其大小是根据实时更新而变化的，正因为如此vector显得更加灵活易用。
 
 ```C++
-vector<int> v;//定义
+//初始化
+vector<int> v={1,2};//初始化为列表中元素的拷贝
+vector<int> v(2,1);//指定值初始化，初始化为包含2个值为1的int
 //常用的成员函数
 v.size();//返回返回容器中元素个数
 v.push_back();//在末尾添加一个函数
@@ -2003,6 +2068,11 @@ bitset 在 bitset 头文件中，它类似数组，并且每一个元素只能�
 //常用算法
 sort();
 binary_search();
+//有序容器，二分法
+//查找容器中大于等于某值的数，返回这个数的指针。
+auto pos1 = lower_bound(nums.begin(), nums.end(), target);
+//查找容器中大于某值的数，返回这个数的指针。
+auto pos2 = upper_bound(nums.begin(), nums.end(), target)
 //...
 ```
 
