@@ -1245,6 +1245,87 @@ public:
 };//C++这边有冒号
 ```
 
+## 34 Pascal's Triangle
+
+2023.2.13
+
+> Given an integer `numRows`, return the first numRows of **Pascal's triangle**.
+>
+> In **Pascal's triangle**, each number is the sum of the two numbers directly above it as shown:
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> generate(int numRows) {
+        vector<vector<int>> ans;
+        vector<int> lastrow(1,1);
+        ans.push_back(lastrow);
+        while(--numRows){
+            vector<int> row;
+            for(int i=0; i <= lastrow.size(); i++){
+                if(i==0 || i==lastrow.size()){
+                    row.push_back(1);
+                }else{
+                    row.push_back(lastrow[i-1]+lastrow[i]);
+                }
+            }
+            ans.push_back(row);
+            lastrow.clear();
+            lastrow = row;
+        }   
+        return ans;
+    }
+};
+```
+
+## 35 Minimum Depth of Binary Tree
+
+> Given a binary tree, find its minimum depth.
+>
+> The minimum depth is the number of nodes along the shortest path from the root node down to the nearest leaf node.
+>
+> **Note:** A leaf is a node with no children.
+
+```c++
+class Solution {
+private:
+    //int count;
+    int DFS(TreeNode* node, int count){
+        if(node->left == NULL && node->right == NULL){
+            ++count;
+            return count;
+        }else if(node->left != NULL && node->right != NULL){
+            ++count;
+            int leftC = DFS(node->left, count);
+            int rightC = DFS(node->right, count);
+            return leftC < rightC ? leftC : rightC;
+        }else if(node->left != NULL && node->right == NULL){
+            ++count;
+            return DFS(node->left,count);
+        }else{
+            ++count;
+            return DFS(node->right,count);
+        }
+    }
+public:
+    int minDepth(TreeNode* root) {
+        if(root == NULL){
+            return 0;
+        }
+        return DFS(root, 0); 
+    }
+};
+/*
+DFS（深度优先搜索）:
+本质上是暴力把所有的路径都搜索出来，它运用了回溯，保存这次的位置并深入搜索，都搜索完便回溯回来，搜下一个位置，直到把所有最深位置都搜一遍（找到目的解返回或者全部遍历完返回一个事先定好的值）。要注意的一点是，搜索的时候有记录走过的位置，标记完后可能要改回来。dfs一般借用递归完成整个算法的构造。
+=>类似于树的先根遍历
+BFS（广度优先搜索）:
+bfs也是一个对连通图进行遍历的算法。它的思想是从一个被选定的点出发；然后从这个点的所有方向每次只走一步的走到底（即其中一个方向走完一步之后换下一个方向继续走）；如果得不到目的解，那就返回事先定好的值，如果找到直接返回目的解。与dfs不同的是，bfs不是运用的递归，而是运用队列和函数内循环构造的。
+=>类似于树的按层次遍历的过程
+BFS是浪费空间节省时间，DFS是浪费时间节省空间。
+*/
+```
+
 ## 41 Sort Characters By Frequency
 
 2023.2.8
@@ -1982,6 +2063,7 @@ for(int i=0;i<v.size();i++){
 for(int c:v){
 	cout<<c<<' ';
 }
+//参考：34 Pascal's Triangle
 ```
 
 #### 3.2.3 deque
