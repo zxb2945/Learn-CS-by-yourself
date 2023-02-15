@@ -2306,29 +2306,91 @@ public:
 
 ### UML
 
-- 一种可视化语言
-- 三种基本元素：事物、关系、图
-- 对象图、类图
-- 依赖关系、关联关系、包含关系、继承关系
+> **类图（Class Diagram）**: 类图是面向对象系统建模中最常用和最重要的图，是定义其它图的基础。类图主要是用来显示系统中的类、接口以及它们之间的静态结构和关系的一种静态模型。
+>
+> 类图的3个基本组件：**类名、属性、方法**。
+>
+> 统一建模语言（Unified Modeling Language，UML）是用来设计软件的可视化建模语言。它的特点是简单、统一、图形化、能表达软件设计中的动态与静态信息。
 
-UML规定函数成员的语法为：
-[访问控制属性] 名称 [（参数表）] [：返回类型] [约束特性]
+=>UML类图就是用来描述类与类之间，类与接口之间，类的成员变量之间的一种关系图。
 
-访问控制属性：
+在UML类图中，常见的有以下几种关系: 泛化（Generalization）, 实现（Realization），关联（Association)**，**聚合（Aggregation)，组合(Composition)，依赖(Dependency)
 
-- public： +
-- private： -
-- protected： #
+1. 泛化（Generalization）: **【泛化关系】**：是一种继承关系，表示一般与特殊的关系，它指定了子类如何特化父类的所有特征和行为。例如：老虎是动物的一种，即有老虎的特性也有动物的共性。**【箭头指向】**：带三角箭头的实线，箭头指向父类
 
-1.泛化（Generalization）: 
+2. 组合(Composition)**【组合关系】**：是整体与部分的关系，但部分不能离开整体而单独存在。如公司和部门是整体和部分的关系，没有公司就不存在部门。组合关系是关联关系的一种，是比聚合关系还要强的关系，它要求普通的聚合关系中代表整体的对象负责代表部分的对象的生命周期。**【代码体现】**：成员变量**【箭头及指向】**：带实心菱形的实线，菱形指向整体
 
-**【泛化关系】**：是一种继承关系，表示一般与特殊的关系，它指定了子类如何特化父类的所有特征和行为。例如：老虎是动物的一种，即有老虎的特性也有动物的共性。
-**【箭头指向】**：带三角箭头的实线，箭头指向父类
+3. ...
 
-5.组合(Composition)
 
-**【组合关系】**：是整体与部分的关系，但部分不能离开整体而单独存在。如公司和部门是整体和部分的关系，没有公司就不存在部门。组合关系是关联关系的一种，是比聚合关系还要强的关系，它要求普通的聚合关系中代表整体的对象负责代表部分的对象的生命周期。
 
-**【代码体现】**：成员变量
+### CMake
 
-**【箭头及指向】**：带实心菱形的实线，菱形指向整体
+> CMake是一种跨平台编译工具，比make更为高级，使用起来要方便得多。CMake主要是编写CMakeLists.txt文件，然后用cmake命令将CMakeLists.txt文件转化为make所需要的makefile文件，最后用make命令编译源码生成可执行程序或共享库（so(shared object)）。`cmake`  指向CMakeLists.txt所在的目录，例如`cmake ..` 表示CMakeLists.txt在当前目录的上一级目录。cmake后会生成很多编译的中间文件以及makefile文件，所以一般建议新建一个新的目录，专门用来编译，例如
+>
+> ```shell
+> mkdir build
+> cd build
+> cmake ..
+> make
+> ```
+>
+> make根据生成makefile文件，编译程序。
+
+以下是一个嵌入式C++工程的CMakeLists.txt:
+
+```cmake
+#cmake的最低版本要求是2.8
+cmake_minimum_required (VERSION 2.8)
+#工程名叫demo
+project (demo)
+
+#CHECK_CXX_COMPILER_FLAG的作用： 检查 CXX 编译器是否支持给定的标志。
+#必须先include(CheckCXXCompilerFlag)
+#CheckCXXCompilerFlag是cmake的一个utility module.(These modules are loaded using the include() command.
+include(CheckCXXCompilerFlag)
+#检查当前编译器是否支持c++11
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+#使用了if-else来根据option来决定是否执行set命令
+if(COMPILER_SUPPORTS_CXX11)
+#set用于设定变量 variable 的值为 value
+#通过set命令修改CMAKE_CXX_FLAGS跟add_compile_options命令在有的情况下效果是一样的，但请注意它们还是有区别的：add_compile_options命令添加的编译选项是针对所有编译器的(包括c和c++编译器)，而set命令设置CMAKE_C_FLAGS或CMAKE_CXX_FLAGS变量则是分别只针对c和c++编译器的。
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+elseif(COMPILER_SUPPORTS_CXX0X)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+else()
+#使用message输出信息
+	message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Use a different C++ compiler.")
+endif()
+
+#include_directories命令是用来向工程添加多个指定头文件的搜索路径，路径之间用空格分隔。
+include_directories(./config/src ./interface/src
+ ./viewer/src /usr/local/include/ )
+
+#EXECUTABLE_OUTPUT_PATH是系统自带的预定义变量：目标二进制可执行文件的存放位置
+#PROJECT_SOURCE_DIR：工程的根目录
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+
+# 设定编译类型为debug，调试时需要选择debug：set(CMAKE_BUILD_TYPE Debug)  
+# 设定编译类型为release，发布时需要选择release：set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Release)
+
+message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+message(STATUS "CMAKE_C_FLAGS: ${CMAKE_C_FLAGS}")
+message(STATUS "CMAKE_C_FLAGS_RELEASE: ${CMAKE_C_FLAGS_RELEASE}")
+message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+message(STATUS "CMAKE_CXX_FLAGS_RELEASE: ${CMAKE_CXX_FLAGS_RELEASE}")
+
+#cmake并不是直接去查找包本身，而是通过查找包对应的配置文件来查找包。这个文件说明了包相关的一些信息，比如版本、目录等。在不同模式下，配置文件可能不同，但是只要目标包有对应的.cmake文件且存在于cmake的查找路径中，就可以被find_package直接使用。
+find_package(OpenCV REQUIRED)
+
+#用于指定从一组源文件 source1 source2 … sourceN 编译出一个可执行文件且命名为 name
+add_executable(config ./config/src/config1.cpp ./config/src/config2.cpp)
+#用于指定 target 需要链接 item1 item2 …。这里 target 必须已经被创建，链接的 item 可以是已经存在的 target（依赖关系会自动添加）
+target_link_libraries(config abc)
+add_executable(viewer ./config/src/viewer.cpp)
+target_link_libraries(viewer abc abd)
+```
+
+(2023.2.15)
