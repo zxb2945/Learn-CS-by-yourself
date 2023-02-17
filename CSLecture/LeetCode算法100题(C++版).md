@@ -1557,6 +1557,141 @@ public:
 };
 ```
 
+## 49 Regular Expression Matching
+
+2023.2.17
+
+> Given an input string `s` and a pattern `p`, implement regular expression matching with support for `'.'` and `'*'` where:
+>
+> - `'.'` Matches any single character.
+> - `'*'` Matches zero or more of the preceding element.
+>
+> The matching should cover the **entire** input string (not partial).
+
+```c++
+class Solution {
+public:
+    bool isMatch(string s, string p) {
+/*
+动态规划最核心的思想，就在于拆分子问题，记住过往，减少重复计算。
+递归到动态规划(英语：Dynamic programming，简称 DP)的一般转化方法： 递归函数有n个参数，就定义一个n维的数组，数组的下标是递归函数参数的取值范围，数组元素的值是递归函数的返回值，这样就可以从边界值开始， 逐步填充数组，相当于计算递归函数值的逆过程。
+动规解题的一般思路:
+1.将原问题分解为子问题，子问题和原问题形式相同或类似，只不过规模变小了。子问题的解一旦求出就会被保存，所以每个子问题只需求解一次。子问题都解决，原问题即解决；
+2.确定一些初始状态（边界状态）的值；
+3.确定状态转移方程，前的若干个状态值一旦确定，则此后过程的演变就只和这若干个状态的值有关，和之前是采取哪种手段或经过哪条路径演变到当前的这若干个状态，没有关系。
+*/                   
+        //c++ 11特性,参见NOTE: 1.7 Lambda
+        auto match = [=](int i, int j) ->bool{
+            if(i==0) return false; //i从0开始，可以用空气应对p开头的a*
+            if(s[i-1] == p[j-1] || p[j-1] == '.') return true;
+            return false;
+        }; //expected ';' at end of declaration
+
+        vector<vector<bool>> ans(s.size()+1,vector<bool>(p.size()+1));
+        ans[0][0] = true;
+        for(int i=0; i < s.size()+1; ++i){ //注意这边i从0开始，表示a*可以跟空气匹配成功，逻辑自洽
+            for(int j=1; j < p.size()+1; ++j){
+                //考虑p:a*与s:aaa进行匹配时，要看作a与空气匹配，而p的*在前面有a的前提下跟s的三个a匹配
+                //如果按a与s的头个a匹配，*与后面两个a匹配写逻辑就麻烦了
+                if(p[j-1] ==  '*'){
+                    if(match(i,j-1)){
+                       ans[i][j] = ans[i][j-2] || ans[i-1][j];
+                    }else{
+                       ans[i][j] = ans[i][j-2]; 
+                    }
+                }else{
+                    if(match(i,j)){
+                        ans[i][j] = ans[i-1][j-1];
+                    }else{
+                        ans[i][j] = false;
+                    }
+                }
+            }
+        }
+        return ans[s.size()][p.size()];
+
+//用递归思想也可以做，就是重复计算过多，导致超时。个人感觉，递归转化为动态规划，其实质就是递归转迭代。递归与动态规划则的关系有点像BFS和DFS...        
+        #if 0 //Time Limit Exceeded        
+        if(p.empty()) return s.empty();
+        if(s.empty()){//处理p尾部没有匹配掉的a*b*
+            int len = p.size();
+            if(len%2 != 0) return false;
+            for(int i=1; i <= p.size(); ++i){
+                if(i%2 == 0 && p[i-1] != '*'){
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        if(p.size()>1 && p[1] == '*'){
+            if(s[0] == p[0] || p[0] == '.'){
+                return isMatch(s,p.substr(2)) || isMatch(s.substr(1),p);
+            }
+            return isMatch(s,p.substr(2));
+        } else{
+            if(s[0] == p[0] || p[0] == '.'){
+                return isMatch(s.substr(1),p.substr(1));
+            }
+            return false;
+        }
+        #endif
+
+        #if 0 //上来手撕代码，没有规划，写出来就是逻辑混乱各种漏洞...
+        int j = 0;
+        for(int i=0; i<s.size(); ++i){
+            cout<< i << "start " << p[j] << ":" << s[i] << endl;
+           // cout << "com " << j << ":" << p.size() << endl;
+            if(j >= p.size()){
+                return false;
+            }else if(p[j] == '.'){
+                cout << "point6" << endl;
+                //cout << p[j] << ":" << s[i] << endl;
+                j++;
+                continue;
+            }else if(p[j] == '*' && j > 0){
+                cout << "point3 " << s[i] << ":" << p[j+1]<< endl;
+                if(s[i] == p[j-1] || p[j-1] == '.'){
+                    cout << "point4" << endl;
+                    continue;
+                }else if((j+1) < p.size() && (p[j+1] == s[i] || p[j+1] == '.')){
+                    j+=2;
+                    continue;
+                }
+                else{
+                    return false;
+                }
+            }else{
+                cout << "point1 " << p[j] << ":" << s[i] << endl;
+                if(p[j] == s[i]){
+                    cout << "point2" << endl;
+                    j++;
+                    continue;
+                }else if((j+1) < p.size() && p[j+1] == '*'){
+                    j+=2;
+                    if(p[j] == s[i]){
+                        j++;
+                        continue;
+                    }
+                }else{
+                    return false;
+                }
+            }
+        }
+        cout << "com " << j << ":" << p.size() << endl;
+        if((j+1) != p.size()){
+            cout << "point5" << endl;
+            //cout << "com " << j << ":" << p.size() << endl;
+            return false;
+        }
+
+        return true;
+        #endif        
+    }
+};
+//这题解了一整天，果然是Hard模式...
+```
+
 # NOTE:
 
 ## 1 C++对C的扩展
