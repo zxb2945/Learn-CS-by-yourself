@@ -1326,6 +1326,153 @@ BFS是浪费空间节省时间，DFS是浪费时间节省空间。
 */
 ```
 
+## 36 Minimum Absolute Difference in BST
+
+2023.2.19
+
+> Given the `root` of a Binary Search Tree (BST), return *the minimum absolute difference between the values of any two different nodes in the tree*.
+
+```c++
+class Solution {
+private:
+    int min = INT_MAX;//C中常量INT_MAX和INT_MIN分别表示最大、最小整数，定义在头文件limits.h中。
+    priority_queue<int> pq;
+    void BFS(TreeNode* root){
+        queue<TreeNode*> q;
+        q.push(root);
+
+        while(!q.empty()){
+            TreeNode* curNode = q.front();//普通queue取首元素用front()
+            q.pop();
+            
+            pq.push(curNode->val);
+
+            if(curNode->left)q.push(curNode->left);
+            if(curNode->right)q.push(curNode->right);
+        }
+    }    
+public:
+    int getMinimumDifference(TreeNode* root) {
+        BFS(root);
+
+        int old = pq.top();
+        pq.pop();
+        while(!pq.empty()){
+            int cur = pq.top();//优先队列取首元素用top()
+            pq.pop();
+            if(min > (old - cur)) min = old - cur;
+            old = cur;
+        }
+        return min;       
+    }
+};
+/*
+广度优先搜索算法（Breadth-First-Search，缩写为 BFS），是一种利用队列实现的搜索算法。简单来说，其搜索过程和 “湖面丢进一块石头激起层层涟漪” 类似。
+深度优先搜索算法（Depth-First-Search，缩写为 DFS），是一种利用递归实现的搜索算法。简单来说，其搜索过程和 “不撞南墙不回头” 类似。
+BFS 的重点在于队列，而 DFS 的重点在于递归。这是它们的本质区别。
+
+=>就我自己通过题35，36的解题后的理解：DFS就是隐性地通过函数递归利用栈做遍历，而BFS则是利用queue先进先出的特点，更接近于迭代的手段进行遍历，两者对象目前为止都是树。
+*/
+```
+
+## 37 Merge Two Sorted Lists
+
+> You are given the heads of two sorted linked lists `list1` and `list2`.
+>
+> Merge the two lists in a one **sorted** list. The list should be made by splicing together the nodes of the first two lists.
+>
+> Return *the head of the merged linked list*.
+
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
+/*
+nullptr是C++11带来的新的关键字，解决了NULL在C++程序中使用的弊端，使得代码变得健壮。在大部分请情况，C++的程序建议替换NULL用nullptr来初始化指针。详见NOTE: 1.8 nullptr
+*/
+        if(list1 == nullptr && list2 == nullptr){
+            return nullptr;
+        }else if(list1 == nullptr){
+            return list2;
+        }else if(list2 == nullptr){
+            return list1;
+        }
+        
+        vector<int> tmp;
+        
+	    ListNode* ptr = list1;
+	    while (ptr->next != nullptr)
+	    {
+            tmp.push_back(ptr->val);
+		    ptr = ptr->next;
+        }
+        tmp.push_back(ptr->val);
+	    ptr->next = list2;
+        ptr = ptr->next;
+	    while (ptr != nullptr)
+	    {
+            tmp.push_back(ptr->val);
+		    ptr = ptr->next;
+        }
+
+        sort(tmp.begin(), tmp.end());
+
+        //ListNode ans = ListNode(); 注意局部变量你没法把地址return出去嘛，用new堆中的地址，又容易地址泄露
+        //不过这个局部变量能够被定义，表明了C++就是把结构体当作特殊的类来处理的，都能有构造函数
+        ptr = list1;
+        for(auto it=tmp.begin();it!=tmp.end();it++){
+            cout << *it << endl;
+            ptr->val = *it;
+            if(it == tmp.end() -1)break;
+            ptr = ptr->next;
+        }
+
+        return list1;
+
+    }
+};
+```
+
+## 38 Climbing Stairs
+
+> You are climbing a staircase. It takes `n` steps to reach the top.
+>
+> Each time you can either climb `1` or `2` steps. In how many distinct ways can you climb to the top?
+
+```c++
+class Solution {
+public:
+    int climbStairs(int n) {
+        vector<int> ans(n+2);
+        ans[1]=1;
+        ans[2]=2;
+
+        for(int i=3; i < n+1; ++i){
+            ans[i] = ans[i-1] + ans[i-2];
+        }
+        
+        return ans[n];
+    }
+};
+/*
+本题是最简单的动态规划的例子：
+动态规划最核心的思想，就在于拆分子问题，记住过往，减少重复计算。
+1.将原问题分解为子问题 ；=>到第n步，就两种可能性，从n-2直接2step，从n走1step到，知道到n-1和n-2的可能性，就知道到n的了。
+2.确定一些初始状态（边界状态）的值；=> 先手动确定到1和2的可能性
+3.确定状态转移方程，前的若干个状态值一旦确定，则此后过程的演变就只和这若干个状态的值有关，和之前是采取哪种手段或经过哪条路径演变到当前的这若干个状态，没有关系。=> f(n) = f(n-1)+f(n-2)
+*/ 
+```
+
 ## 41 Sort Characters By Frequency
 
 2023.2.8
@@ -1836,6 +1983,8 @@ int main(){
 
 ### 1.7 Lambda
 
+lambda表达式是C++11新特性之一。
+
 #### 1.7.1 背景
 
 > 提到lambda，绕不过去的就是函数式编程。C++里面的函数来源于C， 函数的目的是封装执行的细节，简化程序的复杂度，但因为它有入口参数，有返回值，形式上和数学里的函数很像，所以就被称为“函数”。
@@ -1912,6 +2061,36 @@ public:
 > ​	对于函数复用无能为力
 
 (2023.2.17)
+
+### 1.8 nullptr
+
+C++98中，程序员常常采用0或者NULL来判断指针是否为空。在C++11中，我们要采用nullptr来避免不必要的麻烦。
+
+字面常量0的型别是int，而不是一个指针。当C++在只能使用指针的语境中发现了一个0，虽然也会勉强解释为空指针，但是这是个不得已的行为。
+
+以上结论对NULL也成立。虽然标准允许给予NULL非int的型别（比如long），但是不论是0还是NULL，它们都不具备指针型别。
+
+C++的这种基本观点会在指针型别和整形型别发生重载时出现意外：
+
+```c++
+//三个重载函数
+void f(int);
+void f(bool);
+void f(void*);
+
+f(0);		//调用的是f(int)，不是f(void*)
+f(NULL);	//可能不通过编译，但一般会调用f(int)，不会调用f(void*)
+```
+
+nullptr的优点在于它不具整型型别。我们可以把它想象成任意一种型别的指针。
+
+使用0的时候会调用整型版本的重载函数，而传入nullptr就会调用void*那个重载版本，因为nullptr无法视作任何一种整型：
+
+```
+f(nullptr);		//调用的是f(void*)
+```
+
+使用nullptr不仅仅能够避免重载决议的意外，还能够提升代码的清晰性，尤其是使用auto变量的时候。我们阅读代码的时候很容易就能判断出auto变量一定是个指针型别而不是其他型别.
 
 ## 2 类和对象
 
@@ -2328,6 +2507,8 @@ priority_queue是C++中queue库中的优先队列，语法如下：
 ```C++
 //第三个参数为仿函数，详细参照 41 Sort Characters By Frequency
 template <class T, class Container = vector, class Compare = less > class priority_queue;
+//不同于queue，优先队列不能用front(),要用
+pq.top();
 ```
 
 优先队列是一种容器适配器，采用了堆这样的数据结构，保证了第一个元素总是整个优先队列中最大的或最小的元素。优先队列默认使用vector作为底层存储数据的容器，在vector上使用了堆算法将vector中的元素构造成堆的结构，所以**其实我们就可以把它当作堆**，凡是需要用堆的位置，都可以考虑优先队列。
