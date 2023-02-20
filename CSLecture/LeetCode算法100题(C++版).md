@@ -1473,6 +1473,70 @@ public:
 */ 
 ```
 
+## 39 Find the Town Judge
+
+> In a town, there are `n` people labeled from `1` to `n`. There is a rumor that one of these people is secretly the town judge.
+>
+> If the town judge exists, then:
+>
+> 1. The town judge trusts nobody.
+> 2. Everybody (except for the town judge) trusts the town judge.
+> 3. There is exactly one person that satisfies properties **1** and **2**.
+>
+> You are given an array `trust` where `trust[i] = [ai, bi]` representing that the person labeled `ai` trusts the person labeled `bi`. If a trust relationship does not exist in `trust` array, then such a trust relationship does not exist.
+>
+> Return *the label of the town judge if the town judge exists and can be identified, or return* `-1` *otherwise*.
+
+```c++
+class Solution {
+public:
+    int findJudge(int n, vector<vector<int>>& trust) {
+        vector<int> cnt1(n+1);
+        vector<int> cnt2(n+1);
+        for(vector<int> c: trust){
+            cnt1[c[0]]++;
+            cnt2[c[1]]++;
+        }
+        for(int i=1; i < n+1; ++i){
+            if(cnt1[i] == 0 && cnt2[i] == n-1) return i;
+        }
+        return -1;
+    }
+};
+```
+
+## 40 Merge Similar Items
+
+> You are given two 2D integer arrays, `items1` and `items2`, representing two sets of items. Each array `items` has the following properties:
+>
+> - `items[i] = [valuei, weighti]` where `valuei` represents the **value** and `weighti` represents the **weight** of the `ith` item.
+> - The value of each item in `items` is **unique**.
+>
+> Return *a 2D integer array* `ret` *where* `ret[i] = [valuei, weighti]`*,* *with* `weighti` *being the **sum of weights** of all items with value* `valuei`.
+>
+> **Note:** `ret` should be returned in **ascending** order by value.
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> mergeSimilarItems(vector<vector<int>>& items1, vector<vector<int>>& items2) {
+        map<int,int> mmap;//底层红黑树，自动有序
+        for(auto c : items1){ //vector遍历方式
+            mmap[c[0]] = c[1];
+        }
+        for(auto c : items2){
+            if(mmap.count(c[0]))mmap[c[0]] += c[1];
+            else mmap[c[0]] = c[1];
+        } 
+        vector<vector<int>> ans;
+        for (auto it = mmap.begin(); it != mmap.end(); ++it) {//map遍历方式
+            ans.push_back({(*it).first,(*it).second});
+        }
+        return ans;        
+    }
+};
+```
+
 ## 41 Sort Characters By Frequency
 
 2023.2.8
@@ -2444,7 +2508,7 @@ vector<int> v={1,2};//初始化为列表中元素的拷贝
 vector<int> v(2,1);//指定值初始化，初始化为包含2个值为1的int
 //常用的成员函数
 v.size();//返回返回容器中元素个数
-v.push_back();//在末尾添加一个函数
+v.push_back();//在末尾添加一个元素
 v.begin();//返回头部迭代器
 v.end();//返回尾部+1迭代器
 v.erase();//在指定位置删除元素
