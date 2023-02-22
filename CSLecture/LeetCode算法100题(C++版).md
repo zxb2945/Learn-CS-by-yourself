@@ -2192,12 +2192,15 @@ Iterator(Vector<T>* pv, int idx) : pvec(pv), index(idx)
 
 > 上述语句中单冒号(:)的作用是表示后面是初始化列表，一般有三种使用场景。
 >
-> 1、对父类进行初始化
+> 1、**对父类进行初始化**
 >
-> 调用格式为子类构造函数 : 父类构造函数”，如下，其中QMainWindow是MyWindow的父类：
+> 调用格式为子类构造函数 : 父类构造函数”，如下，其中SSMApiBase是SSMApi的父类：
 
 ```C++
-MyWindow::MyWindow(QWidget* parent , Qt::WindowFlags flag) : QMainWindow(parent,flag)
+SSMApi( const char *streamName, int streamId = 0 ) : SSMApiBase( streamName, streamId )
+{
+	initApi();
+}
 ```
 
 > 2、对类成员进行初始化
@@ -2387,7 +2390,7 @@ C++中的virtual关键字主要有这样几种使用场景：第一，修饰父�
 
 ```c++
 //在类中声明虚函数的格式： 
-virtual void display(); 
+virtual void drawGraph( void ); 
 ```
 
 使用virtual修饰的函数会根据实际对象的类型来调用，没有使用virtual修饰的根据指针的类型来调用。虚函数最关键的特点是“动态联编”，它可以在运行时判断指针指向的对象，并自动调用相应的函数。
@@ -2403,7 +2406,7 @@ C++语言为我们提供了一种语法结构，通过它可以指明，**一个
 ```C++
 //纯虚函数的定义是在虚函数的后面加一个=0。
 //最后面的“=0”并不表示函数返回值为0，它只起形式上的作用，告诉编译系统“这是虚函数”
-virtual void func() = 0;
+virtual void chkObstacle( urg_fs *urg ) = 0;
 ```
 
 定义了纯虚函数的类是一个**抽象类**。对于抽象类来说，它无法实例化对象，而对于抽象类的子类来说，只有把抽象类中的纯虚函数全部实现之后，那么这个子类才可以实例化对象。
