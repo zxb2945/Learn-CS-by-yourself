@@ -324,3 +324,54 @@ Getter:维护由State派生的一些状态，这些状态随着State状态的变
 
 一般VueX的逻辑放在store文件夹
 
+
+
+## P14 前端数据模拟MockJS 20230223
+
+> 拦截ajax请求，生成伪数据
+> 应用场景:在工作中,后端已经出接口文档,还没有实现代码
+> 由前端依照接口文档模拟伪数据,实现前端开发功能
+
+## P15 vue-element-admin后台集成方案
+
+> vue-element-admin 是一个后台前端解决方案，它基于 vue 和 element-ui实现，它使用了最新的前端技术栈，内置了动态路由，权限验证，提炼了典型的业务模型，提供了丰富的功能组件，它可以帮助你快速搭建企业级中后台产品原型；
+> 集成方案: vue-element-admin
+> 基础模板: vue-admin-template（功能少一些）
+> 桌面终端: electron-vue-admin
+> Github: https://github.com/PanJiaChen/vue-element-admin
+
+=>vue-element-admin 后台管理系统
+
+> vue-element-admin有一个成熟的集成方案，里面包含了所有的业务功能和场景,并不适合直接拿来进行二次开发, 但是可以通过该项目中的一个案例来进行学习和使用.
+
+## P16 JWT跨域认证
+
+Session认证
+
+Token认证
+
+> ## **session认证**
+>
+> 众所周知，http 协议本身是无状态的协议，那就意味着当有用户向系统使用账户名称和密码进行用户认证之后，下一次请求还要再一次用户认证才行。因为我们不能通过 http 协议知道是哪个用户发出的请求，所以如果要知道是哪个用户发出的请求，那就需要在服务器保存一份用户信息(保存至 session )，然后在认证成功后返回 cookie [值传递](https://so.csdn.net/so/search?q=值传递&spm=1001.2101.3001.7020)给浏览器，那么用户在下一次请求时就可以带上 cookie 值，服务器就可以识别是哪个用户发送的请求，是否已认证，是否登录过期等等。这就是传统的 session 认证方式。
+>
+> session 认证的缺点其实很明显，由于 session 是保存在服务器里，所以如果分布式部署应用的话，会出现session不能共享的问题，很难扩展。于是乎为了解决 session 共享的问题，又引入了 redis，接着往下看。
+>
+> ## **token认证**
+>
+> 这种方式跟 session 的方式流程差不多，不同的地方在于保存的是一个 token 值到 redis，token 一般是一串随机的字符(比如UUID)，value 一般是用户ID，并且设置一个过期时间。每次请求服务的时候带上 token 在请求头，后端接收到token 则根据 token 查一下 redis 是否存在，如果存在则表示用户已认证，如果 token 不存在则跳到登录界面让用户重新登录，登录成功后返回一个 token 值给客户端。
+>
+> 优点是多台服务器都是使用 redis 来存取 token，不存在不共享的问题，所以容易扩展。缺点是每次请求都需要查一下redis，会造成 redis 的压力，还有增加了请求的耗时，每个已登录的用户都要保存一个 token 在 redis，也会消耗 redis 的存储空间。
+
+JWT
+
+> JWT (全称：Json Web Token)是一个开放标准(RFC 7519)，它定义了一种紧凑的、自包含的方式，用于作为 JSON 对象在各方之间安全地传输信息。该信息可以被验证和信任，因为它是数字签名的。
+
+=>用 JWT 来解决前后端分离项目中的跨域认证还是非常丝滑的，这主要得益于 JSON 的通用性，可以跨语言，JavaScript 和 Java 都支持；另外，JWT 的组成非常简单，非常便于传输；还有 JWT 不需要在服务器端保存会话信息（Session），非常易于扩展。
+
+## P17 Springboot+vue-element-template
+
+## P18 阿里云服务器使用
+
+## P19 SpringBoot+Vue云端环境配置
+
+## P20 SpringBoot+Vue项目云端部署
