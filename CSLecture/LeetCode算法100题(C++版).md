@@ -1768,6 +1768,119 @@ public:
 };
 ```
 
+## 46 Longest Substring Without Repeating Characters
+
+2023.2.23
+
+> Given a string `s`, find the length of the **longest** **substring** without repeating characters.
+
+```c++
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        set<char> mset;
+        int ans = 0;
+        for(int i = 0; i < s.size(); ++i){
+            int len = mset.size();
+            //cout<< len << endl;
+            mset.insert(s[i]);
+            if(len == mset.size()){
+                if(len > ans) ans = len;
+                mset.clear();
+                for(int j = i-1; j >= 0; --j){
+                    if(s[j] == s[i]){
+                        for(int k = j+1; k <=i; ++k) mset.insert(s[k]);
+                        break;
+                    }
+                }
+            }
+        }
+        //cout<< ans << endl;
+        if(mset.size() > ans) ans = mset.size();
+        return ans;
+    }
+};
+```
+
+## 47 Top K Frequent Elements
+
+> Given an integer array `nums` and an integer `k`, return *the* `k` *most frequent elements*. You may return the answer in **any order**.
+
+```c++
+class Solution {
+public:
+    vector<int> topKFrequent(vector<int>& nums, int k) {
+        //要求前K个高频元素，与41 Sort Characters By Frequency一摸一样
+        map<int,int> mmap;
+        priority_queue<pair<int,int>, vector<pair<int,int>>, myComp> mqueue;
+
+        //模式1：遍历数组，放入map
+        for(auto c : nums){
+            ++mmap[c];//mmap[c]的value自动初始化为0        
+        }
+        //模式2：遍历map，放入queue
+        for (auto iter = mmap.begin(); iter != mmap.end(); iter++){ 	        
+            mqueue.push(*iter);// *iter就是pair结构           
+        }
+
+		//模式3：遍历queue，放入字符串
+        vector<int> ans;
+        for(int i=0; i < k; ++i){    
+            pair<int,int> mpair = mqueue.top();
+            mqueue.pop();
+            ans.push_back(mpair.first);
+        }
+
+        return ans;                
+    }
+
+private:
+    struct myComp {
+        bool operator()(pair<int,int> const& a, pair<char,int> const& b) const 
+        {
+            return a.second < b.second;
+        }
+    };
+        
+};
+```
+
+## 48 Cheapest Flights Within K Stops
+
+> There are `n` cities connected by some number of flights. You are given an array `flights` where `flights[i] = [fromi, toi, pricei]` indicates that there is a flight from city `fromi` to city `toi` with cost `pricei`.
+>
+> You are also given three integers `src`, `dst`, and `k`, return ***the cheapest price** from* `src` *to* `dst` *with at most* `k` *stops.* If there is no such route, return `-1`.
+
+```c++
+class Solution {
+static constexpr int INF = 10000 * 101 + 1;    
+public:
+    int findCheapestPrice(int n, vector<vector<int>>& flights, int src, int dst, int k) {
+        //allcost[t][j]表示从src出发搭乘t趟航班到达城市j的花费
+        vector<vector<int>> allcost(k+2, vector<int>(n,INF));
+        allcost[0][src] = 0;//目的地城市出发花费即为0，动态规划中重要的边界值
+        for(int t=1; t <= k+1; ++t){ //为什么是k+1? 因为最多中转k次，最多就可以搭乘k+1次航班    
+            for(auto flight : flights){
+                int i = flight[0];
+                int j = flight[1];
+                int onecost = flight[2];
+                allcost[t][j] = min(allcost[t][j], allcost[t-1][i]+onecost);//理解这个转移方程是关键
+            }
+        }
+
+        int ans = INF;
+        for(int t=1; t <= k+1; ++t){
+            ans = min(ans, allcost[t][dst]);
+        }
+
+        return ans == INF ? -1 : ans;
+
+    }
+};
+//虽是按照动态规划来写的，但据说暗合求图 "最短路径" 之 Bellman-Ford 算法。
+//有点难，看官方答案才写出来。基本simple都是可以直观地手撕代码，而middle的话要运用思想方针
+```
+
 ## 49 Regular Expression Matching
 
 2023.2.17
@@ -2155,6 +2268,28 @@ f(nullptr);		//调用的是f(void*)
 ```
 
 使用nullptr不仅仅能够避免重载决议的意外，还能够提升代码的清晰性，尤其是使用auto变量的时候。我们阅读代码的时候很容易就能判断出auto变量一定是个指针型别而不是其他型别.
+
+### 1.9 constexpr
+
+**constexpr** 是 C++ 11 标准新引入的关键字，不过在讲解其具体用法和功能之前，读者需要先搞清楚 C++ 常量表达式的含义。
+
+**所谓常量表达式：**指的就是由多个（≥1）常量组成的表达式。换句话说，如果表达式中的成员都是常量，那么该表达式就是一个常量表达式。这也意味着，常量表达式一旦确定，其值将无法修改。
+
+实际开发中，我们经常会用到常量表达式。以定义数组为例，数组的长度就必须是一个常量表达式。
+
+值得一提的是，常量表达式和非常量表达式的计算时机不同，非常量表达式只能在程序运行阶段计算出结果；而常量表达式的计算往往发生在程序的编译阶段，这可以极大提高程序的执行效率，因为表达式只需要在编译阶段计算一次，节省了每次程序运行时都需要计算一次的时间。
+
+对于用 C++ 编写的程序，性能往往是永恒的追求。那么在实际开发中，如何才能判定一个表达式是否为常量表达式，进而获得在编译阶段即可执行的“特权”呢？除了人为判定外，C++11 标准还提供有 constexpr 关键字。
+
+constexpr 关键字的功能是使指定的常量表达式获得在程序编译阶段计算出结果的能力，而不必等到程序运行阶段。C++ 11 标准中，constexpr 可用于修饰普通变量、函数（包括模板函数）以及类的构造函数。
+
+注意，获得在编译阶段计算出结果的能力，并不代表 constexpr 修饰的表达式一定会在程序编译阶段被执行，具体的计算时机还是编译器说了算。
+
+> constexpr和const的不同：
+>
+> const并不能代表“常量”，它仅仅是对变量的一个修饰，告诉编译器这个变量只能被初始化，且不能被直接修改（实际上可以通过堆栈溢出等方式修改）。而这个变量的值，可以在运行时也可以在编译时指定。
+>
+> constexpr可以用来修饰变量、函数、构造函数。一旦以上任何元素被constexpr修饰，那么等于说是告诉编译器 “请大胆地将我看成编译时就能得出常量值的表达式去优化我”。
 
 ## 2 类和对象
 
@@ -2602,6 +2737,7 @@ set<int> s;
 s.insert();
 s.size();
 s.erase();
+s.clear();//清空容器
 s.begin();//返回第一个节点的迭代器
 s.rbegin();//返回最后一个节点的迭代器
 //set的两种遍历方法
