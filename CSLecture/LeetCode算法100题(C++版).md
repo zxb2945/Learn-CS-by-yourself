@@ -2498,33 +2498,24 @@ a是b好朋友，b是c好朋友，a并不是c的好朋友，友元没有传递�
 
 ```C++
 //三种继承方式，对应上面图表
-//class Student : protected Person
-//class Student : private Person
-class GraphDrawerOBP_2D : public GraphDrawer
+class GraphDrawer_2D : public GraphDrawer
 {
 protected:
-	urg_fs scan;
-	obp_fs obp;
-	Area dec_area[ NUM_AREA_TYPE ], stop_area[ NUM_AREA_TYPE ], avoid_area[ NUM_AREA_TYPE ];
-	
-	bool flag_intensity;
-	bool flag_laser;
+	bool flag;
 	int area_type;
-	config_property conf;
 
 public:
-	GraphDrawerOBP_2D( void ) { }
-	~GraphDrawerOBP_2D( void ) { }
+	GraphDrawer_2D( void ) { }
+	~GraphDrawer_2D( void ) { }
 
-	void initialize( bool laser, bool intensity, config_property *c );
+	void initialize( bool flag);
 	void setAreaType( int a )
 	{
 		area_type = a;
 	}
-	void setScan( urg_fs *urg );
-	void setOBPoint( obp_fs *p );
 	virtual void drawGraph( void );
 };
+//实际项目中一般用public继承，用protected和public成员。
 ```
 
 使用关键字class时默认的继承方式是private，使用struct时默认的继承方式是public，不过**最好显示的写出继承方式**；
