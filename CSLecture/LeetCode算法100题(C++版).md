@@ -2016,6 +2016,54 @@ public:
 //这题解了一整天，果然是Hard模式...
 ```
 
+## 50  Trapping Rain Water
+
+2023.2.27
+
+> Given `n` non-negative integers representing an elevation map where the width of each bar is `1`, compute how much water it can trap after raining.
+
+```c++
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        #if 1 //就是最直白的思路，某一点左右两边最高点取其中低值，减去当前高度
+        int len = height.size();
+        int sum = 0;
+        int temMax = 0;
+        vector<int> leftMax(len,0);
+        for(int i = 1; i < len - 1; ++i){
+            temMax = height[i-1] > temMax ? height[i-1] : temMax;
+            leftMax[i] = temMax;
+            //cout << i << ":" << leftMax[i] << endl;
+        }
+        temMax = 0;
+        vector<int> rightMax(len,0);
+        for(int i = len - 2; i > 0; --i){
+            temMax = height[i+1] > temMax ? height[i+1] : temMax;
+            rightMax[i] = temMax;
+            //cout << i << ":" << rightMax[i] << endl;
+        }
+        for(int i = 1; i < len - 1; ++i){
+            int Max = leftMax[i] < rightMax[i] ? leftMax[i] : rightMax[i];
+            sum +=  Max > height[i] ? Max - height[i] : 0;
+            //cout<< sum << ":" << Max - height[i] << endl; 
+        }
+        return sum;
+        #else //Time Limit Exceeded
+        int sum = 0;
+        for(int i = 1; i < height.size() - 1; ++i){
+            int leftMax = *max_element(height.begin() + i, height.end());//此处就是n的两次方计算规模了
+            int rightMax = *max_element(height.begin(), height.begin() + i);
+            int Max = leftMax < rightMax ? leftMax : rightMax;
+            sum +=  Max > height[i] ? Max - height[i] : 0;
+            cout<< sum << ":" << Max - height[i] << endl; 
+        }
+        return sum;
+        #endif
+    }
+};
+```
+
 # NOTE:
 
 ## 1 C++对C的扩展
