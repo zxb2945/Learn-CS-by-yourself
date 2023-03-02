@@ -3049,7 +3049,8 @@ include_directories(./config/src ./interface/src
 #PROJECT_SOURCE_DIR：工程的根目录
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
-# 设定编译类型为debug，调试时需要选择debug：set(CMAKE_BUILD_TYPE Debug)  
+# 设定编译类型为debug，调试时需要选择debug：set(CMAKE_BUILD_TYPE Debug) 
+# 编译时支持GDB调试: set(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g2 -ggdb")	
 # 设定编译类型为release，发布时需要选择release：set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_BUILD_TYPE Release)
 
