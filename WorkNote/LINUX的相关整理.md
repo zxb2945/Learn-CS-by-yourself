@@ -1053,7 +1053,50 @@ find . -name "*pp"|xargs cat|wc -l
 
 (2023.2.14)
 
-## 16 TTL脚本
+## 16 Linux串口编程
+
+串口是计算机上的串行通讯的物理接口。计算机历史上，串口曾经被广泛用于连接计算机和终端设备和各种外部设备。虽然以太网接口和USB接口也是以一个串行流进行数据传送的，但是串口连接通常特指那些与RS-232标准兼容的硬件或者调制解调器的接口。虽然现在在很多个人计算机上，原来用以连接外部设备的串口已经广泛的被USB替代；而原来用以连接网络的串口则被以太网替代但是，一方面因为串口本身造价便宜技术成熟，另一方面因为串口的控制台功能RS-232标准高度标准化并且非常普及，所以直到现在它仍然被广泛应用到各种设备上。
+
+| 设备名称     | 设备作用                                                   |
+| ------------ | ---------------------------------------------------------- |
+| /dev/tty     | 当前控制终端Terminal                                       |
+| /dev/tty1    | （虚拟）控制台终端                                         |
+| /dev/console | 系统控制终端，系统的错误信息什么的都输出到这里             |
+| /dev/ttyS0   | 串行端口终端(Serial Port Terminal)，接串口线使用的端口设备 |
+| /dev/ttyUSB0 | USB转串口终端，接USB转串口线可用此端口设备                 |
+| /dev/ttyACM0 | USB转串口终端，gps设备就是/dev/ttyACM0                     |
+
+理解为何有的USB串口叫ttyUSB而有的叫ttyACM:对于转换桥，功能较单一，归类为ttyUSB;对于带通信规约的接口，实现复杂，归类为ttyACM。
+
+Linux系统中打开计算机的串口的demo：
+
+```c
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <fcntl.h> /* File control definitions */
+#include <errno.h>
+#include <termios.h> /* POSIX terminal control definitions */
+int open_port(void)
+{
+	int fd; /* File descriptor for the port */
+
+	fd = open("/dev/ttyS0", O_RDWR | O_NOCTTY | O_NDELAY);
+	if (fd == -1)
+	{
+		perror("open_port: Unable to open /dev/ttyS0 -");
+	}
+	else
+	{
+		fcntl(fd, F_SETFL, 0);
+		return (fd);
+	}
+}
+```
+
+(2023.3.12)
+
+## 17 TTL脚本
 
 目前为止接触的工程，都是Linux系统的远程服务器，当前的用Tera Term远程连接，Winscp文件交互，而TTL脚本正是Tera Term自动化脚本，以下是一个单体测试运行GDB的TTL脚本：
 
@@ -1121,7 +1164,7 @@ wait 'Continuing'
 unlink
 ```
 
-## 17 常用字符集
+## 18 常用字符集
 
 ### ASCII
 
@@ -1153,50 +1196,3 @@ Shift_JIS，日本电脑系统常用的编码表，支持假名，文字，拉�
 
 （2019.12.12）
 
-## 18 Linux串口编程
-串口是计算机上的串行通讯的物理接口。计算机历史上，串口曾经被广泛用于连接计算机和终端设备和各种外部设备。虽然以太网接口和USB接口也是以一个串行流进行数据传送的，但是串口连接通常特指那些与RS-232标准兼容的硬件或者调制解调器的接口。虽然现在在很多个人计算机上，原来用以连接外部设备的串口已经广泛的被USB替代；而原来用以连接网络的串口则被以太网替代但是，一方面因为串口本身造价便宜技术成熟，另一方面因为串口的控制台功能RS-232标准高度标准化并且非常普及，所以直到现在它仍然被广泛应用到各种设备上。
-
-| net-tools           | iproute2      | 
-| ------------------- | ------------- | 
-| /dev/tty           | 当前控制终端Terminal | 
-| /dev/tty1     | （虚拟）控制台终端       | 
-| /dev/console  | 系统控制终端，系统的错误信息什么的都输出到这里 |
-| /dev/ttyS0                  | 串行端口终端(Serial Port Terminal)，接串口线使用的端口设备     | 
-| /dev/ttyUSB0              |     USB转串口终端，接USB转串口线可用此端口设备           | 
-| /dev/ttyACM0              |     USB转串口终端，gps设备就是/dev/ttyACM0           | 
-
-理解为何有的USB串口叫ttyUSB而有的叫ttyACM:对于转换桥，功能较单一，归类为ttyUSB;对于带通信规约的接口，实现复杂，归类为ttyACM。
-
-Linux系统中打开计算机的串口的demo：
-```
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h> /* File control definitions */
-#include <errno.h>
-#include <termios.h> /* POSIX terminal control definitions */
-
-/*
- * 'open_port()' - Open serial port 1
- * Returns the file descriptor on success or -1 on error.
- */
-
-int open_port(void)
-{
-	int fd; /* File descriptor for the port */
-
-	fd = open("/dev/ttyS0", O_RDWR | O_NOCTTY | O_NDELAY);
-	if (fd == -1)
-	{
-		/*
-		 * Could not open the port.
-		 */
-		perror("open_port: Unable to open /dev/ttyS0 -");
-	}
-	else
-	{
-		fcntl(fd, F_SETFL, 0);
-		return (fd);
-	}
-}
-```
