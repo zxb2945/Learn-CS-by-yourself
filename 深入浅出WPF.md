@@ -2,7 +2,7 @@
 
 视频地址：https://www.bilibili.com/video/BV1ht411e7Fe?p=5&vd_source=cfea4a81af3552025602bbed3cecda4f
 
-## P1 Lesson1 剖析最简单的WPF程序
+## P1 Lesson1 剖析最简单的WPF程序 20230504
 
 可以直接用Microsoft Windows SDK命令行界面csc编译器编译WPF，编译WPF hello world的时候引用一个WindowsPresentation的dll动态库，把target设置为winexe而不是exe就能编译出一个无控制台背景的wpf程序了。
 
@@ -220,4 +220,225 @@ XAML是一种声明性语言，每创建一个标签，编译器就创建一个�
    </Window>
    ```
 
-   
+
+
+## P5 Lesson3 事件处理器+名称空间+XAML注释
+
+### 事件处理器与代码后置
+
+```xaml
+<Window x:Class="DataTransferTool.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sys="clr-namespace:System;assembly=netstandard"
+        Title="DataTransferTool" Height="195" Width="430">
+    <Grid>
+        <Button x:Name="button1" Content="Click me!" Width="200" Height="100" Click="button1_Click" />
+    </Grid>
+</Window>
+```
+
+```C#
+namespace DataTransferTool
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+
+        private void button1_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Hello WPF!");
+        }
+    }
+}
+```
+
+上述就是一个最简单的事件模型，实质上就是基于C#的委托：Click="button1_Click"就是事件订阅，可以删除它，在C#中用委托实现
+
+```C#
+namespace DataTransferTool
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            //委托来代替xaml中的事件订阅
+            this.button1.Click += new RoutedEventHandler(button1_Click);
+        }
+
+        private void button1_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Hello WPF!");
+        }
+    }
+}
+```
+
+从上面也可以看出，在xaml中加入一个button标签，其实就是给windows对象加一个button对象，这个button对象自动带有一个Click的委托方法（函数指针），可以在xaml中进行方法注入。
+
+### 导入程序集和引用其中的名称空间 20230510
+
+可以在solution中添加WPF控制类库
+
+```xaml
+<UserControl x:Class="WpfControlLibrary2.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfControlLibrary2"
+             mc:Ignorable="d" Background="LightBlue" Height="160" Width="320">
+    <Canvas>
+        <Label Canvas.Left="12" Canvas.Top="12" Content="Name:" Height="28" Name="label1"  />
+        <Label Canvas.Left="12" Canvas.Top="46" Content="Salary:" Height="28" Name="label2"  />
+        <Label Canvas.Left="12" Canvas.Top="80" Content="Position:" Height="28" Name="label3"  />
+        <TextBox Canvas.Left="80" TextWrapping="Wrap"  Canvas.Top="18" Width="120" Name="textname"/>
+        <TextBox Canvas.Left="80" TextWrapping="Wrap"  Canvas.Top="53" Width="120" Name="textsalary" TextChanged="textsalary_TextChanged"/>
+        <TextBox Canvas.Left="80" TextWrapping="Wrap"  Canvas.Top="85" Width="120" Name="textposition"/>
+        <Button Content="Button" Canvas.Left="122" Canvas.Top="125" Click="Button_Click"/>
+    </Canvas>
+</UserControl>
+```
+
+写个按钮逻辑
+
+```c#
+namespace WpfControlLibrary2
+{
+    /// <summary>
+    /// Interaction logic for UserControl1.xaml
+    /// </summary>
+    public partial class UserControl1 : UserControl
+    {
+        public UserControl1()
+        {
+            InitializeComponent();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            this.textposition.Text = this.textsalary.Text + this.textname.Text;
+        }
+
+    }
+}
+```
+
+编译一下，就成了一个组件
+
+然后切换到主程序中去引用这个组件：1.Add Reference; 2.编辑xaml=>xmlns
+
+```xaml
+<Window x:Class="DataTransferTool.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:WpfControlLibrary2;assembly=WpfControlLibrary2"
+        Title="DataTransferTool" Height="380" Width="755">
+    <Grid ShowGridLines="True" HorizontalAlignment="Left" Width="740">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <controls:UserControl1 Grid.Column="0" Grid.Row="0" />
+        <controls:UserControl1 Grid.Column="1" Grid.Row="0" />
+        <controls:UserControl1 Grid.Column="1" Grid.Row="1" />
+    </Grid>
+</Window>
+```
+
+这就是组件化编程设计，很多公司就是设计这个组件来卖的。
+
+引用命名空间
+
+```xaml
+xmlns:controls="clr-namespace:WpfControlLibrary2;assembly=WpfControlLibrary2"
+```
+
+预定义字符串的形式可以引用多个命名空间
+
+```xaml
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+```
+
+### XAML注释
+
+注释 : Ctrl + k + c
+取消注释 : Ctrl + k + u
+
+其实分开按应该也可以 :
+
+注释 : 先按Ctrl + k 再按Ctrl + c
+取消注释 : 先按Ctrl + k 再按Ctrl + u
+
+也可以用Tools=>Options中自定义
+
+## P6 Lesson4 x名称空间极其常用元素
+
+x名称空间的由来和作用：
+
+```xaml
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+```
+
+用来解析xaml文件
+
+
+
+x名称里都有些什么：
+
+**x:Class**=>window的派生类
+
+```xaml
+<Window x:Class="DataTransferTool.MainWindow"
+```
+
+表明要与C#文件中DataTransferTool.MainWindow这个类以partial的形式进行合并
+
+**x:ClassModifier**=>就是用来控制class的访问等级的
+
+```
+x:ClassModifier="internal"
+```
+
+**x:Name**=>x名称空间里这个name两个作用
+
+xaml是一种声明性语言，每见到一个标签就申明一个实例（可以不用变量去引用的实例），可以用this(最外层的window)嵌套加点来调用，即间接访问。
+
+```
+<Button x:Name="button1" Content="Hello" />
+```
+
+如果你加入x:Name信息，相当于给这个实例创建引用变量。
+
+但其实你也可以
+
+```
+<Button Name="button1" Content="Hello" />
+```
+
+当一个控件具有Name属性时，可以用Name代替x:Name
+
+**x:FieldModifier**=>用来控制类中字段的访问控制级别
+
+```
+<Button x:FieldModifier="private" Name="button1" Content="Hello" />
+```
+
+
+
+看到目前为止，一个xaml文件其实类似于c#中一个类，可以写这个类的命名空间，各种引用命名空间，控制这个类以及其成员的访问级别，给这个类中的实例赋予引用变量，诸如此类。还可以跟C#中的类以partial形式合并编译...
+
