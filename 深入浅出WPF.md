@@ -442,3 +442,42 @@ xaml是一种声明性语言，每见到一个标签就申明一个实例（可�
 
 看到目前为止，一个xaml文件其实类似于c#中一个类，可以写这个类的命名空间，各种引用命名空间，控制这个类以及其成员的访问级别，给这个类中的实例赋予引用变量，诸如此类。还可以跟C#中的类以partial形式合并编译...
 
+
+
+## P7 MVVM入门与提高 20230513
+
+开发/学习环境： Visual Studio + Microsoft Prism + Microsoft Blend SDK
+
+必要知识：
+
+1. 熟悉Data Binding 和 Dependency Property
+2. 了解WPF中的命令（知道IConmmand接口即可）
+3. 熟悉Lambda表达式
+
+
+
+Code Snippet:
+
+打入for，双击Tab，自动补齐for循环模板
+
+打入propfull，双击Tab，可以自动补齐完整版属性模板
+
+ctor自动构造函数
+
+
+
+什么是Model：现实世界中对象的抽象结果，建模过程
+
+什么是View和ViewModel：View=UI，View=Model for View. ViewModel与View的沟通：1. 传递数据--双向的数据属性；2.传递操作--单向的命令属性;
+
+
+
+View与ViewModel的交互是技术难点
+
+NotificationObject与数据属性
+
+DelegateCommand与命令属性
+
+
+
+Ctrl+”.“自动补齐修正
