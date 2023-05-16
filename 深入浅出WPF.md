@@ -481,3 +481,10 @@ DelegateCommand与命令属性
 
 
 Ctrl+”.“自动补齐修正
+
+
+
+MVVM的好处就是View完全变了，你可以一点都不改变VIewModel(不要去使用View中的任何变量名，要用Binding)，只要它们之间的映射不变化，你就仅仅在View界面的xaml上改一下Binding就行。
+
+
+
