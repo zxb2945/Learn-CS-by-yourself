@@ -517,3 +517,7 @@ Bindbale
 DelegateCommand
 
 IEventAggregator
+
+
+
+在Prism中，Views与ViewModels建立一定的命名约定就可以自动关联
