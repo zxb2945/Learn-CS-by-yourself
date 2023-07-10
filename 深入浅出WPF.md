@@ -488,3 +488,32 @@ MVVM的好处就是View完全变了，你可以一点都不改变VIewModel(不�
 
 
 
+# WPF-Prism 8.0 核心教程
+
+视频地址：https://www.bilibili.com/video/BV1Ei4y1F7du?p=2&vd_source=cfea4a81af3552025602bbed3cecda4f
+
+Prism是一个用于在WPF，Xamarin Form等中构建松散耦合，可维护和可测试的XAML应用程序框架
+
+有两个选项：Dryloc和Unity
+
+
+
+扩展中寻找Prism Template Pack，并安装，可以直接创建一套模板
+
+
+
+Region作为Prism当中模块化的核心功能，其主要目的是弱化模块之间的耦合关系。
+
+Module以继承IModule类，然后以独立视图形式注入到主程序？
+
+
+
+常见的MVVM框架当中，基本都围绕了ICommand, INotifyProtertyChanged封装实现绑定，通知等功能。
+
+除了通知，命令，聚合器等其它轻量级MVVM框架如Mvvmlight等也有的功能之外，Prism也实现了模块化，容器，依赖注入，导航，对话等特有功能。
+
+Bindbale
+
+DelegateCommand
+
+IEventAggregator
