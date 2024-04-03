@@ -1,4 +1,4 @@
-﻿# C# 学习笔记
+# C# 学习笔记
 
 # 1 发展概况
 
@@ -118,6 +118,190 @@ VS2022就是偏重于跨平台开发，默认的就是 .NET 6.0 和 .NET 7.0（�
 
 (2023.3.28)
 
+### 1.3.5  项目配置文件
+
+[Reference](https://cloud.tencent.com/developer/article/1341150)
+
+#### 1.3.5.1 csproj 文件
+
+> 在旧版本的项目文件中，项目所有的引用（dll/nuget/com/项目）全部糅杂在一起，对人来说很不友好。并且nuget包的引用全部保存在项目的packages.config文件中，但是包还原时却是还原在解决方案文件(sln)同目录的packages目录下，导致包路径错误的问题。
+>
+> 但是在新版风格（NetCore）的项目文件中，大大减少，文件默认使用文件系统引用，不再显示记录在csproj文件中，使得项目文件可以很容易的手动修改各种配置。
+
+旧csproj 文件：
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<!---所有的 csproj 文件都是以 Project 节点为根节点 -->
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--- 无论是新 csproj 还是旧 csproj 文件，都有两个 Import 节点。
+  Import 进来的文件用两种扩展名，定义属性的那一种是 .props，定义行为的那一种是 .targets。这两种文件除了含义不同以外，内容的格式都是完全一样的——而且——就是 csproj 文件的那种格式！由于有 Import 的存在，所以一层一层地嵌套 props 或者 targets 都是可能的。-->
+  <!--- 旧格式 csproj 文件中第一行一定会 Import 的 Microsoft.Common.props --> 
+  <!--- 引入的 props 文件可以实现几乎与 csproj 文件中一样的功能 -->
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <!--- PropertyGroup是用来存放属性的地方 -->
+  <!--- 些属性的含义完全是由外部来决定的，例如编译过程中会使用 TargetFrameworkVersion 属性，以确定编译应该使用的 .NET Framework 目标框架的版本 --> 
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C16F1466-2440-4996-BA7E-933C21F78087}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CsvToTable</RootNamespace>
+    <AssemblyName>CsvToTable</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+    <!--- 有的属性在 Debug 和 Release 下不一样（例如条件编译符 DefineConstants） -->
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <!--- ItemGroup 是用来指定集合的地方 
+    Reference: 引用某个程序集
+	PackageReference: 引用某个 NuGet 包
+	ProjectReference: 引用某个项目
+	Compile: 常规的 C# 编译
+    None: 没啥特别的编译选项，就为了执行一些通用的操作（或者是只是为了在 Visual Studio 列表中能够有一个显示）-->
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="List.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CommonAndConst\CommonAndConst.csproj">
+      <Project>{0768f8e7-4dab-4c93-9563-cd8f7b70536f}</Project>
+      <Name>CommonAndConst</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <!--- Target 节点一般写在 csproj 文件的末尾，编译过程就是靠这些 Target 的组合来完成的。 --> 
+  <!--- 引入的下面这份 .targets 文件便包含了 msbuild 定义的各种核心编译任务(即Target标签)。能够完成绝大多数项目的编译。 -->
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+    <!--- 新的 Microsoft.NET.Sdk 以不兼容的方式原生支持了 NuGet 包管理。也就是说我们可以在不修改 csproj 的情况之下通过 NuGet 包来扩展 csproj 的功能。而旧的格式需要在 csproj 文件的末尾添加如下代码才可以获得其中一个 NuGet 包功能的支持： -->    
+  <Import Project="..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets" Condition="Exists('..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" />  
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets'))" />
+  </Target>
+</Project>
+```
+
+新csproj 文件：
+
+> 新的项目文件会隐式生成程序集信息，无需Properties\AssemblyInfo.cs文件
+
+```xml
+<!--- 新格式中 Project 节点有 Sdk 属性，因为有此属性的存在，新csproj 文件才能如此简洁。 
+所谓 Sdk，其实是一大波 .targets 文件的集合。它帮我们导入了公共的属性、公共的编译任务，还帮我们自动将项目文件夹下所有的 **\*.cs 文件都作为 ItemGroup 的项引入进来。-->  
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MaterialDesignThemes" Version="4.9.0" />
+    <PackageReference Include="Prism.Unity" Version="8.1.97" />
+    <PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Eric.ico" />
+  </ItemGroup>
+</Project>
+```
+
+区别：
+
+| 旧csproj         | 新csproj                   |
+| ---------------- | -------------------------- |
+| xml声明          |                            |
+| Project          | Project(SDK)               |
+| Import(props)    | Import(props)  => 可省略   |
+| PropertyGroup    | PropertyGroup              |
+| ItemGroup        | ItemGroup                  |
+| Import(targets)  | Import(targets)  => 可省略 |
+| Target => 可省略 | Target  => 可省略          |
+
+> ### 编译器是如何将这些零散的部件组织起来的？
+>
+> 这里说的编译器几乎只指 msbuild 和 Roslyn，前者基于 .NET Framework，后者基于 .NET Core。不过，它们在处理我们的项目文件时的行为大多是一致的——至少对于通常项目来说如此。
+>
+> 当 Visual Studio 打开项目时，它会解析里面所有的 `Import` 节点，确认应该引入的 .props 和 .targets 文件都引入了。随后根据 `PropertyGroup` 里面设置的属性正确显示属性面板中的状态，根据 `ItemGroup` 中的项正确显示解决方案管理器中的引用列表、文件列表。——这只是 Visual Studio 做的事情。
+>
+> 在编译时，msbuild 或 Roslyn 还会重新做一遍上面的事情——毕竟这两个才是真正的编译器，可不是 Visual Studio 的一部分啊。随后，执行编译过程。它们会按照 `Target` 指定的先后顺序来安排不同 `Target` 的执行，当执行完所有的 `Target`，便完成了编译过程。
+>
+> ### 新旧 csproj 在编译过程上有什么差异？
+>
+> 新旧格式之间其实并没有什么差异。或者更严格来说，差异只有一条——新格式在 Project 上指定了 `Sdk`。真正造成新旧格式在行为上的差别来源于默认为我们项目 `Import` 进来的那些 .props 和 .targets 不同。新格式通过 `Microsoft.NET.Sdk` 为我们导入了更现代化的 .props 和 .targets，而旧格式需要考虑到兼容性压力，只能引入旧的那些 .targets。
+
+#### 1.3.5.2 packages.config
+
+> **Before VS2017 and .NET Core**, NuGet was not deeply integrated into MSBuild so it needed a separate mechanism to list dependencies in a project: `packages.config`. Using Visual Studio solution explorer's References context menu, developer adds `.csproj` references to restored packages in a solution-wide folder managed by NuGet.
+>
+> The reference added to the project file `.csproj` by Visual Studio looks like this:
+>
+> ```xml
+> <Reference Include="EntityFramework, Version=6.0.0.0">				          <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.dll</HintPath>
+> </Reference>
+> ```
+>
+> **Starting with VS2017 and .NET Core**, NuGet becomes a first class citizen in MSBuild. NuGet package dependencies are now listed as PackageReference in the SDK-style project file `.csproj`
+>
+> A reference now looks like this:
+>
+> ```xml
+> <PackageReference Include="EntityFramework" Version="6.4.4" />
+> ```
+
+（2023.10.16）
+
+#### 1.3.5.3 .NET Upgrade Assistant
+
+[refer](https://learn.microsoft.com/zh-cn/dotnet/core/porting/upgrade-assistant-overview)
+
+1. NuGet Manager Console中安装 ：
+
+   ```
+   dotnet tool install -g upgrade-assistant
+   ```
+
+2. View->Terminal中执行：
+
+   ```
+   upgrade-assistant upgrade xxx.csproj/xxx.sln
+   ```
+
+3. 可选择只升级csproj文件
+
+4. 删除package.config, Properties\AssemblyInfo.cs 以及诸如app.config这类旧版本自动生成的文件
+
+(2023.10.17)
+
 # 2 常规语法
 
 ## 2.1 语法
@@ -160,30 +344,56 @@ VS2022就是偏重于跨平台开发，默认的就是 .NET 6.0 和 .NET 7.0（�
 
 ### 2.1.2 继承与多态
 
-=>相较于C++中的virtual关键字，可以分为一般虚函数和纯虚函数（函数末尾加“=0”的语法形式，必须被子类重写），C#中的virtual关键字就只一般虚函数，而且需要搭配override关键字就行重写。
+=>相较于C++中的virtual关键字，可以分为一般虚函数和纯虚函数（函数末尾加“=0”的语法形式，必须被子类重写），C#中的virtual关键字就只一般虚函数，而且需要搭配override关键字进行重写。
 
 另外，即便父类中没有virtual修饰特定函数，而你又特别想重写这个函数，你仍可以使用new关键字进行类似于重写的操作，即把父类相关函数隐藏，调用子类中重写new出来的函数。
 
-```c#
-class Father
-{
-    public virtual void func() { Console.WriteLine("I'm father"); }
-}
-//C#中的类继承就无需C++中那样的修饰符public...
-class Son : Father
-{
-    //函数返回值类型必须匹配
-    //可以不在继承类中实现，直接调用父类中相应函数
-    public override void func() { Console.WriteLine("I'm son");}
+new与override的区别：用父类类型变量去接收所创建的子类时，子类中override重写的方法仍旧可以覆盖父类中的方法，而new重写的方法就不行，即仍旧会调用父类中的同名方法。参考 [视频](https://www.bilibili.com/video/BV1aM411h75X/?spm_id_from=333.788&vd_source=6fc477a8e79179a3fd30bed2e2ba5fbe)(2023.11.29)
 
-    public void output()
+=>对于纯虚函数, C#中用 abstract 修饰，此函数在基类中不能被实现，而在子类中必须被实现。
+
+```c#
+    abstract class ImBase
     {
-        func();
+        protected ImBase() { }
+
+        //abstract 与 virtual的区别
+        protected abstract void FuncA();
+        protected abstract void FuncB();
+        protected virtual void FuncC() { return; }   
+        protected void FuncD() { return; }
     }
-}
+
+    class Father : ImBase
+    {
+        protected Father() { }
+
+        //必须实现FuncA()与FuncB()，可以选择不实现FuncC()
+        //应用于方法或属性时，sealed 修饰符必须始终与 override 结合使用
+        protected sealed override void FuncA() { return; }
+        //public override void FuncB() { return; } => override覆盖不能改变 访问级别
+        protected override void FuncB() { return; }
+        public new void FuncD() { return; } // new覆盖可以 改变访问级别
+    }
+
+    class Child : Father 
+    { 
+        protected Child() { }
+
+        //protected override void FuncA() { return; } => it can't be inherited， because it is sealed.
+        protected override void FuncB() 
+        {
+            FuncA();
+            return; 
+        }      
+    }
 ```
 
-(2023.6.27)
+> 应用于某个类时，sealed 修饰符可阻止其他类继承自该类。 还可以对子类的虚方法或属性的方法或属性使用 sealed 修饰符。 这使你可以阻止子类的子类对其覆写。
+
+=> C# 中的 sealed 与 Java 中的 final 作用基本相同。
+
+(2023.10.28)
 
 ### 2.1.3 namespace
 
@@ -213,6 +423,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 //C#的命名空间相当于C++中头文件与命名空间的综合作用。
+
+//C#6中支持这种写法，这样定义后可以可以访问类的静态成员(2023.10.20)
+using static System.Console;
 ```
 
 另外C#的namespace：
@@ -244,11 +457,6 @@ C++中编译过程中存在预处理器，预处理有两个作用：1.创建宏
 C#的编译器没有一个单独的预处理器，其预处理只有条件编译这一用途。
 
 ```C#
-#define Debug
-#if Debug
-    //...
-#endif    
-
 #if true
    //...
 #else
@@ -257,6 +465,22 @@ C#的编译器没有一个单独的预处理器，其预处理只有条件编译
 ```
 
 (2023.4.14)
+
+经常用于区别Debug版本与Release版本的不同逻辑：
+
+```C#
+                    catch (Exception ex)
+                    {
+#if DEBUG
+                        ErrorMessage("---{" + ex.Message + ex.StackTrace + "}---");
+#else
+                        ErrorMessage("spc9999", "----", sheetName + ":" + sheetFieldName);
+#endif
+                    }
+//DEBUG是被系统预先定义好的，无需手动控制
+```
+
+(2023.12.11)
 
 ### 2.1.5 struct
 
@@ -386,7 +610,50 @@ var sw = new System.IO.StreamWriter(@"C:\Tool\DATA\" + $"{csvList[i].Nodename}.c
 
 (2023.4.19)
 
+### 2.1.8 this用法
 
+C#的this有许多种用法，这里介绍其中一种：静态扩展方法，顾名思义给某个类增加自定义方法
+
+> 扩展方法的**核心三要素是静态类，静态方法，和this参数**。
+
+在下面的 WriteToCsvFile方法中，参数前面加 this ，可以理解为 给 DataTable类 添加了一个 静态方法 WriteToCsvFile，用于将DataTable输出为csv文件，我们可以在其他的类中使用 DataTable类型变量直接调用这个方法了，而不需要使用 DataTableExtensions.WriteToCsvFile() 这种方式调用。
+
+```C#
+//1.扩展的方法需是静态方法，且位于静态类中；
+public static class DataTableExtensions
+{
+    //2.扩展方法的第一个参数以this修饰符为前缀，后跟要扩展的目标类型(DataTable)及参数；
+    public static void WriteToCsvFile(this DataTable dataTable, string filePath)
+    {
+        StringBuilder fileContent = new StringBuilder();
+
+        foreach (var col in dataTable.Columns)
+        {
+            fileContent.Append(col.ToString() + ",");
+        }
+
+        fileContent.Replace(",", System.Environment.NewLine, fileContent.Length - 1, 1);
+
+        foreach (DataRow dr in dataTable.Rows)
+        {
+            foreach (var column in dr.ItemArray)
+            {
+                fileContent.Append("\"" + column.ToString() + "\",");
+            }
+
+            fileContent.Replace(",", System.Environment.NewLine, fileContent.Length - 1, 1);
+        }
+
+        System.IO.File.WriteAllText(filePath, fileContent.ToString());
+    }
+}
+
+//3.扩展方法只能针对实例调用，也就是说，目标类不能为静态类；
+DataTable dataTable = new DataTable();
+dataTable.WriteToCsvFile("C:\\example.csv");
+```
+
+(2024.2.14)
 
 ## 2.2 数据结构
 
@@ -444,6 +711,22 @@ public class Solution {
         return ans;         
     }
 }
+```
+
+```C#
+//Dictionary 初始化
+        private Dictionary<string, string> beforeAfterDataTemplate = new Dictionary<string, string>()
+        {
+            //**********************************
+            //Node Basic Information
+            //**********************************
+            /// NR NEID (gNBid)
+            {"NR_NEID", "(Error)" },
+            /// LTE NEID(eNBid)
+            {"LTE_NEID", "(Error)" },
+        }
+//Dicitonary 拷贝
+var beforeAfterData = new Dictionary<string, string>(beforeAfterDataTemplate);
 ```
 
 
@@ -593,17 +876,21 @@ list.RemoveAt(0);
 
 #### 2.2.3.2 常用方法
 
-| 方法/属性   | 说明                           | 例子 |
-| ----------- | ------------------------------ | ---- |
-| Count       | 用于获取数组中当前元素数量     |      |
-| Add( )      | 在List中添加一个对象的公有方法 |      |
-| Remove( )   | 移除与指定元素匹配的第一个元素 |      |
-| RemoveAt( ) | 移除指定索引的元素             |      |
-| Clear()     | 清空List集合中的元素对象       |      |
-| ToArray()   | 转化为数组                     |      |
-|             |                                |      |
-|             |                                |      |
-|             |                                |      |
+| 方法/属性   | 说明                                                         | 例子                                          |
+| ----------- | ------------------------------------------------------------ | --------------------------------------------- |
+| Count       | 用于获取数组中当前元素数量                                   |                                               |
+| Add( )      | 在List中添加一个对象的公有方法                               |                                               |
+| Remove( )   | 移除与指定元素匹配的第一个元素                               |                                               |
+| RemoveAt( ) | 移除指定索引的元素                                           |                                               |
+| Clear()     | 清空List集合中的元素对象                                     |                                               |
+| ToArray()   | 转化为数组                                                   |                                               |
+| AddRange()  | 在List的末尾添加另一串List                                   |                                               |
+| **Find()**  | 参数是一个委托，注意List对象为引用类型时，**返回值为指向该对象的内存地址** | `var n = record.Find(x => x.Name == "Host");` |
+|             |                                                              |                                               |
+
+
+
+
 
 ### 2.2.4 Stack
 
@@ -818,7 +1105,7 @@ public CreateViewModel Viewmodel
 
 ### 3.1.4 `ref` 和 `out` 
 
-`ref`表明传入已初始化好的外部变量地址进入方法内部，实现在一个方法中返回除return外的返回值。相当于C++中传入&variable.
+`ref`表明传入已初始化好的ref 变量地址进入方法内部，实现在一个方法中返回除return外的返回值。相当于C++中传入&variable.
 
 而`out`实现同样的功能。唯一的区别在于`out`无需提前定义并初始化，进入方法内部后则必须初始化。也就是说 `ref`既可以向方法内部传值，也可以取得返回值，双向交互，而`out`只能由方法内部向外传值，单向传递。
 
@@ -868,9 +1155,7 @@ break;
 
 (2023.4.21)
 
-### 3.1.5 `sealed`
-
-### 3.1.6 `var` 和 `dynamic`
+### 3.1.5 `var` 和 `dynamic`
 
 
 
@@ -1468,49 +1753,51 @@ public DelegateCommand CommandName =>
 >
 > **using 语句允许程序员指定使用资源的对象应当何时释放资源。using 语句中使用的对象必须实现 IDisposable 接口。此接口提供了 Dispose 方法，该方法将释放此对象的资源。**
 >
-> ```C#
-> using (SqlCommand cmd = new SqlCommand(SQLString, connection))
-> {
->     try
->     {
->         cmd.Connection = connection;
->         cmd.Transaction = trans;
->         int rows = cmd.ExecuteNonQuery();
->         return rows;
->     }
->     catch (System.Data.SqlClient.SqlException e)
->     {
->         //trans.Rollback();
->         throw e;
->     }
-> }
-> ```
->
 > 当我们做一些比较占用资源的操作，而且该类或者它的父类继承了IDisposable接口，这样就可以使用using语句，在此范围的末尾自动将对象释放，常见的using使用在对数据库的操作的时候。
->
-> ————————————————
-> 版权声明：本文为CSDN博主「YuanlongWang」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
-> 原文链接：https://blog.csdn.net/lwpoor123/article/details/78553275
 
 (2023.4.14)
 
 也经常用于StreamWriter：
 
-```C#
-                try
-                {
-                    using (var sw = new System.IO.StreamWriter(@"C:\Tool\DATA\test.csv", true, Encoding.GetEncoding("UTF-8")))
-                    {
-                        sw.WriteLine(csv);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Error !!");
-                }
+```c#
+//这段代码用于向已有的csv文件追加不重复列，所以先读取该文件，后追加写入
+List<string> neidContainer = new List<string>();
+if (File.Exists(inFileName))
+{
+	//如果读入时不用using，会造成之后读取时抛出该文件正在被使用的异常
+    using (FileStream stream = File.Open(inFileName, FileMode.Open, FileAccess.Read))
+    {
+        var csvReader = ExcelReaderFactory.CreateCsvReader(stream);
+        var csvDataSet = csvReader.AsDataSet();
+
+
+        foreach (var row in csvDataSet.Tables[0].AsEnumerable())
+        {
+            neidContainer.Add(row[0].ToString());
+        }
+    }
+}
+
+using (StreamWriter streamWriter = new StreamWriter(inFileName, true, enc))
+{ 
+    
+    foreach (string str in inLines)
+    {
+        var neid = str.Split(',')[0];
+        if (neidContainer.Contains(neid))
+        {
+            continue;
+        }
+        else
+        {
+            neidContainer.Add(neid);
+            streamWriter.Write(str + "\n");
+        }
+    }
+}
 ```
 
-(2023.4.19)
+(2024.2.21)
 
 ## 3.7 初始化器
 
@@ -1789,6 +2076,77 @@ C#的特性与Java的注解，Python的装饰器一样是各自语言中对AOP(A
 > 比如现在有一个网站，有购物、社交、游戏等多种功能且对所有用户开放，现在需要限制只有高级会员才能使用其中的几个功能，我们可以在每个模块加上if判断，但这样侵入性太强，且会造成大量重复代码；换成AOP的方法就是使用装饰器，在需要高级会员的地方加上限制就行
 
 =>即C#的AOP设计模式通过特性来体现。
+
+# 4 OOP设计模式 
+
+## 4.1 GoF中的23种设计模式
+
+参考： [文字资料](https://www.runoob.com/design-pattern/strategy-pattern.html)  + 书籍：《大话设计模式》
+
+| 设计模式                                     |                                                              |
+| -------------------------------------------- | ------------------------------------------------------------ |
+| Strategy Pattern (策略模式)                  | 定义一系列的算法,把它们一个个封装起来, 并且使它们可相互替换。此模式让算法的变化独立于使用算法的客户。 |
+| Decorator Pattern (装饰器模式)               | 动态地给一个对象添加一些额外的职责。就增加功能来说，装饰器模式相比生成子类更为灵活。 |
+| Proxy Pattern（代理模式）                    | 为其他对象提供一种代理以控制对这个对象的访问。=> 从is-a 转换为 has-a, 如基地局MixMode可以代理LTE与NR，而不是继承其中之一 |
+| Factory Pattern (工厂模式)                   | 只需要通过 new 就可以完成创建的对象，无需使用工厂模式。如果使用工厂模式，就需要引入一个工厂类，会增加系统的复杂度。 => 如果需要解决客户端只需要调用基类中的方法，但却要实现许多子类，那么简单工厂模式会比较合适 |
+| Prototype Pattern (原型模式)                 | 原型模式很少单独出现，一般是和工厂方法模式一起出现，通过 clone 的方法创建一个对象，然后由工厂方法提供给调用者。 |
+| Template Pattern (模板模式)                  | 将子类共有的方法抽象到父类中作为模板方法。为防止恶意操作，一般模板方法都加上 final 关键词。 =>比如基地局数据转化中，无论LTE/NR类，均用公有方法，适合该模式 |
+| Facade Pattern (外观模式)                    | 在客户端和复杂系统之间再加一层，这一层将调用顺序、依赖关系等处理好。=> 理想情况下客户端只要new一个Starter类，模块中所有功能依次实现 |
+| Builder Pattern (建造者模式)                 | 一些基本部件不会变，而其组合经常变化的时候。                 |
+| Observer Pattern (观察者模式)                | 让原本耦合的发布和订阅双方都依赖于抽象接口而不是具体类，是依赖倒转原则的最佳体现。C#的事件委托技术是对此模式的升级。 |
+| Abstract Factory Pattern (抽象工厂模式)      | 围绕一个超级工厂创建其他工厂。该超级工厂又称为其他工厂的工厂。 |
+| State Pattern (状态模式)                     | 状态模式与策略模式很相似，也是将类的"状态"封装了起来，在执行动作时进行自动的转换，从而实现，类在不同状态下的同一动作显示出不同结果。 |
+| Adapter Pattern (适配器模式)                 | 系统的数据和行为都正确，但接口不符时，应该考虑用适配器。     |
+| Memento Pattern (备忘录模式)                 | 在不破坏封装性的前提下，捕获一个对象的内部状态，并在该对象之外保存这个状态。如打游戏时的存档。 |
+| Composite Pattern (部分整体模式)             | 将对象组合成树形结构以表示"部分-整体"的层次结构。如公司组织图。关键代码：每个Component中包含一个`List<Component>` |
+| Iterator Pattern (迭代器模式)                | Java 和 .Net 编程环境中非常常用的设计模式。=> `for each`     |
+| Singleton Pattern (单例模式)                 | 保证一个类仅有一个实例，并提供一个访问它的全局访问点。关键代码：构造函数是私有的。 |
+| Bridge Pattern (桥接模式)                    | 实现系统可能有多个角度分类，每一种角度都可能变化。把这种多角度分类分离出来，让它们独立变化，减少它们之间耦合。=> 如基地局即可按LTE/NR/MixMode分，也可以按CRAN/DRAN分，如果纯粹用继承，类的数量则是3x2乘积关系，用桥接则是3+2加和关系。 |
+| Command Pattern (命令模式)                   | 一种数据驱动的设计模式，它属于行为型模式。请求以命令的形式包裹在对象中，并传给调用对象。将"行为请求者"与"行为实现者"解耦。     =>WPF的Command机制 |
+| Chain of Responsibility Pattern (责任链模式) | 避免请求发送者与接收者耦合在一起，让多个对象都有可能接收请求，将这些对象连接成一条链，并且沿着这条链传递请求，直到有对象处理它为止。 =>WPF的Binding目标捕获Binding源所激发的事件 |
+| Mediator Pattern (中介者模式)                | 多个类相互耦合，形成了网状结构时，可以将上述网状结构分离为星型结构。 |
+| Flyweight Pattern (享元模式)                 | 在有大量对象时，有可能会造成内存溢出，我们把其中共同的部分抽象出来，如果有相同的业务请求，直接返回在内存中已有的对象，避免重新创建。关键代码：用 HashMap 存储这些对象。 |
+| Interpreter Pattern (解释器模式)             | 给定一个语言，定义它的文法表示，并定义一个解释器，这个解释器使用该标识来解释语言中的句子。这种模式被用在 SQL 解析、符号处理引擎等。 |
+| Visitor Pattern (访问者模式)                 | 主要将数据结构与数据操作分离。主要解决稳定的数据结构和易变的操作耦合问题。 |
+
+Simple Factory Pattern 简单工厂模式 不在GoF的23种模式之中
+
+
+
+## 4.2 设计原则
+
+面向对象的的几种设计原则：
+
+| 简称 | Link                                                         | 中文                       | 介绍                                                         |
+| ---- | ------------------------------------------------------------ | -------------------------- | ------------------------------------------------------------ |
+| SRP  | [Single Responsibility Principle](http://www.cnblogs.com/gaochundong/p/single_responsibility_principle.html) | 单一职责原则               | 软件设计就是对职责分门别类，引起类变化的原因应该仅有一个     |
+| OCP  | [Open Closed Principle](http://www.cnblogs.com/gaochundong/p/open_closed_principle.html) | 开放封闭原则               | 开放扩展，封闭类内修改                                       |
+| DIP  | [Dependency Inversion Principle](http://www.cnblogs.com/gaochundong/p/dependency_inversion_principle.html) | 依赖倒转原则               | 细节应该依赖于宏观的抽象（常识上说抽象依赖于细节，所以称为依赖倒转），典型就是接口编程：先有接口，然后在对其实现编程 |
+| LSP  | [Liskov Substitution Principle](http://www.cnblogs.com/gaochundong/p/liskov_substitution_principle.html) | 里氏代换原则               | 子类可以在不影响软件单位功能的情况下替代父类                 |
+| ISP  | [Interface Segregation Principle](http://www.cnblogs.com/gaochundong/p/interface_segregation_principle.html) | 接口分离原则               | 客户类不应被强迫依赖那些它们不需要的接口                     |
+| LKP  | [Least Knowledge Principle](http://www.cnblogs.com/gaochundong/p/least_knowledge_principle.html) | 最少知识原则(迪米特拉法则) | 每个类尽量降低成员访问权限，强调类之间的松耦合               |
+
+
+
+## 4.3 抽象类和接口
+
+> 抽象类和接口的区别：
+>
+> 从表象上来说，抽象类可以给出一些成员的实现，接口却不包含成员的实现，抽象类的抽象成员可被子类部分实现，接口的成员需要完全实现，一个类只能继承一个抽象类，但可实现多个接口等等；
+>
+> 但以上都是从两者的形态上去区分。从设计的角度讲，有三点区别：
+>
+> 1. 类是对对象的抽象；抽象类是对类的抽象，接口是对行为的抽象；
+> 2. 如果行为跨越不同类的对象，可使用接口；对于一些相似的类对象，用继承抽象类；
+> 3. 从设计的角度讲，抽象类是从子类中发现了公共的东西，泛化出父类，然后子类继承父类。而接口是根本不知道子类的存在，方法如何实现还不确认，预先定义。
+>
+> 两者的思维过程是相反的，抽象类是自底而上抽象出来的，而接口则是自顶而下设计出来的，所以抽象类往往通过重构而来。
+>
+> (引用于《大话设计模式》)
+
+=> 抽象类适用于 模板模式，将子类的共同行为集中于基类。
+
+(2023.11.17)
 
 # 5 .NET框架
 
@@ -2152,8 +2510,10 @@ foreach (string s in result3) Console.WriteLine(s);
 >
 > ADO.NET类封装在System.Data.dll中，并且与System.Xml.dll中的XML类集成。
 
-### 5.3.1 ADO.NET架构
+### 5.3.1  DataSet vs DataTable
 
+> ### ADO.NET架构
+>
 > ADO.NET由连线数据源（connected data source）以及离线数据模型（disconnected data model）两个部分构成，这两个部分是相辅相成的。
 >
 > 连线数据源：若没办法连线到数据库，则无法被称为数据访问组件。连线数据源便是用来连接数据库的对象类别，由下列接口构成：
@@ -2170,8 +2530,110 @@ foreach (string s in result3) Console.WriteLine(s);
 > 2. **DataTable**，离线型数据模型的核心之一，可将它当成一个离线型的数据表，是存储数据的收纳器。
 > 3. ...(**DataRow**, **DataColumn**)
 
-### 5.3.2 ADO.NET数据提供者(Data Provider)
+| Features | DataSet                                        | DataTable                                                    |
+| -------- | ---------------------------------------------- | ------------------------------------------------------------ |
+| Elements | DataSet  is formed collectively of datatables. | DataTable  is composed of multiple rows and columns to have better access to data. |
 
+> Dataset defines the relationship between the tables and the constraints of having them in the dataset; since there is only one table represented in Datatable, the relationships need not be defined in the Datatable.
+
+`DataSet`和`DataTable`是数据转换中非常重要的概念，`DataSet`就像一个存在于C#程序内存中的临时关系型数据库。C#从数据库或者Excel中取出数据，放入`DataSet`来管理其中各种Tables的关系，然后断开数据库。而`DataTable`正是这个临时数据库中的Table，由数据库中的表或者Excel中一个sheet页又或者CSV文件（CSV文件只能有一个sheet页）转化而来，其中又由`row`和`column`组成。
+
+=>两者皆是ADO.NET框架中的离线数据模型。
+
+DataTable的一些常用操作：
+
+```C#
+DataTable table = new DataTable("Table");
+
+// 追加列
+table.Columns.Add("教科");
+table.Columns.Add("点数", Type.GetType("System.Int32"));
+table.Columns.Add("氏名");
+table.Columns.Add("Class");
+
+
+table.Rows.Add("数学", 80, "田中　一郎", "A");
+table.Rows.Add("英語", 70, "田中　一郎", "A");
+table.Rows.Add("国語", 60, "鈴木　二郎", "A");
+table.Rows.Add("数学", 50, "鈴木　二郎", "A");
+table.Rows.Add("英語", 80, "鈴木　二郎", "A");
+table.Rows.Add("国語", 70, "佐藤　三郎", "B");
+table.Rows.Add("数学", 80, "佐藤　三郎", "B");
+table.Rows.Add("英語", 90, "佐藤　三郎", "B");
+
+
+Console.WriteLine("+++++++++++++++++++++");
+
+//1.使用DataTable的Select方法摘选特定行并升序
+//作为参数的字符串似乎会被方法进一步解析
+var dr1 = table.Select($"教科='数学'", "点数 ASC");
+foreach (var row in dr1)
+{
+    Console.WriteLine("{0}：{1}：{2}:{3}", row[0], row[1], row[2], row[3]);
+}
+
+Console.WriteLine("+++++++++++++++++++++");
+
+//2.使用DataTable的Compute方法对数据进行简单计算
+object ob = table.Compute("Max(点数)", "氏名 = '鈴木　二郎'");
+Console.WriteLine("{0}点", (int)ob);
+
+
+Console.WriteLine("+++++++++++++++++++++");
+
+//3.1 使用LINQ操作DataTable
+var dr2 = table.AsEnumerable()
+    .Where(row => row[0] == "英語")
+    .Select(row => row)
+    .ToArray();
+
+foreach (var row in dr2)
+{
+    Console.WriteLine("{0}：{1}：{2}:{3}", row[0], row[1], row[2], row[3]);
+}
+//3.2 
+var dr3 = from row in table.AsEnumerable()
+          where row[0] == "国語"
+          select row;
+
+foreach (var row in dr3)
+{
+    Console.WriteLine("{0}：{1}：{2}:{3}", row[0], row[1], row[2], row[3]);
+}
+
+//DataTable在WPF中还可以与GridData绑定，直接在GUI中显示
+
+//往DaTaTable写入值 2024.2.16
+var outputtable = new DataTable();
+var newRow = outputtable.NewRow();
+newRow[0] = "1";
+outputtable.Rows.Add(newRow);
+```
+
+(2023.7.6)
+
+实例：
+
+```C#
+private string GetFlagFromTable(string moid)
+{
+	//1.使用LINQ操作DataTable
+    DataRow[] rows = table_kddi_ro_progress.AsEnumerable()
+       .Where(row => row["メインオーダID"].ToString() == moid)
+       .Select(row => row)
+       .ToArray();
+    //2.使用DataTable的Select方法摘选
+    DataRow[] rows = table_kddi_ro_progress.Select($"[メインオーダID] = {moid}");
+    //需要注意的是moid中存在-符号，会影响第二种方法的摘选精度，最终报错
+}
+```
+
+(2023.11.29)
+
+### 5.3.2 数据库
+
+> ### ADO.NET数据提供者(Data Provider)
+>
 > 在.NET Framework中，ADO.NET默认提供了四种数据源：
 >
 > 1. SQL Server：由System.Data.SqlClient提供原生数据源，是微软官方建议访问SQL Server时建议使用的数据提供者。
@@ -2192,6 +2654,8 @@ foreach (string s in result3) Console.WriteLine(s);
 > - DataAdapter对象提供连接 DataSet 对象和数据源的桥梁。DataAdapter 使用 Command 对象在数据源中执行 SQL 命令，以便将数据加载到 DataSet 中，并使对 DataSet 中数据的更改与数据源保持一致。
 > - Parameter对象用于参数化查询。
 
+#### 5.3.2.1 PostgreSQL
+
 以Npgsql举例：
 
 Npgsql is the open source .NET data provider for PostgreSQL.
@@ -2202,6 +2666,7 @@ public ImportDB(string connetcionInfo, string path)
 {
     this.ConnectionSetting = connetcionInfo;
     this.csvfilepath = path;
+    //传入类似 xxx.postgres.database.azure.com port=5432 这样的数据库信息
     NpgsqlConnection conn = new NpgsqlConnection(ConnectionSetting);
     //Connection:Open() 开启数据库连线。
     conn.Open();
@@ -2309,10 +2774,51 @@ public void InsertData2()
 }
 ```
 
+#### 5.3.2.2 SQLite
 
+> 不像常见的客户端/服务器结构数据库管理系统，SQLite引擎不是一个应用程序与之通信的独立进程。SQLite库链接到程序中，并成为它的一个组成部分。这个库也可被动态链接。应用程序经由编程语言内的直接API调用来使用SQLite的功能，这在减少数据库访问延迟上有积极作用，因为在一个单一进程中的函数调用比跨进程通信更有效率。SQLite将整个数据库，包括定义、表、索引以及数据本身，作为一个单独的、可跨平台使用的文件存储在主机中。SQLite将PostgreSQL作为参考平台。项目将“PostgreSQL可能做些什么”作为SQL标准实现的开发参考.
+>
 
-### 5.3.3 ADO.NET的进化: Entity Framework
+=>SQLite产生的数据库以xxx.db 的本地文件形式与程序进行交互
 
+```C#
+internal class ValueCalc
+{
+    /// <summary>
+    /// Connector to SQLite DB
+    /// </summary>
+    protected SQLiteConnection dbConnection;
+
+    public ValueCalcBase(string shogenDBpath
+    {
+        this.shogenDBpath = shogenDBpath;
+        // Connect to SQLite DB
+        this.dbConnection = new SQLiteConnection($"Data Source={shogenDBpath + "XXX.db"}");
+        dbConnection.Open();
+    }
+    
+    protected override string GetValForSite_name()
+    {
+       string sql = $"select [site_info] from SYOGEN_Table where [site_info_ID] == {id}";
+
+       SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+       SQLiteDataReader reader = command.ExecuteReader();
+
+       if (reader.Read()) return reader.GetString(0);
+       else
+       {
+          return "(Error)";
+       }
+     }  
+}
+```
+
+(2023.11.17)
+
+### 5.3.3 Others
+
+> ### ADO.NET的进化: Entity Framework
+>
 > 随着网络应用程序的进化，ADO.NET也随之做了许多的改变，但不变的是，ADO.NET的基础提供了强固的发展支持，这些进化的技术都是植基于ADO.NET的核心组件而来。
 >
 > 长久以来，程序员和数据库总是保持着一种微妙的关系，在商用应用程序中，数据库一定是不可或缺的组件，这让程序员一定要为了连接与访问数据库而去学习SQL指令，因此在信息业中有很多人都在研究如何将程序设计模型和数据库集成在一起，对象关系对应（Object-Relational Mapping）的技术就是由此而生，为此微软在.NET Framework 2.0发展时期，就提出了一个ObjectSpace的概念，ObjectSpace可以让应用程序可以用完全对象化的方法连接与访问数据库，微软将ObjectSpace纳入.NET Framework中，并且再加上一个设计的工具（Designer），构成了现在的ADO.NET Entity Framework。
@@ -3336,23 +3842,21 @@ WPF检索资源的时候，先查找控件自己的Resource属性，如果没有
 
 (2023.8.4)
 
-### Appendix
+### 6.2.4 Style Library
 
-Style Library：
+| Name                                                         |            |
+| ------------------------------------------------------------ | ---------- |
+| [MahApps.Metro](https://github.com/MahApps/MahApps.Metro)    | 开源控件库 |
+| MahApps.Metro.IconPacks                                      | 图标库     |
+| [MaterialDesignInXamlToolkit](https://github.com/MaterialDe.../MaterialDesignInXamlToolkit) | 开源控件库 |
+| [ModernWpf](https://github.com/Kinnara/ModernWpf)            | 开源控件库 |
+|                                                              |            |
+|                                                              |            |
+|                                                              |            |
+|                                                              |            |
+|                                                              |            |
 
-| Name                                                         |                        |
-| ------------------------------------------------------------ | ---------------------- |
-| [ModernWpf](https://github.com/Kinnara/ModernWpf)            | 就黑白两种风格？       |
-| [MaterialDesignInXamlToolkit](https://github.com/MaterialDe.../MaterialDesignInXamlToolkit) | 非常庞大完善的一个项目 |
-| ...                                                          | ...                    |
-|                                                              |                        |
-|                                                              |                        |
-|                                                              |                        |
-|                                                              |                        |
-|                                                              |                        |
-|                                                              |                        |
-
-
+### 6.2.5 其他
 
 `CommonOpenFileDialog`：从GUI比如按钮，选择文件/文件夹的代码例：
 
@@ -3430,6 +3934,11 @@ public MainWindowViewModel(IRegionManager regionManager)
 
     ShgetcAnalyzerCommand = new DelegateCommand(ShgetcAnalyzer);
     BeforeAfterMakerCommand = new DelegateCommand(BeforeAfterMaker);
+    
+    //Initialize the default region view， 2024.3.14
+    //Refer to https://stackoverflow.com/questions/54330435/navigate-to-a-default-view-when-application-loaded-using-prism-7-in-wpf
+    regionManager.RegisterViewWithRegion("ContentRegion", "ShgetcAnalyzer");
+    
 }
 
 
@@ -3593,89 +4102,178 @@ bool CanExecuteCommandCreate()
 
 (2023.7.30)
 
-# 7 Files Operation
+### 6.3.4 Dialog Service 
 
-## 7.1 DataSet vs DataTable
+=>弹出小窗口功能
 
-| Features | DataSet                                        | DataTable                                                    |
-| -------- | ---------------------------------------------- | ------------------------------------------------------------ |
-| Elements | DataSet  is formed collectively of datatables. | DataTable  is composed of multiple rows and columns to have better access to data. |
+App.xaml.cs:
 
-> Dataset defines the relationship between the tables and the constraints of having them in the dataset; since there is only one table represented in Datatable, the relationships need not be defined in the Datatable.
-
-`DataSet`和`DataTable`是数据转换中非常重要的概念，`DataSet`就像一个存在于C#程序内存中的临时关系型数据库。C#从数据库或者Excel中取出数据，放入`DataSet`来管理其中各种Tables的关系，然后断开数据库。而`DataTable`正是这个临时数据库中的Table，由数据库中的表或者Excel中一个sheet页又或者CSV文件（CSV文件只能有一个sheet页）转化而来，其中又由`row`和`column`组成。
-
-=>两者皆是ADO.NET框架中的离线数据模型。
-
-
-
-DataTable的一些常用操作：
-
-```C#
-DataTable table = new DataTable("Table");
-
-// 追加列
-table.Columns.Add("教科");
-table.Columns.Add("点数", Type.GetType("System.Int32"));
-table.Columns.Add("氏名");
-table.Columns.Add("Class");
-
-
-table.Rows.Add("数学", 80, "田中　一郎", "A");
-table.Rows.Add("英語", 70, "田中　一郎", "A");
-table.Rows.Add("国語", 60, "鈴木　二郎", "A");
-table.Rows.Add("数学", 50, "鈴木　二郎", "A");
-table.Rows.Add("英語", 80, "鈴木　二郎", "A");
-table.Rows.Add("国語", 70, "佐藤　三郎", "B");
-table.Rows.Add("数学", 80, "佐藤　三郎", "B");
-table.Rows.Add("英語", 90, "佐藤　三郎", "B");
-
-
-Console.WriteLine("+++++++++++++++++++++");
-
-//1.使用DataTable的Select方法摘选特定行并升序
-//作为参数的字符串似乎会被方法进一步解析
-var dr1 = table.Select($"教科='数学'", "点数 ASC");
-foreach (var row in dr1)
+```c#
+protected override void RegisterTypes(IContainerRegistry containerRegistry)
 {
-    Console.WriteLine("{0}：{1}：{2}:{3}", row[0], row[1], row[2], row[3]);
+    containerRegistry.RegisterForNavigation<ModifyWindow>();
+    containerRegistry.RegisterForNavigation<ShogenCheckWindow>();
+	//与Navigation一样，需要注册一个窗体
+    containerRegistry.RegisterDialog<AreaWindow>();
 }
-
-Console.WriteLine("+++++++++++++++++++++");
-
-//2.使用DataTable的Compute方法对数据进行简单计算
-object ob = table.Compute("Max(点数)", "氏名 = '鈴木　二郎'");
-Console.WriteLine("{0}点", (int)ob);
-
-
-Console.WriteLine("+++++++++++++++++++++");
-
-//3.1 使用LINQ操作DataTable
-var dr2 = table.AsEnumerable()
-    .Where(row => row[0] == "英語")
-    .Select(row => row)
-    .ToArray();
-
-foreach (var row in dr2)
-{
-    Console.WriteLine("{0}：{1}：{2}:{3}", row[0], row[1], row[2], row[3]);
-}
-//3.2 
-var dr3 = from row in table.AsEnumerable()
-          where row[0] == "国語"
-          select row;
-
-foreach (var row in dr3)
-{
-    Console.WriteLine("{0}：{1}：{2}:{3}", row[0], row[1], row[2], row[3]);
-}
-
-//DataTable在WPF中还可以与GridData绑定，直接在GUI中显示
 ```
 
-(2023.7.6)
+新建小窗口 AreaWindow.xaml
 
-## 7.2 文本文件的读写
+```xaml
+<!--调用Style库，不同于Navigation各xaml位于同一窗口，Dialog是独立窗口，所以如果要应用式样库，需要单独引用命名空间--> 
+<UserControl x:Class="ModifyTool2_0.Views.AreaWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ModifyTool2_0.Views"  
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+             Background="{DynamicResource MaterialDesignPaper}"
+             TextElement.FontWeight="Medium"
+             TextElement.FontSize="14"
+             FontFamily="{materialDesign:MaterialDesignFont}"                                        
+             mc:Ignorable="d" 
+             d:DesignHeight="150" d:DesignWidth="300">
+    <!--调整窗口大小，需要引用prism的WindowStyle--> 
+    <prism:Dialog.WindowStyle>
+        <Style TargetType="Window">
+            <Setter Property="Width" Value="300"/>
+            <Setter Property="Height" Value="300"/>
+        </Style>
+    </prism:Dialog.WindowStyle>    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" VerticalAlignment="Center"
+            Text="Select target LTE shogen area"/>
+        <ComboBox  Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3" VerticalAlignment="Top"
+                  Text="{Binding TxtArea, Mode=TwoWay}" ItemsSource="{Binding AreaList}"/>
+        <Button Content="OK" Grid.Column="1" Grid.Row="3"
+                Command="{Binding CommandOK}"/>
+    </Grid>
+</UserControl>
+```
+
+建立AreaWindow的ViewModel：
+
+```c#
+//建立AreaWindow的ViewModel需要继承IDialogAware接口
+class AreaWindowViewModel : BindableBase, IDialogAware
+{
+    #region IDialogAware interface
+    public string Title { get; set; }
+    public event Action<IDialogResult> RequestClose;
+    public bool CanCloseDialog(){return true;}
+    public void OnDialogClosed(){}
+    public void OnDialogOpened(IDialogParameters parameters){}
+    #endregion
+
+    /// <summary>
+    /// Property for selected Area 
+    /// </summary>
+    private string txtArea;
+    public string TxtArea
+    {
+        get { return txtArea; }
+        set
+        {
+            SetProperty(ref txtArea, value);
+            _fieldOK.RaiseCanExecuteChanged();
+        }
+    }
+
+    /// <summary>
+    /// Property for area list
+    /// </summary>
+    private ObservableCollection<string> _areaList;
+    public ObservableCollection<string> AreaList
+    {
+        get { return _areaList; }
+        set { SetProperty(ref _areaList, value); }
+    }
+
+
+    public AreaWindowViewModel()
+    {
+        string[] areaList = { "NR only, unnecessary to load LTE shogen",
+            "auC","auD","auEF","auH","auK","auN","auO","auQ","auS","auT"};
+
+        _areaList = new ObservableCollection<string>(areaList);
+    }
+
+
+    /// <summary>
+    /// Command for OK Button on AreaWindow
+    /// </summary>
+    private DelegateCommand _fieldOK;
+    public DelegateCommand CommandOK =>
+        _fieldOK ?? (_fieldOK = new DelegateCommand(ExecuteCommandOK, CanExecuteCommandOK));
+
+    void ExecuteCommandOK()
+    {
+        //向母窗口回传参数
+        IDialogParameters parameters = new DialogParameters();
+        parameters.Add("Area", txtArea);
+        RequestClose?.Invoke(new DialogResult(ButtonResult.OK, parameters));
+    }
+
+    bool CanExecuteCommandOK()
+    {
+        if (string.IsNullOrEmpty(txtArea))
+        {
+            return false;
+        }
+
+        return true;
+    }
+}
+```
+
+在母窗体ViewModel中调用：
+
+```C#
+//增加字段
+private readonly IDialogService dialogService;
+//构造函数中初始化
+ public ShogenCheckWindowViewModel(IDialogService dialog) 
+ {
+     this.dialogService = dialog;
+ }
+//接收子窗口参数
+ private DelegateCommand _fielddran;
+ public DelegateCommand CommandDRAN_Diagnose =>
+     _fielddran ?? (_fielddran = new DelegateCommand(ExecuteCommandDRAN_Diagnose, CanExecuteCommandDRAN_Diagnose));
+
+ void ExecuteCommandDRAN_Diagnose()
+ {
+     IDialogParameters parameters = new DialogParameters();
+     //ShowDialog与Show的区别在于，前者窗体打开时母窗口被锁定无法使用，后者可以
+     dialogService.ShowDialog("AreaWindow", parameters, DialogCallback);
+     //dialogService.Show("AreaWindow", parameters, DialogCallback);
+ }
+
+ bool CanExecuteCommandDRAN_Diagnose()
+ {
+     return true;
+ }
+```
+
+(2024.3.19)
+
+# 7 Files Operation
+
+## 7.1 文本文件的读写
 
 **StreamReader** 和 **StreamWriter** 类用于文本文件的数据读写。这些类从抽象基类 Stream 继承，Stream 支持文件流的字节读写。
 
@@ -3755,15 +4353,15 @@ Class2.TextReader(@"C:\test\NewCsvFile123.csv");
 
 (2023.4.20)
 
-## 7.3 Excel文件的读写
+## 7.2 Excel文件的读写 
 
-### 7.3.1 ExcelDataReader
+### 7.2.1 ExcelDataReader
 
 用于载入本地Excel文件。
 
 参考：[GitHub - ExcelDataReader/ExcelDataReader: Lightweight and fast library written in C# for reading Microsoft Excel files](https://github.com/ExcelDataReader/ExcelDataReader)
 
-#### 7.3.1.1 CSV文件
+#### 7.2.1.1 CSV文件
 
 ```C#
 using System;
@@ -3842,7 +4440,7 @@ loader.AddCsvData(@"C:\Users\zxb\test");
 
 (2023.4.17)
 
-#### 7.3.1.2 Excel文件
+#### 7.2.1.2 Excel文件
 
 ```c#
    public class ExcelFileLoader
@@ -3876,7 +4474,43 @@ loader.AddCsvData(@"C:\Users\zxb\test");
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 
             var excelReader = ExcelReaderFactory.CreateReader(stream);
-            DataSet excelDataSet = excelReader.AsDataSet();
+            //为AsDataSet增添配置ExcelDataSetConfiguration()，可以将特定行作为Table的列名，csv文件同样适用。2024.2.19
+            DataSet excelDataSet = excelReader.AsDataSet(new ExcelDataSetConfiguration()
+            {
+                // Gets or sets a value indicating whether to set the DataColumn.DataType 
+                // property in a second pass.
+                UseColumnDataType = true,
+                // Gets or sets a callback to determine whether to include the current sheet
+                // in the DataSet. Called once per sheet before ConfigureDataTable.
+                FilterSheet = (tableReader, sheetIndex) => true,
+                // Gets or sets a callback to obtain configuration options for a DataTable. 
+                ConfigureDataTable = (tableReader) => new ExcelDataTableConfiguration()
+                {
+                    // Gets or sets a value indicating the prefix of generated column names.
+                    EmptyColumnNamePrefix = "Column",
+                    // Gets or sets a value indicating whether to use a row from the data as column names.
+                    // data as column names.
+                    UseHeaderRow = true,
+                    // Gets or sets a callback to determine which row is the header row. 
+                    // Only called when UseHeaderRow = true.
+                    ReadHeaderRow = (rowReader) => {
+                        // F.ex skip the first two row and use the 3rdd row as column headers:
+                        rowReader.Read();
+                        rowReader.Read();
+                    },
+                    // Gets or sets a callback to determine whether to include the 
+                    // current row in the DataTable.
+                    FilterRow = (rowReader) => {
+                        return true;
+                    },
+                    // Gets or sets a callback to determine whether to include the specific
+                    // column in the DataTable. Called once per column after reading the 
+                    // headers.
+                    FilterColumn = (rowReader, columnIndex) => {
+                        return true;
+                    }
+                }
+            });
 			//不像Datatable的tablename默认为sheet名，Dataset名需要手手动设置
             excelDataSet.DataSetName = FileName;
             ExcelData.Add(excelDataSet);
@@ -3887,25 +4521,130 @@ loader.AddCsvData(@"C:\Users\zxb\test");
     }
 ```
 
-```c#
-            //调用与遍历
-			var loader2 = new ExcelFileLoader();
-            loader2.AddData(@"C:\Users\zxb\test");
-            foreach(DataSet database in loader2.ExcelData)
+### 7.2.2 NPOI
+
+> NPOI是POI的.NET版本,POI是一套用Java写成的库，我们在开发中经常用到导入导出表格、文档的情况，NPOI能够帮助我们在没有安装微软Office的情况下读写Office文件，如xls, doc, ppt等。NPOI采用的是Apache 2.0许可证（poi也是采用这个许可证），这意味着它可以被用于任何商业或非商业项目，我们不用担心因为使用它而必须开放你自己的源代码，所以它对于很多从事业务系统开发的公司来说绝对是很不错的选择。
+
+=> ExcelDataReader没法对Excel进行输出，NPOI可以。
+
+```C#
+// load NPOI pakage from Nuget for operating Excel
+//Don't suggest Microsoft.Office.Interop.Excel because of the risk of memory leak and time-consuming
+//创建一个Excel，并往里面写入数据
+class ExcelOutput
+{
+    private const string Outputpath = @"C:\Users\exzihon\OneDrive - Ericsson\Desktop\Repository\SelectNeidTool\Output\Output.xlsx";
+
+    public ExcelOutput(List<List<string>> inputlists, string path = Outputpath)
+    {
+        using (FileStream stream = new FileStream(path, FileMode.Create, FileAccess.Write))
+        {
+            IWorkbook wb = new XSSFWorkbook();
+            ISheet sheet = wb.CreateSheet("Sheet1");
+            ICreationHelper cH = wb.GetCreationHelper();
+
+            int i = 0;
+            foreach (List<string> inputlist in inputlists)
             {
-                Console.WriteLine(database.DataSetName);
-                foreach (DataTable table in database.Tables)
+                IRow row = sheet.CreateRow(i);
+                int j = 0;
+                foreach (var item in inputlist)
                 {
-                    Console.WriteLine(table.TableName);
-                    foreach (DataRow row in table.Rows)
-                    {
-                        Console.WriteLine(row[0].ToString());
-                    }
+                    ICell cell = row.CreateCell(j);
+                    cell.SetCellValue(cH.CreateRichTextString(item));
+                    j++;
+                }
+                i++;
+            }
+
+            wb.Write(stream);
+        }
+    }
+
+    public ExcelOutput(DataTable dt, string path = Outputpath)
+    {
+        using (FileStream stream = new FileStream(path, FileMode.Create, FileAccess.Write))
+        {
+            IWorkbook wb = new XSSFWorkbook();
+            ISheet sheet = wb.CreateSheet("Sheet1");
+            ICreationHelper cH = wb.GetCreationHelper();
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                IRow row = sheet.CreateRow(i);
+                for (int j = 0; j < 3; j++)
+                {
+                    ICell cell = row.CreateCell(j);
+                    cell.SetCellValue(cH.CreateRichTextString(dt.Rows[i].ItemArray[j].ToString()));
                 }
             }
+            wb.Write(stream);
+        }
+    }
+
+}
+
+
+//复制一个既存的Excel，并往里面写入数据
+internal class NeidListOutput
+{
+    public readonly string Basepath = @"C:\Users\Desktop\XXX.xlsx";
+    public readonly string Outputpath = @"C:\Users\Desktop\yyy.xlsx";
+
+
+    public NeidListOutput(List<List<string>> inputlists)
+    {
+
+        //Excel复制
+        FileInfo beforAfterBaseFile = new FileInfo(Basepath);
+        beforAfterBaseFile.CopyTo(Outputpath, true);
+        var fs = File.OpenRead(Outputpath);
+
+
+        //Put xlsx file into workbook
+        var workbook = new XSSFWorkbook(fs);
+        //Get the first sheet of xlsx file
+        ISheet sheet = workbook.GetSheetAt(0);
+        int rowNo = 1; 
+        foreach (var inputlist in inputlists)
+        {
+            int column = 0;
+            //Output columns for every row
+            foreach (var item in inputlist)
+            {
+                //注意复制过来的Excel中，并不意味着拥有既存的无穷的行列
+                //比如你写入数据后这个行才被NPOI是为既存（无论之后删除这个数据）
+                SetCellValue(sheet, rowNo, column, item);
+                column++;
+            }
+            rowNo++;
+        }
+
+        SaveExcel(Outputpath, workbook);
+
+        return;
+    }
+
+    private void SetCellValue(ISheet sheet, int row, int column, String value)
+    {
+        ICell tmpCell = sheet.GetRow(row).GetCell(column);
+
+        tmpCell.SetCellValue(value);
+    }
+
+    private void SaveExcel(String path, IWorkbook workbook)
+    {
+        FileStream fs = File.Create(path);
+        workbook.Write(fs);
+        fs.Close();
+    }
+}
 ```
 
-### 7.3.2 EPPlus
+(2023.10.23)
+
+### 7.2.3 其他
+
+#### 7.2.3.1 EPPlus
 
 > EPPlus 是使用Open Office XML格式（xlsx）读写Excel 2007 / 2010文件的.net开发库。
 
@@ -3955,7 +4694,7 @@ var data = ExcelUtility.ExcelDataToDataTable(path, "Sheet1");
 var data2 = ExcelUtility.ExcelDataToDataTable(path, "Sheet2");
 ```
 
-### 7.3.3 GemBox
+#### 7.2.3.2 GemBox
 
 > GemBox.Spreadsheet.dll 是由GemBox公司开发的基于Excel功能的开发工具，该DLL很轻量，且使用起来很方便
 
@@ -4001,7 +4740,7 @@ var data2 = ExcelUtility.ExcelDataToDataTable(path, "Sheet2");
             workbook.Save("C:\\test\\NewCsvFile135.xlsx");
 ```
 
-### Appendix
+#### 7.2.3.3  Microsoft.Office.Interop.Excel
 
 用来操作Excel文件的库其实非常多。比如微软官方为C#写的Microsoft.Office.Interop.Excel
 
@@ -4009,11 +4748,13 @@ MSDN：https://learn.microsoft.com/zh-cn/dotnet/csharp/advanced-topics/interop/h
 
 不仅可以操作Excel，也可以操作Word.
 
+=>Microsoft.Office.Interop.Excel的缺点在于很容易造成内存泄漏(2023.10.23)
+
 其他开源第三方的也非常多，比如：
 
 [(Step by Step) Export to Excel Outputs in C# [Code Example\] | IronXL (ironsoftware.com)](https://ironsoftware.com/csharp/excel/how-to/c-sharp-export-to-excel/)
 
-## 7.4 XML文件的操作
+## 7.3 XML文件的操作
 
 C#中对XML操作有两种方法：1. [XmlDocument](https://learn.microsoft.com/en-us/dotnet/api/system.xml.xmldocument?view=net-7.0&redirectedfrom=MSDN) 类；2.LINQ；
 
@@ -4040,6 +4781,9 @@ IEnumerable<XElement> elListOfContainers =
       let matches = rgx.Matches((string)elListOfContainer.Attribute("id"))
       where matches.Count > 0
       select elListOfContainer;
+
+///链式检索标签，用于检索特定深度的tag
+var vsDataType = el.Element(xn + "attributes").Element(xn + "vsDataType").Value;
 ```
 
 (2023.8.3)
@@ -4088,6 +4832,10 @@ Git 提交代码步骤：
 注意：如果你省略第二步：git commit，那git不知道你做的修改，在第3步的时候把别人在这期间修改的版本pull下来，你有可能去覆盖掉别人的代码而没有任何通知。
 
 (2023.4.14)
+
+=> 针对上述问题，**在TortoiseGit，如果修改了本地文件却没有commit，是无法从远端仓库pull的**。这个时候有两个选项：1. commit后再pull，若没有冲突则可以直接push，若有冲突则merge后push；2. revert掉你本地修改与远端仓库保持一致，然后再pull.
+
+(2023.6.7)
 
 > ①两种commit：
 >
@@ -4147,14 +4895,6 @@ master住分支应该非常稳定，用来发布新版本，一般情况下不�
 
 ### Appendix
 
-#### revert作用
-
-问题现象：使用TortoiseGit时，修改了本地文件却没有commit，发现无法从远端仓库pull：
-
-解决方法：这个时候有两个选项：1. commit后再pull，若没有冲突则可以直接push，若有冲突则merge后push；2. revert掉你本地修改与远端仓库保持一致，然后再pull.
-
-(2023.6.7)
-
 #### Solution for error: RPC failed
 
 问题现象：
@@ -4197,6 +4937,22 @@ git remote update
 
 (2023.7.6)
 
+#### .gitignore文件
+
+在TortoiseGit中可以在commit时对Untracked文件右击Add to ignore list, 此时会在当前目录下自动创建.gitignore文件。(Windows下通过Git Bash来 touch .gitignore的话，编辑时回车符等不好处理。) =>参考 [Link](https://stackoverflow.com/questions/35740254/context-menu-for-folder-does-not-contain-add-to-ignore-list-tortoisegit)
+
+然后可以通过编辑.gitnore来批量忽略一些不必要的文件，例如：
+
+```
+# 忽略.gitignore文件所在目录下.vs目录的内容，其他目录的.vs文件和目录不受影响
+/.vs
+# 忽略.gitignore文件所在目录下的所有bin目录(包括子目录下的bin文件夹都会被忽略)
+bin/
+obj/
+```
+
+(2023.12.27)
+
 #### Command集
 
 ```shell
@@ -4208,6 +4964,12 @@ git branch -r
 git remote -v
 //产看当前分支提交记录
 git log
+//删除本地分支
+git branch -d localBranchName
+//删除远程分支, 他人删除远程分支后，你这边需要 git fetch -p 同步分支列表
+git push origin --delete remoteBranchName
+//-p 的意思是“精简”。这样，你的分支列表里就不会显示已远程被删除的分支了。
+git fetch -p
 ```
 
 
@@ -4448,6 +5210,9 @@ Private Sub IMPORT_Files(ActionType As String)
         tarCategory = Mid(tarCategory, 2)
     End If
     
+    '从Excel中读取数据，并于其中insert到Access的Table中
+    impSuccess = CommonImportExcel(ExApp, fp, rsRule)            
+                
    '各种操作Access界面上所定义的Tables
     db.Execute "DELETE FROM FILE_MANAGEMENT WHERE FILE_CATEGORY  in (" & tarCategory & ") AND INSERT_DATE IS NOT NULL"           
 
@@ -4459,8 +5224,6 @@ Private Sub IMPORT_Files(ActionType As String)
  	End Select
  End Sub
 ```
-
-=>还不清楚如何从Excel中读取数据后Update到Access上的Tables中去
 
 (2023.8.25)
 
@@ -4694,6 +5457,14 @@ Visual Studio中添加项目引用：
 
 
 
+如何为代码中的函数添加git history：
+
+Tools → Options → Text Editor → All Languages → CodeLens
+
+(2024.1.19)
+
+
+
 ### Code Snippets
 
 [Reference](https://learn.microsoft.com/en-us/visualstudio/ide/visual-csharp-code-snippets?view=vs-2022)
@@ -4741,7 +5512,9 @@ C#：属性，成员函数不会被执行。=> 属性如果被赋值同样会先
 
 如果作为属性的List等容器没有被赋值(new), 后续方法中无法直接被使用，会报没实例化的错误。
 
-### 5.2 C#进制转换
+### 5.2 C#数字处理
+
+#### 5.2.1 进制转换 
 
 ```C#
 /* 1.各种进制形式(字符串)转化为十进制(整型)
@@ -4773,6 +5546,21 @@ Console.WriteLine(a10.ToString("X6"));//=> 00028E
 
 (2023.6.16)
 
+#### 5.2.2 小数点后位数处理
+
+```c#
+string latitude = "1413334";
+double mmmm_value = 0;
+double.TryParse(latitude.Substring(latitude.Length - 2, 2), out mmmm_value);
+//四舍五入
+Console.WriteLine((Math.Round((mmmm_value / 60), 4) * 10000).ToString());
+//直接截取
+Console.WriteLine(Math.Floor(mmmm_value / 60 * 10000).ToString());
+//主要就是 Math.Round 与 Math.Floor 的区别
+```
+
+(2023.11.29)
+
 ### 5.3 C#中字符串的分割
 
 ```C#
@@ -4785,3 +5573,79 @@ string[] split2 = Regex.Split(teststring, "__");
 ```
 
 (2023.8.10)
+
+### 5.4 简单Logger设计
+
+```C#
+internal class Logger
+{
+    private static readonly string LOG_FORMAT = "{0} {1}：{2}";
+    private static readonly string DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";
+
+    public static void info(string text)
+    {
+        string outputText = createOutputString("INFO", text);
+        outputLog(outputText);
+    }
+    
+    public static void debug(string text)
+    {
+        string outputText = createOutputString("DEBUG", text);
+        outputLog(outputText);
+    }
+
+    public static void error(string text)
+    {
+        string outputText = createOutputString("ERROR", text);
+        outputLog(outputText);
+    }
+
+    public static void exception(Exception ex)
+    {
+        string outputText = string.Format("{0}\n{1}\n{2}\n{3}\n{4}",
+                                          "+++++++ ActivitySheetMaker Module ++++++++",
+                                          "++++++++++++++++ ERROR +++++++++++++++++++",
+                                          ex.Message,
+                                          "++++++++++++++++ TRACE +++++++++++++++++++",
+                                          ex.StackTrace);
+        outputLog(outputText);
+    }
+
+    private static string createOutputString(string level, string text)
+    {
+        string outputText = string.Format(LOG_FORMAT,
+                                          DateTime.Now.ToString(DATE_FORMAT),
+                                          string.Format("{0, -6}", level),
+                                          text);
+        return outputText;
+    }
+
+    private static void outputLog(string text)
+    {
+        Console.WriteLine(text);
+    }
+
+}
+```
+
+将Console.WriteLine定向到字符串存储：
+
+```C#
+//Redirect Console.WriteLine to String
+var sw = new StringWriter();
+Console.SetOut(sw);
+Console.SetError(sw);
+
+try
+{
+    Action();
+}
+catch (Exception ex)
+{
+    Logger.exception(ex);
+}
+
+Log = sw.ToString();
+```
+
+(2023.2.19)
