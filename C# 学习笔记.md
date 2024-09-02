@@ -2952,6 +2952,75 @@ var dtTask = Task.Run(() =>
 
 (2023.8.17)
 
+=> 总结`Task.Run()`确实是多线程编程，但是`async/await`跟单线程多线程无必然联系，它们是配对使用于异步编程，通常用于等待 I/O 操作或其他异步操作的完成。
+
+```C#
+internal class Asyn
+{
+    static int Count = 0;
+    public async void Action()
+    {
+        string functionName = GetFunctionName();
+        Console.WriteLine($"{functionName} Start");
+        //如果Action()不是异步函数，这里不等，Action()就直接结束去Main函数了，留子函数在等待IO中断
+        await Task.WhenAll(Func_A(), Func_B(), Func_C());
+        Console.WriteLine($"{functionName} Over");
+    }
+	//异步编程 async修饰函数，awai修饰异步操作，配对使用
+    private async Task Func_A()
+    {
+        string functionName = GetFunctionName();
+        Console.WriteLine($"{functionName} Start");
+        //这里不用Task.Run(()起线程，而是等待一个长时间的IO的话，就是单线程下使用异步编程了
+        await Task.Run(() =>
+        {
+            Thread.Sleep(3000);
+            Console.WriteLine($"{functionName} + {Count++}");
+            Thread.Sleep(3000);
+            Console.WriteLine($"{functionName} + {Count++}");
+        });
+        Console.WriteLine($"{functionName} Over");
+    }
+	//这三个子函数因为都处于同一个线程中(母线程)，所以并不是并行，而是顺序执行，即谁能先抢到上下文使用权谁先执行。
+    //await实质上是给编译器一个保存上下文的关键词
+    private async Task Func_B()
+    {
+        string functionName = GetFunctionName();
+        Console.WriteLine($"{functionName} Start");
+        await Task.Run(() =>
+        {
+            Thread.Sleep(3000);
+            Console.WriteLine($"{functionName} + {Count++}");
+            Thread.Sleep(3000);
+            Console.WriteLine($"{functionName} + {Count++}");
+        });
+        Console.WriteLine($"{functionName} Over");
+    }
+
+    private async Task Func_C()
+    {
+        string functionName = GetFunctionName();
+        Console.WriteLine($"{functionName} Start");
+        await Task.Run(() =>
+        {
+            Thread.Sleep(3000);
+            Console.WriteLine($"{functionName} + {Count++}");
+            Thread.Sleep(3000);
+            Console.WriteLine($"{functionName} + {Count++}");
+        });
+
+        Console.WriteLine($"{functionName} Over");
+    }
+
+    string GetFunctionName([System.Runtime.CompilerServices.CallerMemberName] string memberName = "")
+    {
+        return memberName;
+    }
+}
+```
+
+（2024.4.11）
+
 # 6 GUI Development
 
 ## 6.1 History
@@ -4267,6 +4336,18 @@ private readonly IDialogService dialogService;
  {
      return true;
  }
+
+/// <summary>
+/// AreaWindow callback function
+/// </summary>
+/// <param name="result"></param>
+private void DialogCallback(IDialogResult result)
+{
+    if (result.Result != ButtonResult.OK) return;
+
+    _areaForDRAN = result.Parameters.GetValue<string>("Area");
+
+}
 ```
 
 (2024.3.19)
@@ -5462,6 +5543,12 @@ Visual Studio中添加项目引用：
 Tools → Options → Text Editor → All Languages → CodeLens
 
 (2024.1.19)
+
+
+
+在调试时，你可以使用快捷键 `Ctrl + Alt + L` 来打开或关闭 Solution Explorer
+
+(2024.4.17)
 
 
 
