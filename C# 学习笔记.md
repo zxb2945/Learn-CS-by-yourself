@@ -1155,6 +1155,38 @@ break;
 
 (2023.4.21)
 
+
+
+Important thing:
+
+> 在 C# 中，类（即引用类型）作为方法的参数时，它是**按引用传递的**，但是需要注意的是，引用类型本身是按**值传递**的。这意味着：
+>
+> 1. 引用类型作为方法参数时：
+>
+>    - **引用的副本**：方法接收到的是类对象的引用的副本，而不是类对象本身。换句话说，方法接收到的是对同一个对象的引用，因此可以修改对象的属性或字段。
+>    - **修改引用的引用**：如果在方法内部修改这个引用（例如，让它指向一个新的对象），这不会影响方法外部的引用变量。
+>
+>    
+>
+>    如果你希望修改引用本身并反映到外部，可以使用 `ref` 或 `out` 关键字来传递引用的引用。
+
+=>类作为形参类型的时候，这个参数可以看成是一个指针`q`，对`(*q)`修改肯定可以反映到函数之外，然而你把这个指针指向别的地址去了，它这个指针是没法反映到函数之外的。所以`ref` 相当于变这个指针直接为 地址引用 `&adr` 了。
+
+```C#
+        private deletenode(ListNode head)
+        {
+			head.next = null; //可以反映到函数之外
+             head = null; // 不会反映到函数之外，因为这个引用不再指向原来的地址了
+        }
+        private deletenode2(ref ListNode head)
+        {
+			head.next = null;//可以反映到函数之外
+             head = null;//可以反映到函数之外
+        }
+```
+
+(2024.11.22)
+
 ### 3.1.5 `var` 和 `dynamic`
 
 
@@ -2630,22 +2662,14 @@ private string GetFlagFromTable(string moid)
 
 (2023.11.29)
 
-### 5.3.2 数据库
+### 5.3.2 PostgreSQL
 
-> ### ADO.NET数据提供者(Data Provider)
->
-> 在.NET Framework中，ADO.NET默认提供了四种数据源：
->
-> 1. SQL Server：由System.Data.SqlClient提供原生数据源，是微软官方建议访问SQL Server时建议使用的数据提供者。
-> 2. OLE DB Data Source：由System.Data.OleDb提供支持，可适用于OLE DB Provider for ODBC以外的OLE DB数据提供者。
-> 3. Oracle：由System.Data.OracleClient提供支持，必须同时引用 System.Data和  System.Data.OracleClient。
-> 4. ODBC：补OLE DB Provider for ODBC的支持，由System.Data.Odbc提供支持。
->
-> 其他厂商亦为不同的数据库提供数据源：
->
-> - MySQL为本身的MySQL Database Server提供了ADO.NET的原生数据提供者。
-> - Oracle自行开发的.NET Data Provider。
->
+#### 5.3.2.1 Npgsql 
+
+Npgsql is the open source .NET data provider for PostgreSQL.
+
+> **.NET Data Provider** 是一组与数据库交互的类库，用于在 .NET 应用程序中执行数据访问任务。它为数据库操作提供了统一的接口，支持多种类型的数据库（如 SQL Server、Oracle、MySQL 等）。通过数据提供程序，开发者可以轻松地执行 SQL 查询、读取数据、更新数据，并管理数据库事务，极大地简化了数据访问和操作的复杂性。
+
 > 对每种Data Provider，ADO.NET要实现下述对象结构：
 >
 > - Connection对象提供与数据源的连接。
@@ -2654,41 +2678,21 @@ private string GetFlagFromTable(string moid)
 > - DataAdapter对象提供连接 DataSet 对象和数据源的桥梁。DataAdapter 使用 Command 对象在数据源中执行 SQL 命令，以便将数据加载到 DataSet 中，并使对 DataSet 中数据的更改与数据源保持一致。
 > - Parameter对象用于参数化查询。
 
-#### 5.3.2.1 PostgreSQL
+(2023.5.12)
 
-以Npgsql举例：
-
-Npgsql is the open source .NET data provider for PostgreSQL.
+Npgsql 举例：
 
 ```C#
-//using Npgsql;
-public ImportDB(string connetcionInfo, string path)
-{
-    this.ConnectionSetting = connetcionInfo;
-    this.csvfilepath = path;
-    //传入类似 xxx.postgres.database.azure.com port=5432 这样的数据库信息
+/*引用类库*/
+using Npgsql;
+
+/*连接数据库*/
+	//传入类似 xxx.postgres.database.azure.com port=5432 这样的数据库信息
     NpgsqlConnection conn = new NpgsqlConnection(ConnectionSetting);
     //Connection:Open() 开启数据库连线。
     conn.Open();
-    NpgsqlCommand command = new NpgsqlCommand("select version()", conn);
-    String serverversion;
-    try
-    {
-        //Command:ExecuteScalar()：执行指令并回传第一列第一行中的值（object类型）。当没有数据时，ExcuteScalar方法返回System.DBNull。
-        serverversion = (String)command.ExecuteScalar();
-    } catch(Exception e)
-    {
-        throw new Exception("DB connection setting is error.please check the DB connection setting again!");
-    }
-    finally
-    {
-         //Connection:Close() 关闭数据库连线。
-        conn.Close();
-    }
-}
-```
 
-```C#
+/*操作数据库*/
 public void InsertData(DataSet dataset)
 {
     string dsn = ConnectionSetting;
@@ -2714,67 +2718,70 @@ public void InsertData(DataSet dataset)
 }
 ```
 
-```C#
-public string GetData()
- {
-     var dsn = ConnectionSetting;
-     string columnlist = "";
-     using (TransactionScope ts = new TransactionScope())
-     {
-         using (NpgsqlConnection conn = new NpgsqlConnection(dsn))
-         {
-             conn.Open();
-             string columncmd = string.Format(@"SELECT * FROM XXX')");
-             var columnlistcommand = new NpgsqlCommand(columncmd, conn);
-             //Command:ExecuteReader()：执行指令并回传IDataReader对象，以读取数据集中的数据。
-             var columnlistdataReader = columnlistcommand.ExecuteReader();
-             while (columnlistdataReader.Read())
-             {
-                 columnlist = columnlistdataReader.GetValue(0).ToString();
-             }
-             columnlistdataReader.Close();
-             conn.Close();
-         }
-         ts.Complete();
-     }
-     return columnlist;
- }
-```
+#### 5.3.2.2 HeidiSQL 
+
+HeidiSQL是一个免费的、开源的数据库管理工具.
+
+=>比如你在Azure上建立了一个PostgreSQL数据库资源，你可以在本地安装HeidiSQL去连接这个数据库，然后你就可以创建修改相关的表，还可以导出数据
+
+=> 顺便提一嘴，HeidiSQL设置网络类型,依赖库，主机名，端口，数据库等信息，像Azure资源，注意主机名与数据库的区别，一个主机上通常存在多个数据库
+
+=>HeidSQL不仅支持 PostgreSQL,也支持SQLite等其他数据库。
+
+=> 类似的工具还有pgAdmin, 专门为 PostgreSQL 数据库设计的开源工具。
+
+(2024.12.9)
+
+#### 5.3.2.3 Schema
+
+> 在 **PostgreSQL** 和其他数据库管理系统中，**schema**（模式）是数据库对象（如表、视图、索引、函数等）的容器
+>
+> 一个 **schema** 是数据库中的一个命名空间，用于将数据库对象分组。通过模式，用户可以将相关的数据库对象分组在一起，使得数据库结构更加清晰。例如，可以将与用户相关的数据放在一个模式中，将与财务相关的数据放在另一个模式中；不同的模式可以设置不同的访问权限，限制用户对某些模式中的数据的访问。例如，可以给某些用户只对某个模式的数据访问权限，而对其他模式没有访问权限；模式充当数据库对象的命名空间，可以避免不同模式中对象的命名冲突。例如，两个模式中可以各自有一个名为 `employees` 的表，它们不会发生冲突。
+
+用HeidiSQL打开Azure上的PostgreSQL数据库，映入眼帘的是 四个 数据库模式（schemas）
+
+1. information_schema ：并不包含任何数据，它只是提供了关于数据库本身的信息。
+2. pg_catalog： PostgreSQL 内部的系统模式，包含数据库的元数据，类似于 `information_schema`，但它是 PostgreSQL 特有的。是 PostgreSQL 的核心，用于存储所有的数据库管理信息。
+3. pg_toast： 是 PostgreSQL 用来存储大对象（large objects）和超大行数据的系统模式。它通常是不可见的，除非用户显式访问。
+4. public ： 是 PostgreSQL 数据库中的默认模式（schema）。当用户在数据库中创建表、视图或其他对象时，如果没有指定模式，它们通常会被创建在 `public` 模式中。
+
+=>每个scheme中都有相应的函数以及表格，一般就在public中确认业务相关的表
+
+可以在工具代码中看到如下代码：
 
 ```C#
-public void InsertData2()
-{
-    try
-    {
-        var connString = ConnectionSetting;
-        var sql = "select * from z where x=y;"
-        
-        using (var connection = new NpgsqlConnection(connString))
-        {
-            connection.Open();
-            
-            DataTable dt = new DataTable();
-            NpgsqlCommand cmd = new NpgsqlCommand(sql, connection);
-            NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(cmd);
-            //DataAdapter:Fill()：将数据填入离线型数据对象。
-            adapter.Fill(dt);
-
-            string OutputName = dt.Rows[0]["NAME"].ToString();
-
-            cmd.Connection = connection;
-            cmd.CommandText = "INSERT INTO xxx VALUES (@mid)";
-            cmd.Parameters.AddWithValue("@mid", OutputName);
-            cmd.ExecuteNonQuery();
-
-            connection.Close();
-        }
-    }
-    catch (Exception ex)
-    {}
-}
+ cmd_str = string.Format("Call proc_insertdata(\'{0}\',\'{1}\',\'{2}\');", columnstr, rowstr, tmptablename);
+ 
+conn.Open();
+NpgsqlCommand cmd = new NpgsqlCommand(cmd_str, conn);
+cmd.ExecuteNonQuery();
+conn.Close();
 ```
 
-#### 5.3.2.2 SQLite
+疑惑这个cmd_str也不是 SQL语句呀，其实proc_insertdata是定义在public scheme中的function：
+
+```sql
+$$ DECLARE
+	i character varying;
+	tbn text:= tablename;
+	clm text:= columnname;
+	columnset text[];
+BEGIN
+	 columnset := string_to_array(clm,'####');
+	
+	 FOREACH i IN ARRAY columnset
+	 LOOP
+	 EXECUTE'ALTER TABLE '||tbn||' ADD COLUMN IF NOT EXISTS '||quote_ident(i)||' text';
+	 END LOOP;
+END
+ $$
+```
+
+上述是 **PostgreSQL** 数据库系统在SQL上的一个扩展语言PL/pgSQL，支持过程化编程，能够使用变量、条件语句（如 `IF`、`CASE`）、循环（如 `FOR`、`WHILE`）等，允许编写更复杂的逻辑。
+
+(2024.12.7)
+
+### 5.3.3 SQLite
 
 > 不像常见的客户端/服务器结构数据库管理系统，SQLite引擎不是一个应用程序与之通信的独立进程。SQLite库链接到程序中，并成为它的一个组成部分。这个库也可被动态链接。应用程序经由编程语言内的直接API调用来使用SQLite的功能，这在减少数据库访问延迟上有积极作用，因为在一个单一进程中的函数调用比跨进程通信更有效率。SQLite将整个数据库，包括定义、表、索引以及数据本身，作为一个单独的、可跨平台使用的文件存储在主机中。SQLite将PostgreSQL作为参考平台。项目将“PostgreSQL可能做些什么”作为SQL标准实现的开发参考.
 >
@@ -2814,20 +2821,6 @@ internal class ValueCalc
 ```
 
 (2023.11.17)
-
-### 5.3.3 Others
-
-> ### ADO.NET的进化: Entity Framework
->
-> 随着网络应用程序的进化，ADO.NET也随之做了许多的改变，但不变的是，ADO.NET的基础提供了强固的发展支持，这些进化的技术都是植基于ADO.NET的核心组件而来。
->
-> 长久以来，程序员和数据库总是保持着一种微妙的关系，在商用应用程序中，数据库一定是不可或缺的组件，这让程序员一定要为了连接与访问数据库而去学习SQL指令，因此在信息业中有很多人都在研究如何将程序设计模型和数据库集成在一起，对象关系对应（Object-Relational Mapping）的技术就是由此而生，为此微软在.NET Framework 2.0发展时期，就提出了一个ObjectSpace的概念，ObjectSpace可以让应用程序可以用完全对象化的方法连接与访问数据库，微软将ObjectSpace纳入.NET Framework中，并且再加上一个设计的工具（Designer），构成了现在的ADO.NET Entity Framework。
->
-> Entity Framework利用了抽象化数据结构的方式，将每个数据库对象都转换成应用程序对象（entity），而数据字段都转换为属性（property），关系则转换为结合属性（association），让数据库的E/R模型完全的转成对象模型，如此让程序员能用最熟悉的编程语言来调用访问。而在抽象化的结构之下，则是高度集成与对应结构的概念层、对应层和存储层，以及支持Entity Framework的数据提供者（provider），让数据访问的工作得以顺利与完整的进行。
-
-=>Entity Framework：基于ADO.NET的ORM框架，实现特定实体类与数据库中的Tables之间的相互转化。
-
-(2023.5.12)
 
 
 
@@ -5469,9 +5462,13 @@ strsql = strsql & " UNION SELECT * FROM LTE_GWSW_IP_BTS WHERE NODE_NAME='" & GWS
 
 ## 3 Visual Studio
 
-insert mode 切换：
 
-当输入字符时只能替换后面字符，不能添加字符的情况出现时，这是由“输入模式”进入了“修改模式”。在键盘上按一下“insert”即可切换输入和修改模式。
+
+### 快捷键
+
+在调试时，你可以使用快捷键 `Ctrl + Alt + L` 来打开或关闭 Solution Explorer
+
+(2024.4.17)
 
 
 
@@ -5483,19 +5480,15 @@ insert mode 切换：
 
 
 
-Dell fn键切换：
+Ctrl + K ,  Ctrl + D.  自动整理代码
 
-fn+fn lock(可能是shift键也可能是ESC键)
+(2023.6.27)
 
 
 
 Debug mode:  Ctrl+F11 =>能看汇编代码，厉害了...
 
 (2023.6.21)
-
-Ctrl + K ,  Ctrl + D.  自动整理代码
-
-(2023.6.27)
 
 
 
@@ -5506,6 +5499,30 @@ Ctrl + K ,  Ctrl + D.  自动整理代码
 (2023.7.17)
 
 
+
+### Code Snippets
+
+[Reference](https://learn.microsoft.com/en-us/visualstudio/ide/visual-csharp-code-snippets?view=vs-2022)
+
+How to use snippets in VS?
+
+举例:在Prism框架中 输入“propp”，然后双击Tab键。
+
+| **Name** | **Description**                                              | **Valid locations to insert snippet** |
+| -------- | ------------------------------------------------------------ | ------------------------------------- |
+| cw       | Creates a call to [WriteLine](https://learn.microsoft.com/en-us/dotnet/api/system.console.writeline). | Inside a Method, Not inside a Class   |
+| prop     | Creates an [auto-implemented property](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/auto-implemented-properties) declaration. | Inside a class or a struct.           |
+| propfull | Creates a property declaration with `get` and `set` accessors. | Inside a class or a struct.           |
+|          |                                                              |                                       |
+|          |                                                              |                                       |
+|          |                                                              |                                       |
+|          |                                                              |                                       |
+|          |                                                              |                                       |
+|          |                                                              |                                       |
+
+(2023.8.1)
+
+### 其他
 
 Visual Studio中添加项目引用：
 
@@ -5546,33 +5563,17 @@ Tools → Options → Text Editor → All Languages → CodeLens
 
 
 
-在调试时，你可以使用快捷键 `Ctrl + Alt + L` 来打开或关闭 Solution Explorer
+insert mode 切换：
 
-(2024.4.17)
+当输入字符时只能替换后面字符，不能添加字符的情况出现时，这是由“输入模式”进入了“修改模式”。在键盘上按一下“insert”即可切换输入和修改模式。
 
 
 
-### Code Snippets
 
-[Reference](https://learn.microsoft.com/en-us/visualstudio/ide/visual-csharp-code-snippets?view=vs-2022)
 
-How to use snippets in VS?
+Dell fn键切换：
 
-举例:在Prism框架中 输入“propp”，然后双击Tab键。
-
-| **Name** | **Description**                                              | **Valid locations to insert snippet** |
-| -------- | ------------------------------------------------------------ | ------------------------------------- |
-| cw       | Creates a call to [WriteLine](https://learn.microsoft.com/en-us/dotnet/api/system.console.writeline). | Inside a Method, Not inside a Class   |
-| prop     | Creates an [auto-implemented property](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/auto-implemented-properties) declaration. | Inside a class or a struct.           |
-| propfull | Creates a property declaration with `get` and `set` accessors. | Inside a class or a struct.           |
-|          |                                                              |                                       |
-|          |                                                              |                                       |
-|          |                                                              |                                       |
-|          |                                                              |                                       |
-|          |                                                              |                                       |
-|          |                                                              |                                       |
-
-(2023.8.1)
+fn+fn lock(可能是shift键也可能是ESC键)
 
 
 
