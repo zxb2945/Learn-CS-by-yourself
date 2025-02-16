@@ -162,7 +162,7 @@ pause
 >
 > `logging`: 提供日志功能。
 
-### subprocess
+### subprocess 
 
 > `subprocess` 是 Python 标准库中的一个模块，提供了创建和管理子进程的功能，允许我们启动新的进程、连接到它们的输入/输出/错误管道，并等待它们的完成。通过 `subprocess` 模块，我们可以在 Python 程序中运行外部命令或者启动其他程序，并且与这些外部进程进行交互。
 
@@ -354,6 +354,10 @@ if __name__ == '__main__':
     load_dotenv()  # Load environment variables from .env file
     ingest_documents(10)  
 ```
+
+> **FAISS** 是一个由 Facebook AI 研究团队（现为 Meta）开发的开源库，用于高效地搜索和聚类大规模向量数据。FAISS特别适用于处理大规模的向量空间搜索任务，广泛应用于搜索引擎、推荐系统、语音识别、图像检索等场景。
+>
+> FAISS 本身是一个 **向量(vector)检索库**，它的核心功能是对大规模的向量数据进行索引，并能够快速查询与给定向量最相似的数据。简单来说，FAISS 负责创建一个能够存储向量的索引结构，并支持高效的搜索和相似度计算。
 
 rag_retrieve.py:
 
@@ -753,8 +757,6 @@ Precon: There is a factory near Tokyo where they configure all of the settings o
 #启动 Cygwin 的 Bash shell, 并在新的终端窗口中运行脚本，同时将输出日志保存到文件中。
 C:/cygwin64/bin/bash.exe --login -c "/usr/local/bin/moshell 192.168.1.1 'show version' | tee /tmp/log.txt"
 ```
-
-
 
 
 
