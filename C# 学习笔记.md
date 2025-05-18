@@ -2664,7 +2664,7 @@ private string GetFlagFromTable(string moid)
 
 ### 5.3.2 PostgreSQL
 
-#### 5.3.2.1 Npgsql 
+#### 5.3.2.1 Npgsql  
 
 Npgsql is the open source .NET data provider for PostgreSQL.
 
@@ -2687,36 +2687,80 @@ Npgsql 举例：
 using Npgsql;
 
 /*连接数据库*/
-	//传入类似 xxx.postgres.database.azure.com port=5432 这样的数据库信息
-    NpgsqlConnection conn = new NpgsqlConnection(ConnectionSetting);
-    //Connection:Open() 开启数据库连线。
-    conn.Open();
+#if true
+private string _connString = "Host=xxx.postgres.database.azure.com;Username=abc;Password=123;Database=4g_dev";
+private string schema = "commondb4g";
+#else
+private readonly string _connString = "Host=localhost;Username=zxb;Password=19930222;Database=mydb";
+private string schema = "public";
+#endif
+
+public ImportDB(string gen, string type) 
+{
+    // Validate the database connection
+    try
+    {
+        using (var conn = new Npgsql.NpgsqlConnection(_connString))
+        {
+            conn.Open();   // This will throw an exception if the connection fails
+            conn.Close();  // Close immediately after checking
+        }
+    }
+    catch (Exception ex)
+    {
+        // Rethrow with custom message for clarity
+        throw new Exception("Failed to connect to the database. Please check the database status.", ex);
+    }
+
+    timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmssfff");
+    csvFileDir = csvFileDir + gen + "_" + type + "_" + timestamp + "\\";
+}
 
 /*操作数据库*/
-public void InsertData(DataSet dataset)
+private void InitialShogenInfoTable(string tableName, List<string> columnNames)
 {
-    string dsn = ConnectionSetting;
-    //把需要事务包裹的逻辑块写在using (TransactionScope ts = new TransactionScope())中,TransactionScope实现了IDispose接口。
-    using (TransactionScope ts = new TransactionScope())
+    using (var conn = new NpgsqlConnection(_connString))
     {
-        foreach (DataTable table in dataset.Tables)
-        {
-            using (NpgsqlConnection conn = new NpgsqlConnection(dsn))
-            {
-                var cmd_str = string.Format("INSERT INTO xxx VALUES xxx ");
+        conn.Open();
 
-                conn.Open();
-                NpgsqlCommand cmd = new NpgsqlCommand(cmd_str, conn);
-                //Command:ExecuteNonQuery()：执行不回传结果集的数据库指令，像是INSERT、UPDATE与DELETE指令，返回值为该命令所影响的行数。 对于其他所有类型的语句，返回值 为 -1。
-                cmd.ExecuteNonQuery();
-                conn.Close();
-            }
+        // Drop the table first if it exists
+        string dropTableSql = $"DROP TABLE IF EXISTS \"{tableName}\" CASCADE;";
+        using (var cmd = new NpgsqlCommand(dropTableSql, conn))
+        {
+            cmd.ExecuteNonQuery();
         }
-        //除非显示调用ts.Complete()方法。否则，系统不会自动提交这个事务。
-        ts.Complete();
+
+        // Start building CREATE TABLE statement
+        string createTableSql = $"CREATE TABLE IF NOT EXISTS \"{tableName}\" (";
+
+        // Add id column with auto-increment and primary key
+        createTableSql += "\"id\" INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY, ";
+
+        // Add history_no column
+        createTableSql += "\"history_no\" TEXT, ";
+
+        // Add user-defined columns
+        foreach (string columnName in columnNames)
+        {
+            string columnType = "TEXT";
+            createTableSql += $"\"{columnName}\" {columnType}, ";
+        }
+
+        // Remove the last comma and space
+        createTableSql = createTableSql.TrimEnd(',', ' ');
+
+        createTableSql += ");";
+
+        // Execute CREATE TABLE
+        using (var cmd = new NpgsqlCommand(createTableSql, conn))
+        {
+            cmd.ExecuteNonQuery();
+        }
     }
 }
 ```
+
+(2025.5.15)
 
 #### 5.3.2.2 HeidiSQL 
 
@@ -2746,6 +2790,8 @@ HeidiSQL是一个免费的、开源的数据库管理工具.
 4. public ： 是 PostgreSQL 数据库中的默认模式（schema）。当用户在数据库中创建表、视图或其他对象时，如果没有指定模式，它们通常会被创建在 `public` 模式中。
 
 =>每个scheme中都有相应的函数以及表格，一般就在public中确认业务相关的表
+
+=>每个scheme相当于数据库中的子数据库（逻辑隔离空间）（2025.5.15）
 
 可以在工具代码中看到如下代码：
 
@@ -2780,6 +2826,75 @@ END
 上述是 **PostgreSQL** 数据库系统在SQL上的一个扩展语言PL/pgSQL，支持过程化编程，能够使用变量、条件语句（如 `IF`、`CASE`）、循环（如 `FOR`、`WHILE`）等，允许编写更复杂的逻辑。
 
 (2024.12.7)
+
+#### 5.3.2.4 常用SQL语句
+
+增删操作：
+
+```C#
+// 如果表 tableName 存在，则连同其所有依赖对象一起删除该表。
+string dropTableSql = $"DROP TABLE IF EXISTS \"{tableName}\" CASCADE;";
+//清空指定表中的所有数据，但不删除表本身. TRUNCATE 是一种快速清空表的方法，效率比 DELETE FROM table_name; 高。
+string truncateSql = $"TRUNCATE TABLE \"{tableName}\";";
+
+//准备创建一张表，并定义前两列：id 自增长的主键；history_no 历史编号字段（文本类型）；
+string createTableSql = $"CREATE TABLE IF NOT EXISTS \"{tableName}\" (\"id\" INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY, \"history_no\" TEXT);";
+
+//向指定 schema 下的表中插入一条新记录
+//INSERT INTO "schema"."table" ("col1", "col2", ...) VALUES (@col1, @col2, ...)
+string insertSql = $"INSERT INTO \"{schema}\".\"{dbTableName}\" ({columnNames}) VALUES ({paramNames});";
+
+//向表中插入数据，若插入（INSERT）时发生冲突（例如主键重复），执行更新操作，把冲突行的 "column0" 和 "column1" 字段的值更新为新插入的数据中对应字段的值（用 EXCLUDED."column0" 引用插入的值）。换句话说，EXCLUDED."column" 就是指插入语句中原本想插入但冲突导致没插入成功的那条记录里的某个字段的值。
+/*
+ INSERT INTO "example_table" ("primary", "column0", "column1")
+ VALUES (@primary, @column0, @column1)
+ ON CONFLICT ("primary")
+ DO UPDATE SET "column0" = EXCLUDED."column0", "column1" = EXCLUDED."column1"
+ */
+ string upsertSql = $"INSERT INTO \"{dbTableName}\" ({columnNames}) VALUES ({paramNames}) " +
+                    $"ON CONFLICT ({conflictClause}) DO UPDATE SET {updateClause};";
+```
+
+查询：
+
+```C#
+// 检查数据库中是否存在名为 tableName 的表，返回 true 或 false。
+string checkTableSql = $"SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '{tableName}');";
+//SELECT EXISTS (SELECT FROM ...) 这个写法虽然 PostgreSQL 允许（默认选取整行），但加上 SELECT 1 会更标准
+var checkTableCmd = new NpgsqlCommand("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = @schema AND table_name = @tableName);", conn);
+
+
+//用于获取指定 schema 中某表（排除列名为 'id'）的所有列名，按列顺序排序。
+var getColumnsCmd = new NpgsqlCommand(@"
+    SELECT column_name 
+    FROM information_schema.columns 
+    WHERE table_name = @tableName 
+    AND table_schema = @schema
+    AND column_name <> 'id'
+    ORDER BY ordinal_position;", conn, transaction);
+
+//查询指定 schema 下是否存在某个表，返回该表的数量（存在则为1，不存在为0）。
+var checkTableCmd = new NpgsqlCommand("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = @schema AND table_name = @tableName;", conn);
+//查询指定 schema 和表中当前数据行的总数。
+var checkDataCmd = new NpgsqlCommand($"SELECT COUNT(*) FROM \"{schema}\".\"{dbTableName}\";", conn);
+//统计指定 schema 中名为 site_info 的表的列数（字段总数）
+var siteInfoFieldCountSql = "SELECT COUNT(*) FROM information_schema.columns WHERE table_name = 'site_info' AND table_schema = @schema;";
+
+//查询指定 schema 下的 site_info 和 cell_info 表，并对两表进行 JOIN 操作，一行 site_info 对应一行 cell_info，前提是它们的 NEID 相同。仅返回满足以下条件的记录：NEID 相同；两张表的 history_no 等于参数 @timestamp；两张表的 Flag1 字段都等于 '有効'（意为“有效”）
+//SELECT s.*, c.* 表示查询这两个表联结后的所有字段
+var sql = $@"
+            SELECT s.*, c.*        
+            FROM ""{schema}"".""site_info"" AS s 
+            JOIN ""{schema}"".""cell_info"" AS c 
+            ON s.""NEID"" = c.""NEID"" 
+            WHERE s.""NEID"" = @neid 
+            AND s.""history_no"" = @timestamp 
+            AND c.""history_no"" = @timestamp
+            AND s.""Flag1"" = '有効'
+            AND c.""Flag1"" = '有効'";
+```
+
+(2025.5.15)
 
 ### 5.3.3 SQLite
 
@@ -3013,6 +3128,10 @@ internal class Asyn
 ```
 
 （2024.4.11）
+
+## 5.5 RestAPI 20250430
+
+补充 Swagger UI 
 
 # 6 GUI Development
 
