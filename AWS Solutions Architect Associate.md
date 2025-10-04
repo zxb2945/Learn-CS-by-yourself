@@ -680,6 +680,20 @@ The application servers don't see the IP of the client directly, the true IP of 
 
 =>Today, we are announcing **weighted target groups** for application load balancers. It allows developers to control how to distribute traffic to multiple versions of their application.
 
+
+
+常见负载均衡（Load Balancing）算法：
+
+| 算法名称                         | 原理说明                                               | 优点                                         | 缺点                                    | 适用场景                                    |
+| -------------------------------- | ------------------------------------------------------ | -------------------------------------------- | --------------------------------------- | ------------------------------------------- |
+| 轮询（Round Robin）              | 请求按顺序依次分发到服务器                             | 简单易实现，无需额外信息                     | 不考虑服务器负载和性能差异              | 后端服务器性能相近                          |
+| 加权轮询（Weighted RR）          | 根据权重将更多请求分发给性能更强的服务器               | 考虑服务器能力差异                           | 权重配置需要人工设定                    | 服务器性能不同但相对稳定                    |
+| 最少连接（Least Conn）           | 优先将请求分发给当前连接数最少的服务器                 | 动态调整，适合连接持续时间不一致的情况       | 实现较复杂，需持续监控连接数            | 请求处理时间长短不一的业务                  |
+| 源地址哈希（IP Hash）            | 根据客户端 IP 计算 hash，分配到对应的服务器            | 能保证客户端固定访问某一台服务器（粘性会话） | 不易实现负载均衡，新增/移除服务器需谨慎 | 用户登录状态需保持在固定服务器（如session） |
+| 一致性哈希                       | 使用一致性哈希算法，减少节点变动带来的大规模请求重分布 | 扩展性好，适合大规模分布式系统               | 实现复杂，性能受限于 hash 算法          | 分布式缓存、数据库集群等                    |
+| 最快响应时间（Fastest Response） | 根据后端响应时间决定请求分配                           | 实时性能导向                                 | 对系统监控要求高                        | 性能要求敏感的高频业务                      |
+| 随机（Random）                   | 随机选择后端服务器处理请求                             | 实现简单，有一定的负载分散效果               | 不一定最优，可能不均衡                  | 后端差异不大的轻负载应用                    |
+
 ## 076 Network Load Balancer(NLB)
 
 Network load balances(Layer 4) allow to:
@@ -1156,15 +1170,26 @@ CNAME:maps a hostname to another hostname
 
 NS:Name Servers for the Hosted Zone => DNS name or address
 
-> | 类型  | **目的**                                                     |
-> | ----- | ------------------------------------------------------------ |
-> | A     | 地址记录，用来指定域名的 IPv4 地址，如果需要将域名指向一个 IP 地址，就需要添加 A 记录。 |
-> | AAAA  | 用来指定主机名(或域名)对应的 IPv6 地址记录。                 |
-> | CNAME | 如果需要将域名指向另一个域名，再由另一个域名提供 ip 地址，就需要添加 CNAME 记录。 |
-> | MX    | 如果需要设置邮箱，让邮箱能够收到邮件，需要添加 MX 记录。     |
-> | NS    | 域名服务器记录，如果需要把子域名交给其他 DNS 服务器解析，就需要添加 NS 记录。 |
-> | SOA   | SOA 这种记录是所有区域性文件中的强制性记录。它必须是一个文件中的第一个记录。 |
-> | TXT   | 可以写任何东西，长度限制为 255。绝大多数的 TXT记录是用来做 SPF 记录(反垃圾邮件)。 |
+> | 类型      | 全称               | 用途                                               | 举例                                                        |
+> | --------- | ------------------ | -------------------------------------------------- | ----------------------------------------------------------- |
+> | **A**     | Address            | 把域名指向一个 **IPv4地址**                        | `example.com → 192.0.2.1`                                   |
+> | **AAAA**  | IPv6 Address       | 把域名指向一个 **IPv6地址**                        | `example.com → 2001:db8::1`                                 |
+> | **CNAME** | Canonical Name     | 把一个域名指向另一个域名（**别名**）               | `www.example.com → example.com`（再由 example.com 指向 IP） |
+> | **NS**    | Name Server        | 指定这个域名由哪个 DNS 服务器负责解析              | 常用于子域授权，如 `sub.example.com` 指向其他 DNS           |
+> | **MX**    | Mail Exchange      | 指定哪个邮件服务器接收此域的邮件                   | 用于设置公司或个人邮箱接收邮件                              |
+> | **SOA**   | Start of Authority | DNS 区域的起始记录，**必须存在**，包含区域管理信息 | 包含序列号、更新时间、管理员邮箱等信息（不需手动修改）      |
+> | **TXT**   | Text               | 任意文本记录，**多用于身份验证和安全策略**         | 比如：SPF、DKIM、Google site verification                   |
+
+比如你注册了一个域名 `mydomain.com`，你在 Route 53 中可能会设置：
+
+```
+mydomain.com.      A      54.12.34.56        # 指向你的 Web 服务器
+www.mydomain.com.  CNAME  mydomain.com.      # 别名指向主域
+mydomain.com.      MX     10 mail.google.com # 设置 Google Mail
+mydomain.com.      TXT    "v=spf1 include:_spf.google.com ~all" # SPF 策略
+```
+
+
 
 Hosted Zone: A container for records that define how to route traffic to a domain and its subdomains. (可以理解为你专属DNS服务器的一个分机)
 
