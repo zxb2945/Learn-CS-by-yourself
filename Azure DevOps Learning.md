@@ -54,11 +54,11 @@ az sshkey create --name <key-name> --resource-group <rg-name> --public-key "@<fi
 | **存储账户**        | 创建存储账户               | `az storage account create --name mystorageacct --resource-group myResourceGroup --location eastus --sku Standard_LRS` |
 |                     | 列出存储账户               | `az storage account list`                                    |
 | **App Service**     | 快速创建并部署 Web App     | `az webapp up --name <app-name> --resource-group <rg> --location <location>` |
-|                     | 创建 App Service 计划      | `az appservice plan create --name myPlan --resource-group myResourceGroup --sku FREE` |
-|                     | 创建 Web App               | `az webapp create --name mywebapp123 --resource-group myResourceGroup --plan myPlan` |
+|                     | **创建 App Service 计划**  | `az appservice plan create --name myPlan --resource-group myResourceGroup --sku FREE` |
+|                     | **创建 Web App**           | `az webapp create --name mywebapp123 --resource-group myResourceGroup --plan myPlan` |
 |                     | 部署 zip 包到 Web App      | `az webapp deployment source config-zip --resource-group myResourceGroup --name mywebapp123 --src myapp.zip` |
 |                     | 启用本地 Git 部署          | `az webapp deployment source config-local-git --name <app-name> --resource-group <rg>` |
-|                     | 配置 GitHub 自动部署       | `az webapp deployment source config --name <app-name> --resource-group <rg> --repo-url <repo-url> --branch <branch> --manual-integration` |
+|                     | **配置 GitHub 自动部署**   | `az webapp deployment source config --name <app-name> --resource-group <rg> --repo-url <repo-url> --branch <branch> --manual-integration` |
 | **网络服务**        | 创建虚拟网络               | `az network vnet create --resource-group myResourceGroup --name myVnet --subnet-name mySubnet` |
 |                     | 创建公共 IP                | `az network public-ip create --name myPublicIP --resource-group myResourceGroup` |
 | **容器服务（ACR）** | 创建容器注册表             | `az acr create --resource-group myResourceGroup --name myContainerRegistry --sku Basic` |
@@ -114,6 +114,34 @@ az vm open-port --resource-group myResourceGroup --name myVM --port 80
 
 
 ### Azure Resource Manager Templates 20250608
+
+> Azure Resource Manager（ARM）不是用来存储 template 的云资源，而是 Azure 的**资源管理和部署平台**，它的作用更广泛，下面详细解释：
+>
+> ------
+>
+> 什么是 Azure Resource Manager (ARM)？
+>
+> - ARM 是 Azure 的**管理层**，负责管理和控制 Azure 上所有资源的生命周期。
+> - 它提供统一的 API、命令行工具和门户界面，用于创建、更新、删除和管理 Azure 资源（虚拟机、存储账户、网络资源、数据库、Web 应用等）。
+>
+> ------
+>
+> ARM 与 Template（模板）的关系
+>
+> - **ARM Template（ARM 模板）** 是一种基于 JSON 的声明式模板，用来描述和定义 Azure 资源的部署架构。
+> - ARM Template 可以定义一组资源（比如 VM、存储、网络等）及它们的配置和依赖关系。
+> - 你通过 ARM 来部署和管理这些模板，但 ARM 本身是管理和调度的服务，不是“存储模板的资源”。
+>
+> ------
+>
+> 简单比喻
+>
+> - ARM 就像 Azure 的“操作系统”或“大脑”，控制着所有资源如何创建和管理。
+> - ARM Template 是“蓝图”或“说明书”，告诉 ARM 应该怎么创建资源。
+
+=>Azure Resource Manager（ARM）本身不是一个独立的门户（portal），但Azure Portal（就是通过 ARM 来管理所有 Azure 资源的图形界面。换句话说，**你在 Azure Portal 上看到和做的任何资源管理操作，背后都是 ARM 来执行的**。
+
+
 
 Azure Resource Manager Templates == ARM Templates 
 
@@ -282,6 +310,39 @@ Using ACR Client Libraries
 
 
 
+> `az ts create` 是 Azure CLI 中用于 **创建 Azure Template Spec**（模板规范）的命令。
+>
+> Template Spec 是 Azure 中一种用来**存储和版本化 ARM 模板**（Azure Resource Manager 模板）的方式。它让你可以：
+>
+> - 在 Azure 中 **集中存储模板**（比如 ARM templates）。
+> - **版本化模板**，方便多人共享、回滚、更新。
+> - **通过权限控制谁可以使用模板**。
+> - 在多个订阅或资源组中重用。
+>
+> ```
+> az ts create \
+>   --name myTemplateSpec \
+>   --version 1.0.0 \
+>   --resource-group myResourceGroup \
+>   --location eastus \
+>   --template-file ./azuredeploy.json \
+>   --description "My first template spec"
+> ```
+>
+> 这个命令会将 `azuredeploy.json` 文件上传为名为 `myTemplateSpec` 的 Template Spec，版本号为 `1.0.0`，放在 `myResourceGroup` 中。
+>
+> **使用模板创建资源**：
+>
+> ```
+> az deployment group create \
+>   --resource-group myRG \
+>   --template-spec "/subscriptions/<sub-id>/resourceGroups/myResourceGroup/providers/Microsoft.Resources/templateSpecs/myTemplateSpec/versions/1.0.0"
+> ```
+
+
+
+
+
 ### Azure  Container Instances 20250611
 
 > | 特性             | **ACI (Azure Container Instances)**  | **AKS (Azure Kubernetes Service)**                        |
@@ -411,6 +472,59 @@ Using ACR Client Libraries
 
 =>**Docker Compose YAML** 和 **ACI YAML** 都是用 YAML 格式写的，但它们的**结构和元素（关键字）是完全不同的**，因为它们针对的目标和用途不同:  Docker Compose 是容器编排工具的标准文件格式，专注于容器服务和依赖管理；ACI YAML 是 Azure 资源定义文件，更偏向云资源管理，结构更复杂且功能有限。
 
+
+
+> **Azure Container Apps** 是 Microsoft Azure 提供的一种**无服务器（serverless）容器服务**，它介于 Azure Container Instances（ACI）和 Azure Kubernetes Service（AKS）之间，专为构建和运行 **微服务**、**后台处理任务**、**事件驱动应用**、**API** 等现代云原生应用而设计。
+
+=>**Azure Container Apps（ACA）相当于一个“简化版”或“抽象封装版”的 AKS（Azure Kubernetes Service）**，它保留了 Kubernetes 的强大扩展能力，但**隐藏了复杂的集群管理和容器编排细节**，对开发者更友好，特别适合做现代微服务或事件驱动架构的 Serverless 应用。
+
+
+
+=>在 **Azure Container Instances (ACI)** 中，官方支持的 **4 种 storage volume 类型** 是：
+
+| Volume 类型      | 持久性 | 支持跨容器共享 | 使用场景                           |
+| ---------------- | ------ | -------------- | ---------------------------------- |
+| Azure File Share | ✅      | ✅              | 持久化存储，日志、用户文件、缓存等 |
+| Empty Directory  | ❌      | ✅              | 容器组内临时缓存、中间数据处理等   |
+| Secret           | ❌      | ❌              | 密钥、Token、证书等敏感信息注入    |
+| Git Repo         | ❌      | ✅              | 拉取初始化脚本、配置文件，只读挂载 |
+
+
+
+
+
+ExampTopics:
+
+以下是一个简单的 Dockerfile 示例，用于构建一个运行 Python 应用的镜像：
+
+```dockerfile
+# 使用官方 Python 镜像作为基础镜像
+FROM python:3.8-slim
+
+# 设置工作目录，终端默认进入的落脚点
+WORKDIR /app
+
+# 复制当前目录内容到容器的 /app 目录
+COPY . /app
+
+# 安装依赖
+# RUN 等同于，在终端操作的shell命令
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 暴露端口
+EXPOSE 80
+
+# 设置环境变量
+ENV NAME World
+
+# 运行应用
+CMD ["python", "app.py"]
+```
+
+
+
+
+
 ### Azure App Service 20250612
 
 > **Azure App Service** 是 Microsoft Azure 提供的一种**平台即服务（PaaS）**，用于部署和托管**Web 应用、API、后台服务**等，无需管理底层的服务器基础设施。
@@ -472,6 +586,21 @@ Using ACR Client Libraries
 |            | Access restrictions               | 设置 IP 白名单、限制访问来源                                 |
 | **安全类** | Backups                           | 配置自动备份（标准及以上计划）                               |
 |            | SSL certificates (见 TLS/SSL)     | 管理 HTTPS/SSL 证书                                          |
+
+
+
+=>App Service tier plan
+
+| 层级                       | 自动扩展能力（含实例上限）        | 部署槽支持         | 备份   | VNet 集成支持                   | 关键特性补充说明                         |
+| -------------------------- | --------------------------------- | ------------------ | ------ | ------------------------------- | ---------------------------------------- |
+| **Free (F1)**              | ❌ 不支持（每天 60 分钟 CPU 限制） | ❌ 不支持           | ❌ 无   | ❌ 无                            | 无法绑定自定义域名，仅用于学习测试       |
+| **Shared (D1)**            | ❌ 不支持（固定资源，低优先）      | ❌ 不支持           | ❌ 无   | ❌ 无                            | 与他人共享资源，功能受限                 |
+| **Basic (B1~B3)**          | ✅ 支持（最多 3 实例）             | ❌ 不支持           | ✅ 支持 | ❌ 无                            | 支持自定义域名与 SSL                     |
+| **Standard (S1~S3)**       | ✅ 支持（最多 10 实例）            | ✅ 支持最多 5 个槽  | ✅ 支持 | ✅ 支持基础集成                  | 适合中等流量应用，性价比高               |
+| **Premium v2 (P1v2~P3v2)** | ✅ 支持（最多 20 实例）            | ✅ 支持最多 20 个槽 | ✅ 支持 | ✅ 强化集成                      | 更高性能、更大内存、SSD 存储             |
+| **Premium v3 (P1v3~P3v3)** | ✅ 支持（最多 30+ 实例）           | ✅ 支持最多 30 个槽 | ✅ 支持 | ✅ 支持 Zone 冗余                | 高性能与企业级功能，推荐生产使用         |
+| **Isolated (I1~I3)**       | ✅ 支持（最多 100 实例）           | ✅ 支持最多 100 槽  | ✅ 支持 | ✅ App Service Environment (ASE) | 网络完全隔离，适合高合规需求             |
+| **Isolated v2**            | ✅ 支持（最多 100 实例，按需扩展） | ✅ 支持最多 100 槽  | ✅ 支持 | ✅ ASEv3，支持私有 IP            | 最强隔离性与性能，适合大型企业或政府项目 |
 
 
 
@@ -569,6 +698,127 @@ steps:
 > **Scale Up** 是换更强的机器，**Scale Out** 是加更多的机器
 
 =>给以给 Scale Out 设置 Auto Scaling
+
+
+
+Examtopics:
+
+> 为确保在 **Azure App Service 的部署槽（deployment slots）自动交换（auto swap）之前**执行脚本并确保资源准备就绪，你需要使用 **deployment slot settings** 中的 **预热（warm-up）机制**，特别是：
+>
+> 要确保 auto swap 之前脚本执行、资源可用，应通过设置 **`applicationInitialization`** 在**web.config**中配置 warm-up endpoint，Azure 会在正式交换前调用它，确保 app 已准备好。
+>
+>  Auto Swap 的工作机制：将代码部署到一个Testing Slot, 部署成功后，去确保 `Production` 槽上启用了 Auto Swap，然后进行自动从 Testing 接收代码 =>也就是说 auto swap 不应该部署到Testing Slot
+
+=>另一个方案
+
+> 你想要确保在开启了自动交换（Auto Swap）功能的情况下，**在交换操作发生之前先运行一些脚本，并确保资源就绪**。
+>
+> Azure App Service 提供了一个机制，允许在实际完成交换前，先对目标槽位进行**预热（warm-up）**，即：
+>
+> > **自动交换过程中，Azure 会先对目标槽位进行 Ping（探测），只有当返回指定的状态码时，才会继续完成交换。**
+>
+> **配置两个重要的应用设置（App Settings）**：
+>
+> - `WEBSITE_SWAP_WARMUP_PING_PATH`：设置要在交换前 Ping 的路径，比如 `/statuscheck`。
+> - `WEBSITE_SWAP_WARMUP_PING_STATUSES`：设置哪些 HTTP 状态码表示“准备就绪”，比如 `200`。
+
+在 **Azure Web App** 中启用并验证客户端证书（TLS Mutual Authentication），你需要进行以下配置，
+
+> 1️⃣ **Client certificate location（客户端证书位置）**
+>
+> 客户端证书被解码后作为一个 **请求头（HTTP header）`X-ARR-ClientCert`** 传递。
+>
+> ```
+> GET /api/photo HTTP/1.1
+> Host: myapp.azurewebsites.net
+> User-Agent: Mozilla/5.0
+> Accept: application/json
+> X-ARR-ClientCert: MIIDXTCCAkWgAwIBAgIJANzY82+H5CeqMA0GCSqGSIb3DQEBCwUAMEUxCzAJBgNVBAYTAkFVMRMwEQYDVQQIDAq3YJkYbXB0MRcwFQYDVQQKDA5NeSBDb21wYW55IEx0ZDAeFw0xOTA3MjcxMzQyMjRaFw0yOTA3MjQxMzQyMjRaMEUxCzAJBgNVBAYTAkFVMRMwEQYDVQQIDAq3YJkYbXB0MRcwFQYDVQQKDA5NeSBDb21wYW55IEx0ZDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAsU9lg==
+> ```
+>
+> ### 2️⃣ **Encoding type（编码类型）**
+>
+> > 客户端证书是以 **Base64 编码的 X.509 格式字符串** 传递的。
+
+=>因为Azure Web App **不会自动拒绝未通过验证的客户端证书**，你必须**在代码中处理验证逻辑**。这个代码指的是你Azure Web Application的代码！Azure向客户端请求CA证书，然后把它标为X-ARR-ClientCert转给Web App代码去处理
+
+将一个ASP.NET Core Web 应用（基于 Docker）迁移到 Azure，并通过自定义域名（如 `www.fourthcoffee.com`）访问，你可以写一个shell脚本
+
+> ```shell
+> #!/bin/bash
+> 
+> # 1. 创建 Web App（已存在可以略过）
+> az webapp create \
+>   --resource-group FourthCoffeePublicWebResourceGroup \
+>   --plan AppServiceLinuxDockerPlan \
+>   --name fourthcoffee-webapp \
+>   --deployment-container-image-name fourthcoffee/webapp:latest
+> 
+> # 2. 配置 Docker Hub 镜像（等价于 dockerHubContainerPath）
+> az webapp config container set \
+>   --name fourthcoffee-webapp \
+>   --resource-group FourthCoffeePublicWebResourceGroup \
+>   --docker-custom-image-name fourthcoffee/webapp:latest \
+>   --docker-registry-server-url https://index.docker.io
+> 
+> # 3. 添加自定义域名
+> az webapp config hostname add \
+>   --webapp-name fourthcoffee-webapp \
+>   --resource-group FourthCoffeePublicWebResourceGroup \
+>   --hostname www.fourthcoffee.com
+> 
+> ```
+
+创建一个从 github repro上拉一个仓库部署到Azure App Service， 从CLI命令的角度**3～4 个命令** 完成部署：
+
+> 1. 创建资源组（如果需要）
+>
+>    ```
+>    az group create --name myResourceGroup --location japaneast
+>    ```
+>
+> 2. 创建 App Service Plan
+>
+>    ```
+>    az appservice plan create --name myAppServicePlan --resource-group myResourceGroup --sku B1 --is-linux
+>    ```
+>
+> 3. 创建 Web App（附带部署源）
+>
+>    ```
+>    az webapp create --resource-group myResourceGroup --plan myAppServicePlan \
+>      --name my-webapp-name --runtime "NODE|18-lts" \
+>      --deployment-source-url https://github.com/your-username/your-repo.git
+>    ```
+>
+> 4. （可选）设置 GitHub Actions 自动部署
+>
+>    ```
+>    az webapp deployment source config \
+>      --name my-webapp-name \
+>      --resource-group myResourceGroup \
+>      --repo-url https://github.com/your-username/your-repo.git \
+>      --branch main \
+>      --manual-integration
+>    ```
+>
+>    =>也可设置`--manual-integration` 参数，**不启用自动同步 / CI（Continuous Integration）**。
+>
+>    =>`az webapp deployment slot` 是 Azure CLI 里用于管理 **Azure App Service 部署槽（Deployment Slots）** 的命令组。如
+>
+>    ```
+>    az webapp deployment slot create \
+>      --name mywebapp \
+>      --resource-group myResourceGroup \
+>      --slot staging
+>    ```
+>
+
+
+
+
+
+
 
 ### Azure Functions 20250617
 
@@ -677,6 +927,14 @@ steps:
 > **`host.json` 是配置 Function App 行为的全局设置，影响函数的运行时行为。**
 >  **`local.settings.json` 是本地开发环境用的配置文件，包含环境变量和连接字符串，不会部署到 Azure。**=>是本地用来模拟 Azure 环境的配置行为，比如Azure发个Queue能被本地vscode感知到，因为本地也跟Azure Functions所在的容器一样配置了相关信息
 
+
+
+ 
+
+
+
+
+
 ### Azure Functions Triggers 20250620
 
 > 在 Azure Functions 中，**Triggers（触发器）** 和 **Bindings（绑定）** 是函数运行模型的核心概念
@@ -741,18 +999,63 @@ steps:
 >       "type": "httpTrigger",
 >       "direction": "in",
 >       "name": "req",
+>       "methods": [ "post" ]
+>     },
+>     {
+>       "type": "http",
+>       "direction": "out",
+>       "name": "res"
+>     }
+>   ]
+> }
+> 
+> ```
+
+> 在 Azure Functions 中，`host.json` 和 `function.json` 是两个非常关键的配置文件，它们分别用于控制：
+>
+> - **整个 Function App 层面的设置（`host.json`）**
+>
+> ```json
+> {
+>   "version": "2.0",
+>   "customHandler": {
+>     "description": {
+>       "defaultExecutablePath": "process.exe",
+>       "workingDirectory": "",
+>       "arguments": []
+>     },
+>     "enableForwardingHttpRequest": true
+>   }
+> }
+> 
+> ```
+>
+> - **每个具体 Function 的触发器绑定配置（`function.json`）**
+>
+> ```json
+> {
+>   "bindings": [
+>     {
+>       "authLevel": "function",
+>       "type": "httpTrigger",
+>       "direction": "in",
+>       "name": "req",
 >       "methods": [ "get", "post" ]
 >     },
 >     {
->       "type": "queue",
+>       "type": "http",
 >       "direction": "out",
->       "name": "$return",
->       "queueName": "myqueue-items",
->       "connection": "AzureWebJobsStorage"
+>       "name": "res"
 >     }
 >   ]
 > }
 > ```
+>
+> 
+
+
+
+
 
 Azure Fucntion的hosting的种类
 
@@ -769,6 +1072,23 @@ Azure Fucntion的hosting的种类
 > (Serverless)   (No cold start)       (Always On VM)
 > 
 > ```
+
+
+
+> Azure Web PubSub 是微软提供的一个 **实时消息传递服务**，专门用来简化开发基于 WebSocket 的实时双向通信应用，比如聊天、实时仪表盘、协作工具等。
+>
+> ## 使用 Azure Web PubSub **事件触发** Azure Functions
+>
+> - **场景**：Azure Web PubSub 支持事件回调（如连接打开、关闭、消息接收），可以把这些事件推送到 Azure Functions 进行处理。
+>
+> - 在最新的 Azure Functions 扩展里，微软提供了一个专门的 **Web PubSub Trigger**，用来直接触发 Azure Functions（和传统的 HTTP Trigger 不同）。
+> - 这个 Trigger 绑定需要你在 `function.json` 里指定一个 `eventType`，用来区分触发函数的事件消息类型。
+> - `eventType` 的值只能是下面两种之一：
+>
+> | eventType 值 | 说明                                                         |
+> | ------------ | ------------------------------------------------------------ |
+> | `user`       | 表示来自客户端的“用户事件”，比如客户端发来的自定义消息。     |
+> | `system`     | 表示系统事件，比如连接（connect）、断开（disconnect）等系统级事件。 |
 
 
 
@@ -789,6 +1109,51 @@ Azure Cosmos DB
 =>说Azure Function如何Handle抛出的异常，其实就是C#的try catch...
 
 =>还可以给Azure Function进行依赖注入，可以用传统的In-Process 模式，使用 `Startup.cs`来注册类型-实例对应关系，感觉更偏向于C#语法层面的东西哈 
+
+
+
+Exam topic:
+
+Azure Functions 各种托管计划:
+
+| 托管计划         | 计费方式                     | 弹性伸缩     | 冷启动 | VNET 支持 | 适用场景                                                    |
+| ---------------- | ---------------------------- | ------------ | ------ | --------- | ----------------------------------------------------------- |
+| Consumption Plan | 按执行量付费                 | 自动按需扩缩 | 有     | 不支持    | 事件驱动、低频调用、无服务器                                |
+| Premium Plan     | 按预留实例计费               | 自动按需扩缩 | 无     | 支持      | 低延迟、高性能、**VNET 集成**                               |
+| App Service Plan | 固定资源规格计费             | 手动扩缩     | 无     | 支持      | 复用现有资源、负载稳定，**仅部分 SKU 支持VNET，且性能很差** |
+| Dedicated Plan   | App Service Environment 计费 | 手动扩缩     | 无     | 支持      | 高安全隔离、企业级环境                                      |
+
+=>Premium Plan 是 **专门为 Azure Function 优化** 的运行环境，有自动 scale-out、高性能、**冷启动优化**。App Service Plan 虽然能跑 Function，但并**不建议**用它做高负载函数运行平台，**缺乏自动扩展能力**（不是真正 Serverless，因为资源是预先分配的，不按调用量计费。）。除非你已经有 App Service Plan，想复用资源。Plan 可以保持几乎热启动，需设置**Always On**，确保无冷启动
+
+=>Consumption Plan 没有冷启动优化，搞不好得10min才能启动起来
+
+=>Azure Functions 在 App Service Plan 上运行时，本质上就是在 **标准的 Azure App Service 环境** 里启动函数应用（Function App），跟普通的 Web App、API App 共享同一组计算资源（VM 或实例）。
+
+> ### **SKU（Stock Keeping Unit，库存单位）**
+>
+> - 是托管计划下面的具体资源规格，用来定义**虚拟机的大小、性能等级和价格**。
+> - 比如在 **App Service Plan** 里，你可以选择不同的 SKU：
+>   - Free
+>   - Shared
+>   - Basic (B1, B2, B3)
+>   - Standard (S1, S2, S3)
+>   - Premium (P1v2, P2v2...)
+>
+> SKU 影响 CPU、内存、存储配额和价格。
+
+=>Plan与SKU两个层级
+
+
+
+> **Extension Bundle** 是 Azure Functions 中用于集中管理扩展（如 Blob、Queue、Cosmos DB 等触发器和绑定）的机制。
+>  通过启用 Extension Bundle，无需单独安装每个扩展包，Azure 会根据 bundle 配置自动加载对应的功能。
+>  这简化了函数应用的依赖管理，尤其适用于使用 Azure Functions 的非 .NET 项目（如 JavaScript、Python 等）。
+
+=>比如使用Rust来写Azure Functions 
+
+
+
+
 
 ## 2.Develop for Azure storage
 
@@ -1084,6 +1449,32 @@ Azure Cosmos DB
 >
 > =>Cosmos DB 还提供了一个基于 HTTP 的 **REST API**，你可以通过它来管理数据库、容器、文档等资源，支持 SQL API 的所有基本操作，包括 **增删改查、创建容器、配置索引、设置 RU、查询文档** 等。
 
+=>具体场景举例：
+
+> 你有一个支付外卖的 **Web Service**，数据存在 **Azure Cosmos DB**。
+>
+> 新功能要求：每个 Cosmos DB 文档必须有一个名为 `tip` 的属性，且值是数字。
+>
+> 但是：现有的客户端（网站、移动端）暂时不会更新来设置这个 `tip` 属性，意味着旧文档可能没有 `tip` 字段。
+>
+> =>使用 Pre-trigger比较好，伪代码
+>
+> ```
+> function preTrigger() {
+>   var context = getContext();
+>   var request = context.getRequest();
+>   var documentToCreate = request.getBody();
+> 
+>   if (!documentToCreate.hasOwnProperty('tip') || typeof documentToCreate.tip !== 'number') {
+>     documentToCreate.tip = 0;  // 默认值
+>   }
+> 
+>   request.setBody(documentToCreate);
+> }
+> ```
+
+
+
 
 
 =>Partitioning（分区）和 Horizontal Scaling（水平扩展)
@@ -1131,6 +1522,22 @@ Azure Cosmos DB
 > | **Session**（会话一致性）           | 低   | 高   | 高     | 当前客户端读写强一致，跨客户端可能看到旧数据     |
 > | **Consistent Prefix**（前缀一致性） | 低   | 高   | 高     | 保证读到的数据是按写入顺序排列的前缀             |
 > | **Eventual**（最终一致性）          | 最低 | 最高 | 最高   | 不保证顺序，最终你**可能**读到一致的数据         |
+
+
+
+=>Azure Cosmos DB 的 Change Feed Processor 主要由以下四个核心组件组成：
+
+```
+[Monitored Container]  <-- 监听变更
+        ↓
+[Change Feed Processor in Compute Instance]
+        ↓
+[Delegate (用户代码处理变更)]
+        ↑
+[Lease Container]  <-- 存储进度，协调多个 Compute Instance
+```
+
+
 
 ### Azure Blob Storage 20250623
 
@@ -1221,6 +1628,26 @@ Azure Cosmos DB
 > - 没有固定保留时间
 > - 设置一个“标签”锁定 blob
 > - 必须手动解除才能修改或删除
+
+
+
+ExampTopics:
+
+**如何以合规、安全、顺序一致的方式异步处理 Azure Blob Storage 中的变更日志（Transaction Logs）**，主要用于 **审计用途**。
+
+> 什么是 Azure Blob Storage 的 Change Feed？
+>
+> **Change Feed** 是一种 **事件日志记录机制**，用于记录对 Blob（包括 block blob 和 append blob）进行的 **创建、修改和删除等操作**。它为开发者提供了类似数据库事务日志的功能，可以 **有序追踪和读取变更历史**。
+>
+> Change Feed 的数据存储在特殊容器 `$blobchangefeed` 中
+>
+> =>非常适合 审计合规
+>
+> =>另外， **Azure Cosmos DB** 也提供了 **Change Feed** 功能，而且非常强大，广泛用于**实时数据处理、事件驱动架构、审计日志、增量ETL等场景**。
+
+
+
+
 
 ## 3.Implement Azure security
 
@@ -1368,7 +1795,30 @@ Azure AD 是身份系统的“后端”，而 Microsoft Identity Platform 是开
 >
 > CAE 是一种新一代的访问控制机制，它让 Azure AD 能够在**用户状态变化时，立即通知资源服务端，使其能主动撤销 Access Token 或重新认证**。
 
+
+
+> **用户分配的托管身份（User-assigned managed identities）** 是一种可以在多个应用之间复用权限的方式。
+> 用户分配的托管身份将托管身份与新应用关联起来，不需要使用密钥或密码。
+>
+> **系统分配的托管身份（System-assigned managed identities）** 是为每个应用创建一个新的身份，
+> 这不符合常见的配置需求（因为不能复用）。
+>
+> | 特性 / 维度        | 用户分配的托管身份（UAMI）                                   | 系统分配的托管身份（SAMI）                             |
+> | ------------------ | ------------------------------------------------------------ | ------------------------------------------------------ |
+> | **创建和生命周期** | 独立于任何具体资源创建，可以被多个资源共享。                 | 随资源创建，同时创建；资源删除时身份自动删除。         |
+> | **作用域**         | 可以在多个 Azure 资源（VM、App Service、Function 等）间复用。 | 绑定到单个资源，不可跨资源共享。                       |
+> | **管理复杂度**     | 需要单独管理身份资源，权限授予在身份级别管理。               | 身份随资源自动管理，无需额外维护。                     |
+> | **权限复用**       | ✅ 支持，多个应用可使用同一个托管身份访问相同资源。           | ❌ 不支持，每个应用有独立身份。                         |
+> | **资源删除影响**   | 身份独立，删除某个应用不影响身份存在。                       | **资源删除即删除身份，身份随资源生命周期结束。**       |
+> | **典型使用场景**   | - 多个服务需要用同一身份访问同一资源- 需要集中管理权限       | - 简单应用或场景- 身份只绑定一个资源- 不需要跨应用复用 |
+> | **身份更改影响**   | 独立更改身份配置，不影响已绑定的资源（需要重新绑定）         | 身份随资源变更，自动同步。                             |
+> | **角色分配管理**   | 针对身份进行角色分配。                                       | 针对身份进行角色分配，但身份只能用于单一资源。         |
+
+
+
 ### Azure Active Directory 20250626
+
+=>Azure Active Directory（Azure AD）现在已经正式更名为 Microsoft Entra ID。
 
 > Azure AD（Azure Active Directory）是 Microsoft 提供的**云端身份和访问管理（IAM）服务**，是企业在 Azure 云上进行**用户身份验证、单点登录（SSO）、权限控制**等操作的核心服务。
 
@@ -1638,6 +2088,8 @@ Azure AD 是身份系统的“后端”，而 Microsoft Identity Platform 是开
 
 =>千万不要拘泥于名字类似认为Front Door 局限于**Frontend Endpoint**！
 
+=>Front Door 可以理解为是“**带 CDN 和智能路由的 L7 全球级loader balancer**”。
+
 
 
 > Azure Content Delivery Network（**Azure CDN**）是微软提供的**全球分布式内容加速服务**，用于提高网站、应用程序和 API 的性能、可靠性和可扩展性，尤其适合静态内容（如图片、视频、JS、CSS）的加速分发。
@@ -1840,6 +2292,46 @@ Microsoft Defender for Cloud
 >
 > > ✅ **发现风险、强化配置、检测威胁、自动修复，保护你在 Azure、其他云（如 AWS/GCP）、甚至本地的数据和资源安全。**
 
+=>Defender for Cloud 需要底层的 VM 支持深入的分析和集成（如漏洞扫描、依赖项分析、吊起 DNS 检查）,所以跟 SKU息息相关，是的，只有在特定 SKU（如 Standard / Premium）以上，你才能启用 Defender for Cloud 的完整功能，包括 DNS 吊起监控。Consumption Plan 是 serverless 架构，资源极度弹性和临时，**无法持续追踪域名配置等状态**
+
+
+
+=>设置报警
+
+```
+az monitor metrics alert create \
+  --name high-cpu-alert \
+  --resource-group my-rg \
+  --scopes /subscriptions/.../resourceGroups/my-rg/providers/Microsoft.Compute/virtualMachines/myVM \
+  --condition "avg Percentage CPU > 80" \
+  --severity 2 \
+  --evaluation-frequency 1m \
+  --window-size 5m \
+  --auto-mitigate true \
+  --description "High CPU usage alert for VM" \
+  --action my-action-group
+```
+
+> | 参数                                 | 说明                                                         |
+> | ------------------------------------ | ------------------------------------------------------------ |
+> | `--action`                           | 当警报被触发时要执行的动作，例如发送邮件、调用 webhook、触发自动化等。通常是 Action Group 的资源 ID 或名称，例如：`--action /subscriptions/.../actionGroups/my-action-group` |
+> | `--auto-mitigate`                    | 是否在问题解决后自动将警报重置为已解决（默认 `true`）。设置为 `false` 会保留告警状态直到手动清除。 |
+> | `--description`                      | 为此告警规则添加说明文字。                                   |
+> | `--disabled`                         | 是否在创建后立即禁用警报。`true` 表示创建后不会自动启用；默认 `false`。 |
+> | `--evaluation-frequency`             | **多久评估一次指标数据**（默认值通常为 1 分钟或 5 分钟）。支持单位：`m`（分钟）、`h`（小时）例如：`1m`, `5m`, `15m` |
+> | `--region`                           | 警报规则本身的部署区域（不是监控资源的区域）。例如：`eastus`, `japaneast` |
+> | `--severity`                         | 告警严重等级，数值范围 0 到 4：`0` = 严重，`4` = 信息性告警。例如：`--severity 2` |
+> | `--tags`                             | 为告警规则添加标签（Key=Value 格式），如：`--tags team=dev env=prod` |
+> | `--target-resource-type` 或 `--type` | 指定要监控的资源类型，如 `Microsoft.Compute/virtualMachines`。 |
+> | `--target-resource-region`           | 被监控资源的部署区域，例如 `eastus`。有助于在资源类型不唯一时精确匹配。 |
+> | **`--window-size`**                  | **每次评估时使用的时间窗口长度**，用于聚合指标数据（非常重要）。例如：`5m`, `10m`, `1h`表示“在过去多少时间内的数据是否超过阈值”。 |
+
+
+
+
+
+
+
 ## 5.Connect to and consume Azure services and third-part services
 
 ### Azure API Management 20250708
@@ -1987,6 +2479,28 @@ JWT是什么：
 
 =>API Management可以设置Multi-region和scaling
 
+
+
+右侧菜单栏：APIs,Product,Subscription
+
+> ```
+> [API1]         [API2]
+>    \             /
+>    ---> [Product A]  --->  [Subscription] (Key1/Key2)  --->  [Developer/User]
+> ```
+>
+> 多个 API 放进 Product
+>
+> 用户订阅 Product
+>
+> 获得一个 Subscription Key
+>
+> 用 Key 访问 Product 中的所有 API
+
+
+
+
+
 ### Azure Event Grid 20250710
 
 > **Azure Event Grid** 是 Azure 提供的 **事件驱动架构服务（Eventing Service）**，它可以在 **服务之间高效、安全地传递事件通知**。
@@ -2064,7 +2578,7 @@ Azure Service Bus：
 > 函数/服务处理                 Lambda / 服务处理
 > ```
 
-
+=>Azure Blob Storage Trigger  +  Event Grid + Azure Functions, Event Grid 的触发延迟通常在 1 秒以内
 
 >  Topic 是事件的“投递地址”:你要发送（发布）事件到 Event Grid，就必须指定一个 Topic，相当于“门口的信箱”。
 >
@@ -2093,7 +2607,7 @@ Azure Service Bus：
 
 =>创建 Topic 和 Event Subscription 是使用 Azure Event Grid 的两个核心步骤
 
-=>**Azure Event Grid 的 Event Subscription 支持设置 Filter（过滤器）**，也就是说，**你订阅了一个 Topic，但可以选择只接收符合某些条件的事件**，比如事件类型、路径、数据内容等。
+=>**Azure Event Grid 的 Event Subscription 支持设置 Filter（过滤器）**，也就是说，**你订阅了一个 Topic，但可以选择只接收符合某些条件的事件**，比如Event Type、Subject、Data等。
 
 > Routing 是 Event Grid 的核心职责：你只需要发布事件，Event Grid 会根据你设置的规则把它“路由”到正确的订阅接收方。
 
@@ -2136,6 +2650,22 @@ Azure Service Bus：
 > | Queue           | RabbitMQ / Kafka（简化）      | 轻量消息队列         |
 > | Table           | DynamoDB / MongoDB（简化）    | NoSQL 表格数据库     |
 > | File Shares     | NFS / SMB                     | 共享文件系统         |
+
+> ## 具体 Storage Account 类型（在 CLI 中用 `--sku` 指定）
+>
+> | 类型名                         | 说明                               | 支持的服务               | 用途                         |
+> | ------------------------------ | ---------------------------------- | ------------------------ | ---------------------------- |
+> | **Storage (GPv1)**             | 旧版通用账户，已不推荐使用         | Blob, File, Queue, Table | 向后兼容场景                 |
+> | **StorageV2 (GPv2)**           | 推荐的通用账户类型                 | Blob, File, Queue, Table | Web应用、备份、归档等        |
+> | **BlobStorage**                | 专用于 Blob 服务                   | Blob                     | 适合冷数据访问分层管理       |
+> | **BlockBlobStorage**           | 高性能 Blob                        | Blob                     | 数据湖、媒体处理、高性能场景 |
+> | **FileStorage**                | 高性能文件共享                     | File                     | 替代 NAS 的场景              |
+> | **Premium_ZRS**                | Zone-redundant 高可用 Premium 存储 | Blob, File（部分支持）   | 高可用与性能并存场景         |
+> | **BlockBlobStorage + Premium** | SSD 支持的高性能 Blob 存储         | Blob                     | 延迟敏感的大文件上传等       |
+
+=>exam topic: StorageV2 是通用型存储账户，基于 HDD，支持 Block Blob、Append Blob、Page Blob、Queue、Table 和 File 等多种服务及冷热归档层，而 **BlockBlobStorage** 是基于 SSD 的高级账户，仅支持块 Blob，专为高吞吐低延迟场景设计。
+
+
 
 =>Azure Service Bus 是功能更强大、专为企业场景设计的“高级队列服务”，与 Azure Storage Queue 都提供消息排队功能，它有**单独的服务门户入口**，**不属于 Storage Account** 的一部分
 
@@ -3162,3 +3692,5 @@ Azure Pipelines:就像对基础结构即代码的兴趣增加一样，人们对�
 > - **具有不利的许可限制。** 许可证的效果可能会影响使用开放源代码软件的整个解决方案。
 
 > [Mend](https://www.mend.io/) 是持续开源软件安全性和合规性管理的领导者。
+>
+> 

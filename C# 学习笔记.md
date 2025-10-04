@@ -3088,7 +3088,7 @@ internal class ValueCalc
 
 
 
-## 5.4 多线程编程 补充20250630
+## 5.4 多线程编程
 
 微软强烈推荐使用Task，而不是Thread。
 
@@ -3195,19 +3195,50 @@ public partial class WindowForThread : Window
 }
 ```
 
-自动化工具项目中偶尔也会用到
+Chimera工具中运用一下：
 
 ```c#
-var dtTask = Task.Run(() =>
+/// <summary>
+/// Check Start Button
+/// </summary>
+private DelegateCommand _btnCheckType;
+public DelegateCommand btnCheckType =>
+    _btnCheckType ?? (_btnCheckType = new DelegateCommand(async () => await ExecutebtnCheckTypeAsync(), CanExecutebtnCheckType));
+
+async Task ExecutebtnCheckTypeAsync()
 {
-    if (Model.Copytemplate(ApplyTemplateList.ToList<string>()))
+    IsBusy = true;
+
+    if (SelectedItemChkType == null) return; 
+
+    // Handle selected DBList 
+    DataTable dbListDataTable = ReadCsvFile(SelectedItem);
+    // Input shogen path
+    var checker = new DataCheckStarter(ShogenDir, dbListDataTable);
+
+    await Task.Run(() =>
     {
-        ret = Model.CreateDT(radioname, specpath);
-    }
+        if (SelectedItemChkType == "DRAN_LTE_NewSite")
+        {
+            checker.MainLogic(DataCheckStarter.BaseStationGen.LTE, DataCheckStarter.BaseStationType.DRAN_Precon);
+        }
+        else if (SelectedItemChkType == "DRAN_NR_NewSite")
+        {
+            checker.MainLogic(DataCheckStarter.BaseStationGen.NR, DataCheckStarter.BaseStationType.DRAN_Precon);
+        }
+    });
+
+    IsBusy = false;
+    this.Log = checker.Log;
+
+    _isBtnCheckTypeClicked = true;
+    _isBtnOutputLogEnabled = true;
+    RaisePropertyChanged(nameof(IsBtnOutputLogEnabled));
+    btnOutputLog.RaiseCanExecuteChanged();
 }
 ```
 
-(2023.8.17)
+(2025.9.10)
 
 => 总结`Task.Run()`确实是多线程编程，但是`async/await`跟单线程多线程无必然联系，它们是配对使用于异步编程，通常用于等待 I/O 操作或其他异步操作的完成。
 
@@ -3277,8 +3308,6 @@ internal class Asyn
 ```
 
 （2024.4.11）
-
-=>尝试一下在chimera中应用异步编程
 
 ## 5.5 ASP.NET 
 
