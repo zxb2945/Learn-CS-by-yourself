@@ -2975,7 +2975,7 @@ var sql = $@"
 
 (2025.5.15)
 
-#### 5.3.2.5  SQL 性能优化要点 补充20250630
+#### 5.3.2.5  SQL 性能优化要点
 
 问题背景：进行从Excel导入电力表到PostgreSQL数据库时，原本设计代码的代码有以下问题
 
@@ -3043,7 +3043,7 @@ using (var transaction = conn.BeginTransaction())
 
 =>需要注意的是 **事务（Transaction）本身不会合并 SQL 命令为一个通信包**，**每条 SQL 语句仍是一次数据库通信**，只是事务保证了这些操作要么一起成功、要么一起失败。(20250622)
 
-=>改成stored function会不会更快速？？
+=>改成stored function应该会更快吧
 
 ### 5.3.3 SQLite
 
@@ -4171,6 +4171,12 @@ public partial class Window3 : Window
 ```
 
 (2023.8.2)
+
+Chimera Tool开发过程中，主窗口往子窗口传递SW Ver.(25Q2 etc.)时可以用 事件，在Prism框架中使用IEventAggregator
+
+主窗口用 `_eventAggregator.GetEvent<SWVerSelectedEvent>().Publish(SelectedItem);`发布，子窗口用`_eventAggregator.GetEvent<SWVerSelectedEvent>().Subscribe(OnSWVerChanged);`注册接收。
+
+(2025.10.31)
 
 #### 6.2.3.4 Command
 
