@@ -1814,7 +1814,7 @@ SQL Tuning Advisor
 
 # OCI AI Foundations Associate
 
-范围从大到小： Artificial Intelligence => Machine Learning => Deep Learning => Generative AI
+范围从大到小： Artificial Intelligence => Machine Learning => Deep Learning => Generative AI => LLM
 
 ## AI Foundations 20260716
 
@@ -1951,11 +1951,378 @@ Transformer 时代（架构革命）
 
 
 
+## Machine Learning Foundations 20260723
+
+Supervised Learning - Linear Regression
+
+Supervised Learning - Classification  => Logistic Regression
+
+Unsupervised Learning - Clustering Algorithm
+
+Reinforcement Learning
+
+| 学习类型                                                     | 定义                                                    | 目标                     | 应用示例                                                     |
+| ------------------------------------------------------------ | ------------------------------------------------------- | ------------------------ | ------------------------------------------------------------ |
+| 监督学习（Supervised Learning）— 线性回归（Linear Regression） | 使用带有标签的数据进行训练，预测连续数值。              | 预测一个数值。           | 房价预测、销售预测、气温预测                                 |
+| 监督学习（Supervised Learning）— 分类（Classification）      | 使用带有标签的数据进行训练，预测数据所属的类别。        | 预测类别。               | 垃圾邮件识别、疾病诊断、情感分析                             |
+| 无监督学习（Unsupervised Learning）                          | 使用没有标签的数据，自动发现数据中的规律和结构。        | 找出数据中的模式或分组。 | 客户分群 Market Segmentation、异常检测 Outlier Analysis、商品推荐 Recommendation Systems |
+| 强化学习（Reinforcement Learning）                           | 智能体（Agent）通过与环境交互，根据奖励和惩罚不断学习。 | 获得最大累计奖励。       | 自动驾驶、机器人控制、围棋 AI（AlphaGo）                     |
+
+=>机器学习三大范式的内部机理，本质上都是数学函数、概率模型和优化算法的组合；这些组合在高维空间里运行，所以能表示远超我们三维直觉的复杂结构。
+
+=> Linear Regression  用来拟合数据线性关系，而Logistic Regression名字里Regression，但实际上是一种分类算法。
+
+> Linear Regression 和 Logistic Regression 都是典型的监督学习（Supervised Learning）方法，因为它们都需要带标签的数据来训练。因为“回归”这个词本身就暗示了有一个目标值 y 要学习。
+>
+> 无监督学习常见的任务是聚类（Clustering），降维（Dimensionality Reduction），异常检测（Anomaly Detection），关联规则学习（Association Rule Learning
+
+Logistic Regression可以看成是“没有隐藏层的Neural Networks”，或者说是一个最简单的神经元模型。
+
+=> 神经网络可以理解成 把上一层Logistic Regression的输出作为下一层Logistic Regression的输入，一层层叠起来
+
+=> 常用Anaconda 和 Jupyter Notebook 来进行机器学习训练
+
+> Anaconda = Python + 常用数据科学库 + 包管理工具 + 开发工具
+>
+> Jupyter Notebook 是一个基于浏览器的交互式开发工具。 是 Anaconda 自带的一个工具
+
+> **Reinforcement Learning**（强化学习，RL） 是机器学习三大范式（监督学习、无监督学习、强化学习）之一。
+>
+> 强化学习就是让智能体（Agent）通过不断尝试，从奖励（Reward）和惩罚（Penalty）中学习如何做出最优决策。
 
 
 
+## Deep Learning Foundations 20260725
+
+Neural Network 核心概念一览
+
+| 概念                | 中文     | 作用                                                         |
+| ------------------- | -------- | ------------------------------------------------------------ |
+| Layer               | 层       | 对数据进行逐层处理                                           |
+| Neuron              | 神经元   | 一个计算单元: 输入=>加权求和=>激活函数=>输出                 |
+| Weight (W)          | 权重     | 决定输入的重要程度                                           |
+| Bias (b)            | 偏置     | 调整输出，使模型更灵活                                       |
+| Activation Function | 激活函数 | 给神经网络加入非线性能力，使网络能够学习复杂关系。比如ReLU: f(x)=max(0,x);Sigmoid等函数 |
+
+=>训练神经网络，本质就是不断调整 Weight和Bias，使网络的预测结果越来越接近真实答案。
+
+```
+输入(Input)
+      │
+      ▼
+Weight（权重）
+      │
+      ▼
+加权求和
+      │
+      ▼
++ Bias（偏置）
+      │
+      ▼
+Activation Function（激活函数）
+      │
+      ▼
+Neuron 输出
+      │
+      ▼
+传递到下一 Layer
+```
 
 
+
+> **Backpropagation Algorithm**（反向传播算法，简称 BP） 是深度学习中最核心的训练算法之一。作用是：根据预测误差，反向计算每个神经元的责任，并更新每个权重（Weight）和偏置（Bias），使神经网络越来越准确。可以把它理解成神经网络的"纠错机制"。
+
+神经网络训练全过程实际上不断重复以下步骤：
+
+```
+           输入数据
+               │
+               ▼
+      Forward Propagation
+               │
+               ▼
+        Prediction（预测）
+               │
+               ▼
+      Loss Function（计算误差）
+               │
+               ▼
+      Backpropagation（反向传播）
+               │
+               ▼
+   计算每个 Weight、Bias 的 Gradient
+               │
+               ▼
+ Gradient Descent（梯度下降）
+               │
+               ▼
+ 更新 Weight 和 Bias
+               │
+               ▼
+      下一轮训练（重复）
+```
+
+
+
+=>Transformer 是一种神经网络架构思想，通常用 PyTorch 这样的深度学习框架实现。PyTorch 的底层很多底层高性能计算是用 C++ / CUDA 写的，以支持高效的GPU 计算；而训练时，很多时候只需要用几行 Python 代码就能启动模型训练。
+
+=>PyTorch是Meta的开源，有数百万行代码（包括 C++、Python、CUDA 等），十几万次提交（Commit），取代谷歌的TensorFlow成为目前各家大模型的主流框架
+
+=>简单启动模型训练虽然几行Python代码，但是正真训练GPT这种几千亿参数的大模型正真的代码可能有几十万行，要解决数据流水线编排， GPU 编排，数据并行...   
+
+=> Python => PyTorch => LLM 可以类比为 C语言 => C语言标准库 => Linux Kernel, 当然不严谨的地方是Linux Kernel底层也还是用C语言，但LLM最底层不是Python而是C++/CUDA
+
+=>DeepSeek的开源主要是指 模型权重和运行代码，至于完整训练代码以及训练数据是拿不到的
+
+
+
+## Generative AI and LLM Foundations 20260730
+
+Generative AI（生成式 AI） 是建立在Deep Learning基础上的一类应用，它利用深度学习模型（如 Transformer、Diffusion）来生成文本、图片、音频、视频和代码等新内容。
+
+LLM（Large Language Model） 是一种专门处理自然语言NLP(Natural Language Processing)的大型生成模型。是 Generative AI 的一个重要分支（或一种实现）。
+
+
+
+**Transformer** 是现代大语言模型（LLM）的核心架构，2017 年，Google 发表论文：Attention Is All You Need. Transformer 使用 Self-Attention让模型在处理一个词时，同时关注（Attention）句子中的其他所有词，从而更好地理解上下文。
+
+Transformer 可以看作一个由许多重复模块组成的网络，每个模块都通过 Self-Attention 让每个词都能关注句子中的其他所有词，再结合Position Encoding、Feed Forward Network、Residual Connection和Layer Normalization不断提炼信息，最终学会理解上下文并预测下一个 Token。这种能够并行计算且有效建模长距离依赖的能力，是它成为现代大语言模型（GPT、Claude、Gemini、Llama 等）基础架构的关键原因。
+
+一个 Transformer Block：
+
+```
+输入 Embedding
+      │
+      ▼
+Position Encoding
+      │
+      ▼
+Multi-Head Attention
+      │
+Residual + LayerNorm
+      │
+      ▼
+Feed Forward
+      │
+Residual + LayerNorm
+      │
+      ▼
+输出
+```
+
+一个 GPT 模型会堆叠很多这样的 Block，例如几十层甚至上百层。随着模型规模增大（更多层、更大参数量、更多训练数据），它学到的语言规律越来越丰富，因此能完成聊天、翻译、写作、代码生成等任务。
+
+
+
+Embeddings 可以理解成：把文本、图片、声音等内容，转换成计算机能理解的“数字向量表示”。让“意思相近”的内容在数学空间里更接近,方便模型做比较、检索、分类、推荐、相似度计算
+
+Embedding 与 vector database是 RAG（Retrieval-Augmented Generation）的核心。Embedding 负责"把文本变成向量"，Vector Database 负责"存储和快速查找这些向量"。
+
+
+
+主流的大模型定制（Customization）有三大类:
+
+- **Prompt**：通过写好指令来引导模型，快速、灵活。
+- **Fine-tuning**：通过继续训练模型来改变其能力和风格，成本较高但效果更稳定。
+- **RAG**（Retrieval-Augmented Generation）：通过实时检索最新知识来增强回答，无需重新训练模型，适合知识经常变化的场景。
+
+RAG 本质上是检索 + 大模型: 用户问题=>Embedding=>向量数据库=>找到最相关文档=>Prompt=>LLM生成答案
+
+=>之前在Ericsson AI Hackthon 就是RAG的应用。
+
+
+
+**Hallucination（幻觉）** 是 Generative AI 和 LLM 中一个非常重要的概念。因为训练目标决定了它的行为。GPT 的目标不是：判断真假。而是：预测最合理的下一个 Token。现代模型已经通过对齐训练（Alignment）有所改进，更倾向于在不确定时说明不知道或表达不确定性，但并不能完全避免幻觉。
+
+
+
+## OCI AI Portfolio 20260801
+
+=>OCI 的基础由 Compute、Storage、Networking 和 IAM 等核心云服务构成；Oracle 长期以来最大的差异化优势是其数据库产品（Oracle Database、Exadata、Autonomous Database）。随着生成式 AI 的快速发展，OCI AI Infrastructure 已成为 Oracle 当前重点投入和发展的战略方向，通过 GPU、RDMA Supercluster、高性能网络和存储，为大模型训练和推理提供企业级 AI 基础设施。
+
+
+
+Oracle AI Stack: AI Service => ML Service => AI infrastrucure
+
+```
+                 Oracle AI Stack
+────────────────────────────────────────────
+
+Layer 3
+AI Services（AI应用服务）   =>类似百度平台的各种AI服务，感觉只是AI服务的边角料
+--------------------------------------------
+• OCI Generative AI   
+• OCI AI Language  =>简单的自然语言处理（NLP），如Language detextion, Text classification等
+• OCI Vision    =>图片识别一类的，如Image classfication,  Object detection等
+• OCI Document Understanding  =>比如识别一张发票信息，OCR属于这个范畴
+• OCI Speech   =>语音翻译...
+
+        ▲
+
+Layer 2
+ML Services（机器学习平台）    => 帮助数据科学家完成模型开发生命周期
+--------------------------------------------
+• OCI Data Science
+
+        ▲
+
+Layer 1
+AI Infrastructure（AI基础设施）   => 这是 Oracle 最强调的一层，也是 OCI 的竞争优势。
+--------------------------------------------
+• NVIDIA GPU (H100, B200 等)
+• OCI Compute
+• RDMA Cluster Network
+• OCI Supercluster
+• Block Volume
+• Object Storage
+• Kubernetes (OKE)
+```
+
+机器学习平台的核心产品OCI Data Science：
+
+```
+          数据(Data)
+               │
+               ▼
+      Feature Engineering
+      （数据清洗/特征构造）
+               │
+               ▼
+         Notebook 开发   => 相当于云端 JupyterLab,整个 AI 开发的入口。
+               │
+      ┌────────┴────────┐
+      ▼                 ▼
+ PyTorch 代码训练   AutoML 自动训练
+      └────────┬────────┘
+               ▼
+        Model Catalog
+     （模型版本与管理）
+               │
+               ▼
+        Pipeline 自动化
+ （训练→评估→注册→部署）
+               │
+               ▼
+      Model Deployment
+      （REST API 服务）
+               │
+               ▼
+     Web / App / 企业系统调用
+```
+
+创建一个 Notebook Session 时，OCI 会为你启动一台计算实例。你可以选择GPU，内存，Python 环境（Conda Environment）。
+
+
+
+ CPU 像一群经验丰富的专家，适合处理各种复杂问题；GPU 更像一支规模庞大的流水线工人队伍，每个人做同样的计算，因此面对 AI 中海量重复的矩阵运算时，GPU 能发挥压倒性的性能优势。
+
+```
+2020        2022          2024          2025+
+ ───────────┬─────────────┬─────────────┬──────────►
+
+ A100       H100          H200         B200
+ Ampere     Hopper        Hopper       Blackwell
+```
+
+比喻：GPU = 工厂 ，HBM = 工厂旁边的超大原料仓库，普通显存/内存 = 远一点的仓库
+
+=>最近GPU的迭代主要是提升对 HBM 更大容量和更高带宽的适配。
+
+过去几年 AI 的瓶颈已经从 GPU 芯片本身，逐渐转移到了 HBM （High Bandwidth Memory，高带宽内存）的供应。
+
+（HBM 是为“喂饱 GPU 算力”设计的，DDR 是为“通用主机内存”设计的）
+
+```
+1. GPU 制造（TSMC Fab）
+        │
+        ▼
+   GPU Die（裸芯片）
+
+2. HBM 制造（SK hynix / Samsung / Micron）
+        │
+        ▼
+   HBM 堆栈（Stack）
+
+3. TSMC 先进封装（CoWoS）
+        │
+        ▼
++--------------------------------------+
+|        CoWoS Package                 |
+|                                      |
+|   HBM      GPU Die       HBM         |
+|                                      |
+|   HBM                  HBM           |
++--------------------------------------+
+            │
+            ▼
+GB200 / B200
+            │
+            ▼
+OCI / AWS / Azure AI Cluster
+```
+
+**RDMA**（Remote Direct Memory Access，远程直接内存访问） 是 AI 基础设施中最关键的技术之一。如果说 GPU 决定计算速度，那么 RDMA 决定多台服务器之间的数据交换速度。对于 OCI AI Infrastructure 来说，RDMA 是支撑大规模 GPU 集群（Supercluster）的核心能力。
+
+=>RDMA是服务器之间的数据交换技术，跟GPU/HBM这个主机自身层面的不同层次
+
+=> Oracle Database 运行在 Exadata 上时，也会大量利用 RDMA 来提升性能。
+
+
+
+## OCI Generative AI Service 20260804
+
+=>OCI Generative AI 定位于企业级 AI 开发平台（Enterprise AI Platform），提供包括 Meta Llama、Cohere Embed等在内的多种模型能力。平台并不局限于LLM，还提供 Embedding Model 等不同类型的模型；同时支持 Dedicated AI Clusters，帮助企业进行模型 Fine-tuning，满足定制化的 AI 应用需求。
+
+Embedding Model 的作用是将文本转换成一串数字（向量），使语义相近的文本在向量空间中距离更近。Embedding 是为了 Find（找），LLM 是为了 Read（读）和 Think（思考）。
+
+=>Dedicated AI Cluster 是为单一租户（Tenant）独占分配的一组 GPU 计算资源，用于部署和运行生成式 AI 模型。作为 PaaS 服务，用户无需自行管理底层 GPU VM，也无需负责 CUDA、PyTorch 等软件栈的安装，以及模型部署、升级和日常维护。同时，Dedicated AI Cluster 支持导入兼容的开源模型（Imported Models），并将其部署到专属集群上，对外提供模型推理服务。
+
+典型的企业知识库（RAG）架构如下：
+
+```
+PDF
+    │
+Object Storage
+    │
+OCR / Parser
+    │
+Cohere Embed
+    │
+Oracle Database 23ai
+(AI Vector Search)
+    │
+Top K Documents
+    │
+Meta Llama（生成最终答案）
+    │
+Answer
+```
+
+=>**LangChain** 就是把上面PDF → Chunking → Embedding → Vector DB → Retrieval → LLM 这些组件串起来的orchestration框架。但进入 AI Agent 时代后，相比固定的 Chain，有状态的 Agent Workflow 更重要，需要处理状态管理、Workflow、Human Approval 和 Tool Orchestration 等，因此 LangChain 生态发展出了 **LangGraph**。LangGraph 适合构建 Coding Agent，但它主要负责 Agent Orchestration 和状态管理。一个类似 Codex 的完整 Agent，还需要代码执行环境、文件系统、Sandbox、工具系统、上下文管理和安全策略等。可以简单理解：Agent Harness = 完整的 Agent Runtime 系统，LangGraph = 其中 Agent 编排与状态机这一层的框架。
+
+
+
+OCI Generative AI Console 内置 **Playground**，本质上是一个 API 调试工具。开发者可以测试预训练模型和自定义模型、调整 Prompt 和参数、查看 Sample Code，实现从“试效果”到“代码集成”的快速过渡。
+
+需要特别区分 Playground 和 Fine-tuning：Playground 用来测试和调试模型效果，Fine-tuning 用来训练和定制模型，两者属于模型开发流程中的不同阶段。
+
+Chat Playground 常用参数：
+
+- Temperature：控制输出随机性
+- Max Tokens：控制回答长度
+- Top P：控制候选 Token 范围，通常保持默认即可
+
+
+
+Oracle 将 **AI Vector Search** 集成到 Oracle Database 26ai 中，可以直接存储 Embedding Vector，并通过 Similarity Search 找到语义最相关的数据，使语义搜索和传统关系型查询可以在同一个数据库中完成。
+
+Vector Search 并不是一套新的查询语言，而是 Oracle SQL 对 Vector 能力的扩展。SQL 本身有国际标准，但 Oracle、PostgreSQL、MySQL、SQL Server 等数据库都会在标准 SQL 基础上扩展自己的功能。
+
+Embedding Model 负责把文本转换成 Vector；Vector Database 负责存储 Vector，并通过相似度搜索找到最相关的数据。每个 Vector 通常会和对应的原文 Chunk、文档 ID、页码等 Metadata 一起保存。数据库可以存储不同维数的 Vector，但具体输出多少维，通常由 Embedding Model 决定。
+
+
+
+ADB（Autonomous AI Database）里的 **Select AI**，最容易理解的功能是：你说自然语言，Select AI 帮你生成并执行 SQL。选用外部Model作为AI provider，然后 Select AI 帮你处理数据库和 LLM 之间的交互。
 
 
 
