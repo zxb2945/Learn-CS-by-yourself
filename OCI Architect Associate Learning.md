@@ -26,15 +26,15 @@
 
 [Oracle Data Platform Foundations Associate](https://mylearn.oracle.com/ou/learning-path/japanese-become-an-oracle-data-platform-foundations-associate-2025-/154414) 
 
-[Oracle Cloud Database Service Professional](https://mylearn.oracle.com/ou/learning-path/japanese-become-an-oracle-cloud-database-service-professional-2025-/153955)  想要挑战
+[Oracle Cloud Database Service Professional](https://mylearn.oracle.com/ou/learning-path/japanese-become-an-oracle-cloud-database-service-professional-2025-/153955)  补充看看
 
 [Oracle Autonomous Database Cloud Professional](https://mylearn.oracle.com/ou/learning-path/japanese-become-an-oracle-autonomous-database-cloud-professional-2025-/153823)
 
 [OCI Migration Architect Professional](https://mylearn.oracle.com/ou/learning-path/become-an-oci-migration-architect-professional-2025/148010)
 
-[OCI AI Foundations Associate](https://mylearn.oracle.com/ou/learning-path/japanese-become-a-oci-ai-foundations-associate-2025-/153174) 随便看看
+[OCI AI Foundations Associate](https://mylearn.oracle.com/ou/learning-path/japanese-become-a-oci-ai-foundations-associate-2025-/153174) 认真看看
 
-[OCI Generative AI Professional](https://mylearn.oracle.com/ou/learning-path/japanese-become-an-oci-generative-ai-professional-2025-/153868) 随便看看
+[OCI Generative AI Professional](https://mylearn.oracle.com/ou/learning-path/japanese-become-an-oci-generative-ai-professional-2025-/153868) 认真看看
 
 # [OCI Architect Associate](https://mylearn.oracle.com/ou/learning-path/japanese-become-an-oci-architect-associate-2025-/152367) 
 
@@ -1870,16 +1870,16 @@ Generative Adversarial Network：生成对抗网络。GAN 的核心思想是让�
 └── 深度学习（Deep Learning）
       │
       ├── 神经网络架构（Architecture）
-      │      ├── CNN
-      │      ├── RNN
+      │      ├── CNN   Convolutional Neural Network=> 从单点像素开始分析图像
+      │      ├── RNN   Recurrent Neural Network=> 预测序列数据
       │      ├── LSTM
       │      ├── Transformer
       │      ├── Siamese Network
       │      └── Autoencoder / VAE
       │
       ├── 生成模型（Generative Models）
-      │      ├── GAN
-      │      ├── VAE
+      │      ├── GAN   Generative Adversarial Network=>让两个神经网络互卷，你制造假图片，我判断
+      │      ├── VAE   Variational Autoencoder=> 把复杂人脸解析成各种维度然后重新生成心脸脸
       │      └── Diffusion Model
       │
       ├── 检测/应用模型（Task Models）
@@ -1976,7 +1976,7 @@ Reinforcement Learning
 >
 > 无监督学习常见的任务是聚类（Clustering），降维（Dimensionality Reduction），异常检测（Anomaly Detection），关联规则学习（Association Rule Learning
 
-Logistic Regression可以看成是“没有隐藏层的Neural Networks”，或者说是一个最简单的神经元模型。
+**Logistic Regression可以看成是“没有隐藏层的Neural Networks”，或者说是一个最简单的神经元模型。**
 
 => 神经网络可以理解成 把上一层Logistic Regression的输出作为下一层Logistic Regression的输入，一层层叠起来
 
@@ -1989,6 +1989,10 @@ Logistic Regression可以看成是“没有隐藏层的Neural Networks”，或�
 > **Reinforcement Learning**（强化学习，RL） 是机器学习三大范式（监督学习、无监督学习、强化学习）之一。
 >
 > 强化学习就是让智能体（Agent）通过不断尝试，从奖励（Reward）和惩罚（Penalty）中学习如何做出最优决策。
+
+=>强化学习有既定目标（Reward Objective），但没有既定答案或既定路径；Agent 可以通过探索，发现甚至超越人类已有策略的更优策略。如阿尔法狗。
+
+
 
 
 
@@ -2154,7 +2158,7 @@ AI Services（AI应用服务）   =>类似百度平台的各种AI服务，感觉
 • OCI Generative AI   
 • OCI AI Language  =>简单的自然语言处理（NLP），如Language detextion, Text classification等
 • OCI Vision    =>图片识别一类的，如Image classfication,  Object detection等
-• OCI Document Understanding  =>比如识别一张发票信息，OCR属于这个范畴
+• OCI Document Understanding  =>比如识别一张发票信息，会用到但不仅限于OCR，还要通过识别的文字判断这是发票
 • OCI Speech   =>语音翻译...
 
         ▲
@@ -2314,11 +2318,13 @@ Chat Playground 常用参数：
 
 
 
-Oracle 将 **AI Vector Search** 集成到 Oracle Database 26ai 中，可以直接存储 Embedding Vector，并通过 Similarity Search 找到语义最相关的数据，使语义搜索和传统关系型查询可以在同一个数据库中完成。
+Oracle 将 **AI Vector Search** 集成到 Oracle Database 23ai 中，可以直接存储 Embedding Vector，并通过 Similarity Search 找到语义最相关的数据，使语义搜索和传统关系型查询可以在同一个数据库中完成。
 
 Vector Search 并不是一套新的查询语言，而是 Oracle SQL 对 Vector 能力的扩展。SQL 本身有国际标准，但 Oracle、PostgreSQL、MySQL、SQL Server 等数据库都会在标准 SQL 基础上扩展自己的功能。
 
 Embedding Model 负责把文本转换成 Vector；Vector Database 负责存储 Vector，并通过相似度搜索找到最相关的数据。每个 Vector 通常会和对应的原文 Chunk、文档 ID、页码等 Metadata 一起保存。数据库可以存储不同维数的 Vector，但具体输出多少维，通常由 Embedding Model 决定。
+
+=>Oracle Database 23ai 可以加载训练好的 Embedding Model。对于需要检索的数据，可以预先生成 Embedding 并存储在 VECTOR 列中；当用户进行自然语言查询时，再用同一个或兼容的 Embedding Model把 Query 转换成 Query Vector，然后 Oracle Database 执行 Vector Similarity Search，计算 Query Vector 与已有数据 Vector 之间的距离，找出最相似的结果。也就是说Oracle Database 23ai 可以当作 Vector Database 使用。
 
 
 
