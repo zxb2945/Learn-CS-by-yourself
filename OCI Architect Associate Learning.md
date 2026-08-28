@@ -2136,7 +2136,25 @@ RAG 本质上是检索 + 大模型: 用户问题=>Embedding=>向量数据库=>�
 
 
 
+=>LLM 的一切外显行为，在微观层面都落实为“预测下一个 token”；但每次预测并非局部反应，而是对整个上下文经由高维 Transformer 计算后的概率分布。宏观上的理解、推理、规划、风格控制与工具使用，最终都会投射为下一个 token 概率的变化。
+
+> 在 decoding 阶段，**temperature** 是最关键的随机性控制参数之一：temperature 越高，候选 token 的概率分布越平坦，低概率 token 越可能被采样；temperature 越低，分布越尖锐，输出越稳定。
+>
+> 当 temperature 接近 0 时，模型近似总选择概率最高的 token，即 **greedy decoding**。它稳定、可复现，但容易保守、模板化，并可能陷入局部最优。
+>
+> 在 **non-deterministic decoding** 中，模型通常以非零 temperature 配合 top-p 或 top-k 等采样策略，从候选 token 中随机采样，因此相同输入可以产生不同输出。
+>
+> 对代码、JSON、分类、信息抽取等正确性和格式一致性优先的任务，通常选择低 temperature 或近似确定性的解码；对创作、头脑风暴、开放式写作，则可提高 temperature 以获得更多样性。
+
+
+
 **Hallucination（幻觉）** 是 Generative AI 和 LLM 中一个非常重要的概念。因为训练目标决定了它的行为。GPT 的目标不是：判断真假。而是：预测最合理的下一个 Token。现代模型已经通过对齐训练（Alignment）有所改进，更倾向于在不确定时说明不知道或表达不确定性，但并不能完全避免幻觉。
+
+> Groundedness（有据性 / 基于证据）和 Attributability（可归因性 / 可追溯性）都是减少幻觉、提升 LLM 可信度的关键概念。
+>
+> Groundedness: 模型回答必须“落在”可信来源上，而不是仅依赖参数记忆或语言上的合理猜测。
+>
+> Attributability: 即使答案看起来有依据，还需要让用户或系统能检查其依据。
 
 
 
@@ -2275,7 +2293,9 @@ OCI / AWS / Azure AI Cluster
 
 ## OCI Generative AI Service 20260804
 
-=>OCI Generative AI 定位于企业级 AI 开发平台（Enterprise AI Platform），提供包括 Meta Llama、Cohere Embed等在内的多种模型能力。平台并不局限于LLM，还提供 Embedding Model 等不同类型的模型；同时支持 Dedicated AI Clusters，帮助企业进行模型 Fine-tuning，满足定制化的 AI 应用需求。
+=>OCI Generative AI 定位于企业级 AI 开发平台（Enterprise AI Platform），提供包括 Meta Llama、Cohere Embed等在内的多种模型能力(Pretrained Foundational Models)。平台并不局限于LLM，还提供 Embedding Model 等不同类型的模型；同时支持 Dedicated AI Clusters，帮助企业进行模型 Fine-tuning，满足定制化的 AI 应用需求。
+
+=>OCI Generative AI 核心能力可以分成三层：先选择预训练模型(Pretrained Foundational Models) → 根据业务数据定制模型(Fine-tunning) → 在Dedicated  AI Cluster 上运行和服务模型。
 
 Embedding Model 的作用是将文本转换成一串数字（向量），使语义相近的文本在向量空间中距离更近。Embedding 是为了 Find（找），LLM 是为了 Read（读）和 Think（思考）。
 
@@ -2316,6 +2336,13 @@ Chat Playground 常用参数：
 - Max Tokens：控制回答长度
 - Top P：控制候选 Token 范围，通常保持默认即可
 
+> Top-K 固定保留概率最高的 k 个候选, 它的作用是排除大量概率极低、容易导致跑题或不自然输出的 token；Top-P 按累计概率保留候选，因此候选数量会随模型当前的确定程度动态变化。
+
+> - Frequency penalty（频率惩罚）：某个 token 已出现越多次，就越降低它再次出现的概率，用来减少反复用同样的词或句式。
+> - Presence penalty（出现惩罚）：某个 token 只要已经出现过，就降低它再次出现的概率，用来鼓励模型引入新词、新话题。
+>
+> 一句话：frequency 看“重复了多少次”，presence 只看“是否已经出现过”
+
 
 
 Oracle 将 **AI Vector Search** 集成到 Oracle Database 23ai 中，可以直接存储 Embedding Vector，并通过 Similarity Search 找到语义最相关的数据，使语义搜索和传统关系型查询可以在同一个数据库中完成。
@@ -2335,4 +2362,12 @@ ADB（Autonomous AI Database）里的 **Select AI**，最容易理解的功能�
 # [OCI Generative AI Professional](https://mylearn.oracle.com/ou/learning-path/japanese-become-an-oci-generative-ai-professional-2025-/153868) 
 
 =>说需要三方面的基础知识 1.深度学习与机器学习；2.Python；3.OCI.
+
+
+
+
+
+
+
+
 
