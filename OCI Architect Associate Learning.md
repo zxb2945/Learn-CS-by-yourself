@@ -36,6 +36,26 @@
 
 [OCI Generative AI Professional](https://mylearn.oracle.com/ou/learning-path/japanese-become-an-oci-generative-ai-professional-2025-/153868) 认真看看
 
+
+
+2026再整理：
+
+[OCI Architect Associate](https://mylearn.oracle.com/ou/learning-path/japanese-become-an-oci-architect-associate-2026-/164999)
+
+[OCI Architect Professional](https://mylearn.oracle.com/ou/learning-path/japanese-become-an-oci-architect-professional-2026-/163169)
+
+[OCI AI Foundations Associate](https://mylearn.oracle.com/ou/learning-path/become-an-oci-ai-foundations-associate/163544) Completed
+
+[Oracle Agentic AI Foundations Associate](https://mylearn.oracle.com/ou/learning-path/become-an-oracle-agentic-ai-foundations-associate-2026/163239) Completed
+
+[OCI Enterprise AI Professional](https://mylearn.oracle.com/ou/learning-path/become-an-oci-enterprise-ai-professional-2026/163234) 
+
+[OCI Data Science Professional](https://mylearn.oracle.com/ou/learning-path/become-an-oci-data-science-professional/162289)
+
+[Oracle AI Agent Studio for Fusion Applications Foundations Associate](https://mylearn.oracle.com/ou/learning-path/oracle-ai-agent-studio-for-fusion-applications-foundations-associate-training-and-certification/151552)
+
+
+
 # [OCI Architect Associate](https://mylearn.oracle.com/ou/learning-path/japanese-become-an-oci-architect-associate-2025-/152367) 
 
 
@@ -370,16 +390,18 @@ Namespace    每个 Tenancy 只能有一个 Namespace，Namespace = 租户的 Ob
 
 **ブロック・ストレージ 20260312**
 
-> ブロック・ストレージ（Block Storage） 是一种 基于块（block）的持久化存储服务，类似传统服务器的硬盘（HDD/SSD），可挂载到 OCI 的 Compute 实例（虚拟机） 使用。
+> ブロック・ストレージ（**Block Storage**） 是一种 基于块（block）的持久化存储服务，类似传统服务器的硬盘（HDD/SSD），可挂载到 OCI 的 Compute 实例（虚拟机） 使用。
 >
 > - Block Storage = 块存储这个概念（硬盘存储类型）
 > - Block Volume Service = OCI 提供的具体服务，你通过它创建和管理块存储卷
 >
 > 所以 你要用块存储，一定要通过 Block Volume Service 来实现。
 >
-> ブート・ボリューム（Boot Volume） 是指 用于启动 Compute 实例的块存储卷，类似虚拟机的系统盘（OS Disk）。它包含操作系统以及实例启动所需的系统文件。
+> ブート・ボリューム（**Boot Volume**） 是指 用于启动 Compute 实例的块存储卷，类似虚拟机的系统盘（OS Disk）。它包含操作系统以及实例启动所需的系统文件。
 >
 > =>Boot Volume 并不是你手动单独创建的，而是 在创建实例（Compute Instance）时自动生成的块存储卷。
+>
+> =>但Boot Volume也是跟Block Storage一样网络连接的，而不是在同一台物理机上。2026.9.3
 >
 > 動的パフォーマンス・スケーリング（Dynamic Performance Scaling） 是 OCI Block Volume（块存储） 的一个性能功能，用来 根据负载自动调整存储性能（IOPS / Throughput）
 >
@@ -1814,6 +1836,10 @@ SQL Tuning Advisor
 
 # OCI AI Foundations Associate
 
+# [OCI Generative AI Professional](https://mylearn.oracle.com/ou/learning-path/japanese-become-an-oci-generative-ai-professional-2025-/153868) 
+
+=>说需要三方面的基础知识 1.深度学习与机器学习；2.Python；3.OCI.
+
 范围从大到小： Artificial Intelligence => Machine Learning => Deep Learning => Generative AI => LLM
 
 ## AI Foundations 20260716
@@ -2120,6 +2146,8 @@ Residual + LayerNorm
 
 Embeddings 可以理解成：把文本、图片、声音等内容，转换成计算机能理解的“数字向量表示”。让“意思相近”的内容在数学空间里更接近,方便模型做比较、检索、分类、推荐、相似度计算
 
+=>在RAG 语境下，最常见的不是一个token或者一整个文件，而是文件中一段文本（chunk）对应一个 embedding vector。（这个不是绝对的，像Transformer 内部确实会给每个 token 产生向量表示）
+
 Embedding 与 vector database是 RAG（Retrieval-Augmented Generation）的核心。Embedding 负责"把文本变成向量"，Vector Database 负责"存储和快速查找这些向量"。
 
 
@@ -2155,6 +2183,16 @@ RAG 本质上是检索 + 大模型: 用户问题=>Embedding=>向量数据库=>�
 > Groundedness: 模型回答必须“落在”可信来源上，而不是仅依赖参数记忆或语言上的合理猜测。
 >
 > Attributability: 即使答案看起来有依据，还需要让用户或系统能检查其依据。
+
+
+
+Soft Prompting :
+
+Soft Prompting 是一种属于 PEFT（Parameter-Efficient Fine-Tuning）的模型专门化方法：它不直接训练或选择 vocabulary 中的离散 token，而是在 embedding 空间中训练一组连续的可学习向量（virtual tokens），将其与用户输入的 token embeddings 一起送入冻结的 LLM，从而以极少的可训练参数为模型注入特定的任务意图、上下文或行为模式。
+
+
+
+
 
 
 
@@ -2332,11 +2370,11 @@ OCI Generative AI Console 内置 **Playground**，本质上是一个 API 调试�
 
 Chat Playground 常用参数：
 
-- Temperature：控制输出随机性
+- Temperature： LLM 生成阶段用于调节 token 概率分布随机性的参数——温度越低，概率分布越尖锐、输出越确定稳定；温度越高，概率分布越平坦、输出越随机多样。
 - Max Tokens：控制回答长度
 - Top P：控制候选 Token 范围，通常保持默认即可
 
-> Top-K 固定保留概率最高的 k 个候选, 它的作用是排除大量概率极低、容易导致跑题或不自然输出的 token；Top-P 按累计概率保留候选，因此候选数量会随模型当前的确定程度动态变化。
+> Top-k 固定“候选 token 的数量”；Top-p 固定“候选 token 的累计概率”。所以 Top-p 的优势是候选集合大小会根据模型的确定程度动态变化
 
 > - Frequency penalty（频率惩罚）：某个 token 已出现越多次，就越降低它再次出现的概率，用来减少反复用同样的词或句式。
 > - Presence penalty（出现惩罚）：某个 token 只要已经出现过，就降低它再次出现的概率，用来鼓励模型引入新词、新话题。
@@ -2359,15 +2397,349 @@ ADB（Autonomous AI Database）里的 **Select AI**，最容易理解的功能�
 
 
 
-# [OCI Generative AI Professional](https://mylearn.oracle.com/ou/learning-path/japanese-become-an-oci-generative-ai-professional-2025-/153868) 
+ =>OCI上还有一个独立的Generative AI Agent Service，但估计发布即淘汰？Generative AI Service目前也只有Softbank在用，NTT与Fujitsu都没订阅...
 
-=>说需要三方面的基础知识 1.深度学习与机器学习；2.Python；3.OCI.
+```
+[用户 / 业务应用]
+        ↓
+[Agent Endpoint：Agent 的 API 访问入口]
+        ↓
+[Session：保存对话历史、任务状态与上下文]
+        ↓
+[AI Agent：任务拆解、决策、编排与执行]
+        ├──→ [Generative AI Model / LLM：理解、推理、生成答案]
+        │
+        ├──→ [Knowledge Base / RAG：检索企业知识]
+        │          ├──→ [Oracle Database 23ai：Chunks、Metadata、ACL、Embeddings、Vector Index]
+        │          └──→ [Object Storage：PDF、Word、PPT、图片等原始文件]
+        │
+        ├──→ [Tools / APIs：调用数据库、CRM/ERP、工单、邮件等业务操作]
+        │
+        ├──→ [Content Moderation：输入/输出安全与合规检查]
+        │
+        └──→ [Trace / Monitoring：记录模型、检索、工具调用、耗时与错误]
+        ↓
+[Response：答案 + Citation / 来源引用]
+        ↓
+[用户 / 业务应用]
+```
+
+=>其实也就是用database当RAG稍微有点卖点，API调用视频根本没深入，Agent还完全停留在2024年LangChain时代的思维...
+
+
+
+# [Oracle Agentic AI Foundations Associate](https://mylearn.oracle.com/ou/learning-path/become-an-oracle-agentic-ai-foundations-associate-2026/163239) 
+
+## Introduction to AI Agents 20260906
+
+Al Agent(LLM-based) = LLM + Tools + Loop
+
+> An LLM never executes tools directly. It emits a structured tool-call request, and the agent application validates and executes it.
+>
+> MCP provides a standardized way for AI applications to connect with the tools, data, and context they need.
+
+=>Loop 就像程序中的while(1)， Like an OS for the AI Agent
+
+```python
+while not task_completed:
+    decision = llm(context, user_goal, available_tools)
+
+    if decision.is_tool_call:
+        result = validate_and_execute(decision)
+        context.append(result)
+    else:
+        return decision.final_answer
+```
+
+
+
+ Reasoning Patterns 推理模式
+
+> - CoT（Chain of Thought）：单一路径、逐步推理。适合分析、计算和任务拆解，但不直接获取外部信息或执行操作。
+> - ReAct（Reason + Act）：在循环中交替进行“推理 → 调工具 → 观察结果 → 再推理”。适合需要搜索、查数据库、调用 API 或执行代码的 Agent。
+> - ToT（Tree of Thoughts）：同时探索多条推理分支，比较后保留较优方案。适合复杂决策、方案设计和难题求解，但成本和延迟更高。
+>
+> 一句话：
+>
+> CoT=一条思路逐步想    ReAct=边想边做     ToT=多条思路择优
+
+
+
+=> Agent Frameworks很多，最传统的LangChain/LangGraph, 还有OpenAI原生的OpenAI Agents SDK，AWS等云平台也有，又比如CrewAI，Hugging Face smolagents
+
+=>Safety 与 Guardrails（安全护栏）也是Agent系统中需要重视的地方
+
+> 常形成攻击链：
+>
+> ```
+> 恶意网页 / 邮件 / 文档
+> → Prompt Injection
+> → 诱导 Agent 调用工具
+> → Tool Misuse 或越权访问
+> → 写入恶意长期记忆（Memory Poisoning）
+> → 通过邮件 / HTTP / 云盘泄露数据（Data Exfiltration）
+> ```
+
+> **Prompt Injection**（提示词注入）是 LLM 应用里非常核心的一类安全问题。它和传统的 SQL Injection 有一点类似：攻击者通过构造特殊输入，让系统把本来应该作为“数据”的内容，当成了“指令”执行。
+
+=> Agent Runtime 就是 Agent 的“控制程序”，通常需要你自己编写；它正是 Loop 所在的位置。你也可以使用 LangChain、LangGraph、OpenAI Agents SDK 等框架减少代码量，但它们本质上是在替你实现或托管这部分 Runtime。
+
+```
+用户请求
+→ Agent Runtime 组织上下文并调用 LLM
+→ LLM 输出 JSON 形式的 tool call
+→ Runtime 解析并校验 JSON
+→ Runtime 调用真实 Tool / API
+→ Runtime 将工具结果回传 LLM
+→ Loop 继续，直到完成或触及限制
+```
+
+最简伪代码：
+
+```python
+messages = [user_message]
+
+while within_limits():
+    reply = llm.generate(messages, tools=tool_schemas)
+
+    if reply.has_tool_call:
+        call = reply.tool_call
+        args = validate(call.arguments)       # JSON Schema + 业务校验
+        check_permission(user, call, args)    # 外部安全控制
+        result = execute_tool(call.name, args)
+
+        messages.append(tool_result(call.id, result))
+    else:
+        return reply.text
+```
+
+ 
+
+## LangChain for AI Agents 20260908
+
+LangChain Ecosystem: LangChain, LangGraph, LangSmith, Integrations
+
+```
+业务应用
+├─ LangChain：组装 LLM、提示词、RAG、Tools
+├─ LangGraph：控制 Agent 的状态、流程和 Loop  =>LangGraph≈Agent Runtime / Workflow Orchestrator
+├─ Integrations：连接外部模型与系统
+└─ LangSmith：观察、调试、评估与监控
+```
+
+=>2026年的课程还是演示 LangChain 来创建 AI Agents, 是不是有些落后了...
+
+> =>使用 Codex 时，你已经拥有了 Agent Runtime，可以通过 Markdown 很方便地用自然语言甚至伪代码定义和组织 Agent 工作流。因此，在这种架构下，再使用 LangGraph 搭建一层 Agent Harness 的必要性就没有那么高了。
+>
+> 关键区别在于，Markdown 中的自然语言或伪代码，本质上仍然是由 Agent 解释和遵循的语义约束（soft constraints），而不是由 CPU 强制执行的确定性控制流（hard guarantees）。
+>
+> 因此，对于必须具备 hard guarantees 的部分——例如权限与 Policy enforcement、严格的状态转换、事务、一致性约束、审批门禁等——仍然需要使用 Python 或其他传统编程语言进行显式控制和定制化实现。
+>
+> 与其使用 LangGraph 再建立一层与 Codex 职责有所重叠的 Agent orchestration，不如将这些需要确定性和显式控制的逻辑下沉到 Tool 层，再通过 MCP 以标准化的工具接口暴露给 Codex。
+>
+> 这样可以形成一个比较清晰的职责分工：
+>
+> **Markdown 定义意图和 soft orchestration；Codex 负责推理、规划和动态 orchestration；MCP 定义标准化的 tool boundary；Tool implementation 负责 deterministic logic 和 hard guarantees。**
+>
+> 只有当应用本身需要一个复杂且独立于 Agent 的 deterministic workflow——例如需要持久化状态、严格的状态转换、checkpoint、长期暂停与恢复、人工审批、失败重试和可审计执行——才有必要进一步引入 LangGraph 或其他 workflow engine。
+>
+> 换句话说：
+>
+> **Let the agent decide what to do; let the tools enforce what it is allowed to do.**
+
+```
+                AI Agent
+                   │
+          ┌────────┴────────┐
+          │                 │
+   Agent-controlled    App-controlled
+   orchestration       orchestration
+          │                 │
+        Codex            LangGraph
+          │                 │
+     AGENTS.md          Graph / State
+     + Tools            + Agent Nodes
+```
 
 
 
 
 
+## Introduction to MCP 20260909
+
+Model Context Protocol
+
+MCP 的底层通信核心之一就是 JSON-RPC 2.0。它是一种非常简单的 RPC（Remote Procedure Call，远程过程调用）协议。
+
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "add",
+  "params": {
+    "a": 1,
+    "b": 2
+  },
+  "id": 1 #用来标记request <=> response
+}
+```
+
+=>MCP就是用来规定jsonrpc，method等字段含义的协议
 
 
 
+```
+┌─────────────────────────────────┐
+│  User                           │
+│                                 │
+│  "帮我查一下 ABC-123"           │
+└──────────────┬──────────────────┘
+               │ Natural Language
+               ▼
+┌─────────────────────────────────┐
+│  LLM                            │
+│                                 │
+│  Tool Call:                     │
+│  get_issue("ABC-123")           │
+└──────────────┬──────────────────┘
+               │ Structured Tool Call
+               ▼
+┌─────────────────────────────────┐
+│  Agent Runtime                  │
+│                                 │
+│  Tool Manager                   │
+│       ↓                         │
+│  MCP Client                     │
+└──────────────┬──────────────────┘
+               │
+               │ MCP Protocol
+               │
+               │ JSON-RPC 2.0
+               │
+               │ Transport
+               │ ├── stdio
+               │ └── Streamable HTTP
+               ▼
+┌─────────────────────────────────┐
+│  MCP Server                     │
+│                                 │
+│  tools/list                     │
+│  tools/call                     │
+│                                 │
+│  get_issue()                    │
+└──────────────┬──────────────────┘
+               │
+               │ Jira Native API
+               ▼
+┌─────────────────────────────────┐
+│  Jira                           │
+└─────────────────────────────────┘
+```
 
+=>可以把MCP Client 理解成是 Agent Runtime 里的“外部 MCP 工具适配器/通信模块”，负责把 Agent 的工具调用转换成 MCP/JSON-RPC 请求，并把结果送回 Agent Runtime。
+
+
+
+MCP Server = 工具/数据源这一侧的 MCP 适配层adapter。
+
+一个最小 MCP Server
+
+```python
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("demo-server") #FastMCP：用 Python 快速开发 MCP Server 的高级框架
+
+@mcp.tool()     # 装饰器decorator可以在不修改原函数代码的情况下增加功能。
+def add(a: int, b: int) -> int:
+    """Add two numbers."""
+    return a + b
+
+if __name__ == "__main__":
+    mcp.run()
+```
+
+=>复杂来说的话Authentication，business logic可以扩展开去许多模块，而把函数注册成 Tool其实只是一个交互接口而已。
+
+=>MCP 有多种 Transport Mechanism。stdio 通常用于同机的本地 MCP Server，通过进程 stdin/stdout 通信；Streamable HTTP 通常用于远程 MCP Server，通过 HTTP 网络连接。
+
+
+
+## OpenAI Agent Stack 20260921
+
+> 主要介绍了 OpenAI Responses API 和 OpenAI Agents SDK。
+>
+> 可以将 OpenAI Agents SDK 类比为一个 OpenAI-native 的 Agent Framework，与 LangChain 处于相近的抽象层。它提供 Agent、Runner、Tools、Handoffs、Guardrails、Sessions 等更高层的 Agent 开发与编排能力。
+>
+> Responses API 则位于更底层，是 Agents SDK 调用 OpenAI 模型和相关能力的重要 API 基础。不过 Responses API 本身已经具备 Tool Calling、Function Calling、Built-in Tools 等 Agentic 能力，因此不能简单理解为传统的 Model API，而可以理解为 Model + Tool Calling + Agentic Primitives 的统一底座。
+>
+> 两者的关系可以概括为：
+>
+> Responses API 提供底层的 Model 与 Tool primitives；Agents SDK 在其之上提供更高层的 Agent Runtime / Framework abstraction。
+
+Agent 开发正在从“Prompt + Function Calling”升级成“Model + Runtime + Skills + Tools/MCP + Sandbox + Memory + Multi-Agent”
+
+=>Agent 编排分为两个层次：单个 Agent 内部由 LLM 动态编排 Tools；Agent 外部则通过 SDK 编排多个 Agent 及整体 Workflow。
+
+=>构建Agent系统时，Agent 定义“谁来做”，Skill 定义“这类任务怎么做”，Tool 定义“具体能做什么”。建议先把重复工作 Skill 化，需要独立职责、上下文或权限时，再 Agent 化。
+
+Function Calling = 模型请求调用某个函数型 Tool 的机制。  => 最早最典型的 Tool 就是开发者定义的 function，所以叫Function Calling ，所以 Function Calling 是 Tool Calling 的一种
+
+ OpenAI 的工具体系可以概念化成：
+
+```
+                         Tools
+                           │
+        ┌──────────────────┼─────────────────┐
+        │                  │                 │
+        ▼                  ▼                 ▼
+ Function Tools       Built-in Tools      MCP Tools
+        │                  │                 │
+        ▼                  ▼                 ▼
+your Python/API        Web Search         Jira
+functions              File Search        GitHub
+                       Computer           Database
+                       Code etc.          Enterprise API
+```
+
+=>guardrail 与 safety 也是重要的课题。
+
+Codex 更像是 Agent Stack 上“软件工程 Agent”的产品化实现，同时 Codex 的 agent harness 又正在反过来成为 OpenAI 通用 Agent Stack 的核心基础设施。
+
+
+
+## Agentic AI for OCI Enterprise AI 20261002
+
+OCI Enterprise AI Agents 是 OCI Enterprise AI 中面向“生产级 Agentic AI 应用”的 Agent 平台能力。OCI Enterprise AI 于 2026 年 3 月 GA。
+
+OCI Enterprise AI ≈ Model Gateway + Responses API + Agent Runtime + Tools/MCP + Memory + Vector Store/RAG + Sandbox + Hosted Deployment + Enterprise Governance
+
+=>OCI Enterprise AI 的核心战略更偏向“Agent Infrastructure / Agent Platform”，而不是做一个面向终端用户、像 Codex 那样的完整 Agent 产品。
+
+
+
+OCI OpenAI-compatible Responses API 基本沿用了 Native OpenAI Responses API 的“API contract / programming model”，但把后端实现替换成 OCI 的模型、认证、资源管理、网络和执行环境。OCI 没有重新发明 Agent northbound API，而是采用 OpenAI Responses API 作为兼容层；OCI 真正做差异化的是这个 API 后面的 model serving、IAM、Project、networking、data residency、tools、memory、containers 和 enterprise integration。
+
+=>Oracle还是想跟OpenAI深度绑定兼容的
+
+
+
+Deploying Agents - From Local Dev to Production: 本地开发 Agent → 容器化 → 推送 OCIR → OCI Generative AI Hosted Application → Deployment → Production Endpoint
+
+File Search, Code Interpreter, Function Calling, MCP Calling
+
+=>OCI Enterprise AI很新，大概From Local Dev to Production都没多少人用过吧...
+
+## Agentic AI for Oracle AI Database 20261006
+
+Agentic AI for Database = AI Vector Search +  Agent Factory + Select AI Agent + Autonomous MCP Server + More...
+
+Oracle AI Database 想成为 AI Agent 的数据、知识、分析和工具执行底座。
+
+Oracle AI Vector Search: Brings semantic search capability directly into Oracle DB
+
+Oracle AI Database Private Agent Factory: a no-code platform that lets business users and AI engineers rapidly built, teat, and deploy intelligent AI agents - without writhing any code
+
+Select AI Agent: a framework for creating and managing interactive, autonomous agents that live inside the Oracle AI Database
+
+Oracle Autonomous AI Database MCP Server: a multi-tenant, built-in feature of Autonomous AI Database that exposed MCP endpoints, letting AI agents invoke tools
+
+=>Private Agent Factory 跟 OCI Enterprise AI产品定位上有重复处，因为AI发展太迅速了，估计都还在探索阶段
